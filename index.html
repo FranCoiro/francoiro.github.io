@@ -1,0 +1,470 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Francisca Coiro Díaz · educación matemática y tecnología educativa. Herramientas que programo, investigación y producción académica.">
+<title>Francisca Coiro Díaz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: portada con un prisma interactivo (eco de su app de geometría); proyectos como tarjetas vivas con mini-animaciones; investigación en pestañas; producción en línea de tiempo. */
+:root{
+  --bg:#f6f5f1;
+  --surface:#ffffff;
+  --ink:#151a24;
+  --soft:#596070;
+  --faint:#9aa0ac;
+  --line:#e4e2dc;
+  --accent:#1f7a5c;
+  --accent-2:#e0743a;
+  --accent-soft:#e3f1ea;
+  --on-accent:#ffffff;
+  --c3:#a24fae;
+  --c4:#3473c4;
+  --shadow:0 1px 2px rgba(21,26,36,.04),0 8px 28px rgba(21,26,36,.07);
+  --f-display:"Fraunces", Georgia, serif;
+  --f-body:"Instrument Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono:"JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f1218; --surface:#171b23; --ink:#eceef2; --soft:#a8aebb; --faint:#6c7282; --line:#272c36;
+  --accent:#5fd0a3; --accent-2:#f29a63; --accent-soft:#16322a; --on-accent:#08261b; --c3:#d99ae2; --c4:#8ab4f2;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.35); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1218; --surface:#171b23; --ink:#eceef2; --soft:#a8aebb; --faint:#6c7282; --line:#272c36;
+  --accent:#5fd0a3; --accent-2:#f29a63; --accent-soft:#16322a; --on-accent:#08261b; --c3:#d99ae2; --c4:#8ab4f2;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.35); color-scheme:dark}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16.5px;line-height:1.6;
+  background-image:radial-gradient(var(--line) 1px,transparent 1.2px);background-size:26px 26px;background-attachment:fixed}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:6px}
+p{margin:0}
+.wrap{max-width:1040px;margin:0 auto;padding-inline:20px}
+.mono{font-family:var(--f-mono)}
+
+/* Navegación */
+.nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  background:color-mix(in srgb,var(--bg) 82%,transparent);border-bottom:1px solid transparent;transition:border-color .2s}
+.nav.scrolled{border-bottom-color:var(--line)}
+.nav .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;height:56px}
+.nav .me{font-family:var(--f-display);font-size:1.05rem;text-decoration:none;opacity:0;transform:translateY(4px);transition:opacity .25s,transform .25s;white-space:nowrap}
+.nav.scrolled .me{opacity:1;transform:none}
+.nav ul{list-style:none;display:flex;gap:4px;margin:0;padding:0}
+.nav ul a{display:block;text-decoration:none;font-size:.9rem;color:var(--soft);padding:6px 12px;border-radius:999px;transition:background .2s,color .2s}
+.nav ul a:hover{color:var(--ink)}
+.nav ul a.on{background:var(--ink);color:var(--bg)}
+
+/* Portada */
+.hero{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:32px;align-items:center;padding-block:56px 72px}
+.kicker{font-family:var(--f-mono);font-size:.78rem;color:var(--accent);letter-spacing:.02em;display:flex;gap:10px;align-items:center}
+.kicker::before{content:"";width:22px;height:1.5px;background:var(--accent)}
+h1{font-family:var(--f-display);font-weight:400;font-size:clamp(3rem,8.2vw,6.2rem);line-height:.92;letter-spacing:-.025em;margin:18px 0 28px}
+h1 em{font-style:italic;color:var(--accent)}
+.contact{display:flex;flex-wrap:wrap;gap:10px}
+.chip-btn{font:inherit;font-size:.9rem;display:inline-flex;align-items:center;gap:8px;padding:9px 16px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;text-decoration:none;transition:transform .15s,border-color .15s,box-shadow .15s}
+.chip-btn:hover{border-color:var(--ink);transform:translateY(-1px);box-shadow:var(--shadow)}
+.chip-btn svg{width:16px;height:16px;flex:none}
+.chip-btn .ok{color:var(--accent);font-family:var(--f-mono);font-size:.75rem}
+.place{font-size:.9rem;color:var(--soft);display:inline-flex;align-items:center;padding:9px 4px}
+.stage{position:relative;aspect-ratio:1/1;max-width:440px;width:100%;justify-self:end;touch-action:none;cursor:grab}
+.stage:active{cursor:grabbing}
+.stage canvas{width:100%;height:100%;display:block}
+.stage .hint{position:absolute;left:0;right:0;bottom:-6px;text-align:center;font-family:var(--f-mono);font-size:.72rem;color:var(--faint);pointer-events:none}
+.stage .badge{position:absolute;top:8px;right:8px;font-family:var(--f-mono);font-size:.72rem;padding:4px 10px;border-radius:999px;background:var(--surface);border:1px solid var(--line);color:var(--soft)}
+
+/* Secciones */
+section{padding-block:56px;scroll-margin-top:64px}
+.sec-head{display:grid;gap:10px;margin-bottom:28px;max-width:640px}
+.num{font-family:var(--f-mono);font-size:.78rem;color:var(--faint)}
+h2{font-family:var(--f-display);font-weight:400;font-size:clamp(2rem,4.4vw,3rem);line-height:1.05;letter-spacing:-.015em;margin:0;text-wrap:balance}
+.intro{color:var(--soft);font-size:1.05rem;max-width:62ch}
+
+/* Proyectos */
+.cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.card{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:18px;overflow:hidden;display:flex;flex-direction:column;
+  transition:transform .25s cubic-bezier(.2,.7,.2,1),box-shadow .25s,border-color .25s;transform:perspective(900px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg))}
+.card:hover{box-shadow:var(--shadow);border-color:color-mix(in srgb,var(--accent) 35%,var(--line))}
+.card .art{height:170px;background:var(--accent-soft);position:relative}
+.card .art canvas{width:100%;height:100%;display:block}
+.card .art .lvl{position:absolute;left:14px;top:12px;font-family:var(--f-mono);font-size:.7rem;padding:3px 9px;border-radius:999px;background:var(--surface);color:var(--soft)}
+.card .body{padding:18px 20px 20px;display:flex;flex-direction:column;gap:10px;flex:1}
+.card h3{font-family:var(--f-display);font-weight:500;font-size:1.45rem;line-height:1.1;margin:0}
+.card p{color:var(--soft);font-size:.95rem;flex:1}
+.stack{display:flex;flex-wrap:wrap;gap:6px}
+.stack span{font-family:var(--f-mono);font-size:.7rem;padding:2px 8px;border-radius:6px;border:1px solid var(--line);color:var(--soft)}
+.actions{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;margin-top:6px}
+.visit{display:inline-flex;align-items:center;gap:10px;padding:10px 18px;border-radius:999px;background:var(--ink);color:var(--bg);text-decoration:none;font-weight:600;font-size:.93rem;transition:background .2s,gap .2s}
+.visit:hover{background:var(--accent);color:var(--on-accent);gap:14px}
+.repo{font-family:var(--f-mono);font-size:.78rem;color:var(--soft);text-decoration:none;border-bottom:1px solid var(--line);padding-bottom:1px}
+.repo:hover{color:var(--ink);border-color:var(--ink)}
+.more{margin-top:22px;color:var(--soft);font-size:.95rem}
+.more a{color:var(--ink);text-underline-offset:3px}
+
+
+/* Catálogo de matemática */
+.catalog{margin-top:44px;display:grid;gap:18px}
+.catalog h3.ct{font-family:var(--f-display);font-weight:400;font-size:1.6rem;margin:0}
+.filters{display:flex;flex-wrap:wrap;gap:8px}
+.f{font:inherit;font-size:.88rem;padding:7px 14px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--soft);cursor:pointer;transition:all .18s}
+.f:hover{color:var(--ink);border-color:var(--ink)}
+.f[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.f .c{font-family:var(--f-mono);font-size:.72rem;opacity:.65;margin-left:6px}
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
+.tile{position:relative;display:flex;flex-direction:column;gap:6px;padding:16px 16px 14px;border-radius:14px;background:var(--surface);border:1px solid var(--line);text-decoration:none;color:var(--ink);overflow:hidden;transition:transform .2s,border-color .2s,box-shadow .2s}
+.tile::before{content:"";position:absolute;inset:0 auto 0 0;width:3px;background:var(--dot,var(--accent));opacity:.9}
+.tile:hover{transform:translateY(-3px);border-color:color-mix(in srgb,var(--accent) 40%,var(--line));box-shadow:var(--shadow)}
+.tile .top{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+.tile b{font-weight:600;font-size:1rem;line-height:1.25}
+.tile .lv{font-family:var(--f-mono);font-size:.68rem;color:var(--faint);white-space:nowrap}
+.tile p{font-size:.88rem;color:var(--soft);line-height:1.45;flex:1}
+.tile .go{display:flex;justify-content:space-between;align-items:center;font-size:.8rem;margin-top:4px}
+.tile .go span:first-child{font-family:var(--f-mono);color:var(--faint)}
+.tile .go span:last-child{font-weight:600;color:var(--accent);transition:transform .2s}
+.tile:hover .go span:last-child{transform:translateX(3px)}
+.tile.hide{display:none}
+.repos{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px;margin-top:6px}
+.rp{display:grid;grid-template-columns:auto minmax(0,1fr);gap:2px 12px;align-items:center;padding:12px 14px;border-radius:12px;border:1px dashed var(--line);text-decoration:none;color:var(--ink);transition:border-color .2s,background .2s}
+.rp:hover{border-style:solid;border-color:var(--ink);background:var(--surface)}
+.rp svg{grid-row:span 2;width:20px;height:20px;color:var(--soft)}
+.rp b{font-family:var(--f-mono);font-weight:500;font-size:.88rem}
+.rp small{color:var(--soft);font-size:.8rem;line-height:1.3}
+.rlabel{font-family:var(--f-mono);font-size:.75rem;color:var(--faint);margin-top:10px}
+
+/* Investigación */
+.research{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:28px;align-items:start}
+.tabs{display:grid;gap:8px}
+.tab{font:inherit;text-align:left;display:grid;grid-template-columns:auto 1fr;gap:4px 14px;padding:16px 18px;border-radius:14px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;transition:border-color .2s,background .2s,transform .2s}
+.tab:hover{transform:translateX(3px)}
+.tab .i{grid-row:span 2;font-family:var(--f-mono);font-size:.75rem;color:var(--faint);padding-top:3px}
+.tab b{font-weight:600}
+.tab small{color:var(--soft);font-size:.85rem}
+.tab[aria-selected="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.tab[aria-selected="true"] .i{color:var(--accent)}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:28px;display:grid;gap:14px;min-height:100%}
+.panel .big{font-family:var(--f-display);font-size:clamp(3.4rem,8vw,5rem);line-height:.9;color:var(--accent);font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.panel .cap{font-size:1.05rem;max-width:42ch}
+.panel .meth{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.panel .meth span{font-family:var(--f-mono);font-size:.72rem;padding:3px 9px;border-radius:999px;background:var(--bg);color:var(--soft)}
+.panel .src{font-size:.88rem;color:var(--soft);border-top:1px solid var(--line);padding-top:14px}
+.fade{animation:fade .35s ease}
+@keyframes fade{from{opacity:.25;transform:translateY(6px)}to{opacity:1;transform:none}}
+.next{margin-top:22px;display:grid;grid-template-columns:auto minmax(0,1fr);gap:18px;align-items:start;padding:24px 26px;border-radius:18px;background:var(--ink);color:var(--bg)}
+.next .arrow{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:var(--accent);color:var(--on-accent);font-size:1.2rem}
+.next h3{font-family:var(--f-display);font-weight:400;font-size:1.45rem;line-height:1.2;margin:0 0 8px;text-wrap:balance}
+.next p{opacity:.78;font-size:.98rem;max-width:64ch}
+
+/* Producción */
+.timeline{list-style:none;margin:0;padding:0;display:grid}
+.timeline li{display:grid;grid-template-columns:90px minmax(0,1fr) auto;gap:18px;align-items:baseline;padding:16px 14px;border-top:1px solid var(--line);border-radius:10px;transition:background .2s}
+.timeline li:last-child{border-bottom:1px solid var(--line)}
+.timeline li:hover{background:var(--surface)}
+.timeline .y{font-family:var(--f-mono);font-size:.8rem;color:var(--faint);font-variant-numeric:tabular-nums}
+.timeline .t{font-weight:500}
+.timeline .d{color:var(--soft);font-size:.92rem}
+.timeline .d em{font-style:italic}
+.st{font-family:var(--f-mono);font-size:.7rem;padding:3px 9px;border-radius:999px;white-space:nowrap}
+.st.rev{background:color-mix(in srgb,var(--accent-2) 16%,transparent);color:var(--accent-2)}
+.st.ok{background:var(--accent-soft);color:var(--accent)}
+.st.pr{border:1px solid var(--line);color:var(--soft)}
+.sub{font-family:var(--f-mono);font-size:.75rem;color:var(--faint);margin:28px 0 6px;padding-left:14px}
+.end{height:48px}
+
+/* Aparición suave: el contenido es visible en reposo; solo se desplaza un poco */
+.reveal{transition:transform .6s cubic-bezier(.2,.7,.2,1)}
+.reveal.pre{transform:translateY(14px)}
+
+@media (max-width:860px){
+  .hero{grid-template-columns:minmax(0,1fr);padding-block:28px 40px;gap:8px}
+  .stage{justify-self:center;max-width:300px;order:-1;margin-bottom:36px}
+  .stage .hint{font-size:.66rem;white-space:nowrap;bottom:-18px}
+  .cards{grid-template-columns:minmax(0,1fr)}
+  .research{grid-template-columns:minmax(0,1fr)}
+}
+@media (max-width:560px){
+  .nav ul a{padding:6px 9px;font-size:.84rem}
+  .nav .me{display:none}
+  .timeline li{grid-template-columns:minmax(0,1fr);gap:4px}
+  .next{grid-template-columns:minmax(0,1fr)}
+  .panel{padding:22px}
+}
+@media (prefers-reduced-motion:reduce){
+  .card,.tab,.visit,.chip-btn,.reveal{transition:none}
+  .fade{animation:none}
+}
+</style>
+
+</head>
+<body>
+<nav class="nav" id="nav" aria-label="Secciones">
+  <div class="wrap">
+    <a class="me" href="#top">Francisca Coiro Díaz</a>
+    <ul>
+      <li><a href="#herramientas">Herramientas</a></li>
+      <li><a href="#investigacion">Investigación</a></li>
+      <li><a href="#produccion">Producción</a></li>
+    </ul>
+  </div>
+</nav>
+
+<div class="wrap" id="top">
+  <header class="hero">
+    <div>
+      <p class="kicker">educación matemática · tecnología educativa</p>
+      <h1>Francisca<br><em>Coiro</em> Díaz</h1>
+      <div class="contact">
+        <button class="chip-btn" id="copy-mail" type="button" aria-describedby="mail-txt">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+          <span id="mail-txt">francisca.coiro.d@mail.pucv.cl</span><span class="ok" id="mail-ok" hidden>copiado</span>
+        </button>
+        <a class="chip-btn" href="https://github.com/FranCoiro" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-3.2 19.5c.5.1.7-.2.7-.5v-1.7c-2.8.6-3.4-1.3-3.4-1.3-.5-1.2-1.1-1.5-1.1-1.5-.9-.6.1-.6.1-.6 1 .1 1.5 1 1.5 1 .9 1.6 2.4 1.1 3 .8.1-.7.4-1.1.6-1.3-2.2-.3-4.6-1.1-4.6-5 0-1.1.4-2 1-2.7-.1-.3-.4-1.3.1-2.7 0 0 .8-.3 2.8 1a9.6 9.6 0 0 1 5 0c1.9-1.3 2.8-1 2.8-1 .5 1.4.2 2.4.1 2.7.6.7 1 1.6 1 2.7 0 3.9-2.3 4.7-4.6 5 .4.3.7.9.7 1.9V21c0 .3.2.6.7.5A10 10 0 0 0 12 2Z"/></svg>
+          FranCoiro
+        </a>
+        <span class="place">Valparaíso, Chile</span>
+      </div>
+    </div>
+    <div class="stage" id="stage" role="img" aria-label="Prisma tridimensional que se puede girar arrastrando y cambiar de base con un toque">
+      <canvas id="prism"></canvas>
+      <span class="badge" id="badge">prisma hexagonal</span>
+      <span class="hint">arrastra para girar · toca para cambiar la base</span>
+    </div>
+  </header>
+
+  <section id="herramientas" aria-labelledby="h-tools">
+    <div class="sec-head reveal">
+      <span class="num">01</span>
+      <h2 id="h-tools">Herramientas que programo</h2>
+      <p class="intro">Desde 2024 diseño y programo los recursos que uso en clases. Hoy son 27 aplicaciones abiertas que cualquier docente puede usar sin crear cuentas, escritas en JavaScript, con Node.js y Supabase cuando el problema necesita servidor o base de datos.</p>
+    </div>
+
+    <div class="cards">
+      <article class="card reveal" data-art="prism">
+        <div class="art"><canvas></canvas><span class="lvl">geometría · 3.º básico</span></div>
+        <div class="body">
+          <h3>Del plano al cuerpo</h3>
+          <p>Los polígonos se levantan hasta formar prismas y pirámides. El estudiante gira cada cuerpo y toca caras, aristas y vértices para nombrarlos.</p>
+          <div class="stack"><span>3D sin librerías</span><span>SVG</span><span>accesible</span></div>
+          <div class="actions"><a class="visit" href="https://francoiro.github.io/tercero/geometria/" target="_blank" rel="noopener">Visitar página <span aria-hidden="true">→</span></a><a class="repo" href="https://github.com/FranCoiro/tercero" target="_blank" rel="noopener">repositorio</a></div>
+        </div>
+      </article>
+
+      <article class="card reveal" data-art="calendar">
+        <div class="art"><canvas></canvas><span class="lvl">seguimiento de cursos</span></div>
+        <div class="body">
+          <h3>Aula al día</h3>
+          <p>Registro diario de clases y estudiantes con inicio de sesión. Guarda en la nube, funciona sin conexión y evita sobrescribir cambios de otro dispositivo.</p>
+          <div class="stack"><span>Supabase</span><span>autenticación</span><span>sin conexión</span></div>
+          <div class="actions"><a class="visit" href="https://francoiro.github.io/auladia/" target="_blank" rel="noopener">Visitar página <span aria-hidden="true">→</span></a></div>
+        </div>
+      </article>
+
+      <article class="card reveal" data-art="tiles">
+        <div class="art"><canvas></canvas><span class="lvl">descomposición prima · 6.º básico</span></div>
+        <div class="body">
+          <h3>Decodificador</h3>
+          <p>Cada número bien descompuesto en factores primos revela parte de una imagen que elige la docente. La configuración se comparte entre colegas.</p>
+          <div class="stack"><span>Canvas</span><span>carga de imágenes</span><span>Web Audio</span></div>
+          <div class="actions"><a class="visit" href="https://francoiro.github.io/sexto/decodificador.html" target="_blank" rel="noopener">Visitar página <span aria-hidden="true">→</span></a><a class="repo" href="https://github.com/FranCoiro/sexto" target="_blank" rel="noopener">repositorio</a></div>
+        </div>
+      </article>
+
+      <article class="card reveal" data-art="signal">
+        <div class="art"><canvas></canvas><span class="lvl">datos · STEM</span></div>
+        <div class="body">
+          <h3>Analizador de sensores</h3>
+          <p>Recibe archivos CSV de sensores, detecta la variable medida, calcula la tasa de fallas y genera un reporte descargable.</p>
+          <div class="stack"><span>Node.js</span><span>Vercel</span><span>CSV</span></div>
+          <div class="actions"><a class="visit" href="https://github.com/FranCoiro/sensor" target="_blank" rel="noopener">Ver código <span aria-hidden="true">→</span></a></div>
+        </div>
+      </article>
+    </div>
+    <div class="catalog reveal" id="matematica">
+      <h3 class="ct">Todo lo de matemática</h3>
+      <div class="filters" role="group" aria-label="Filtrar por eje"><button class="f" type="button" aria-pressed="true" data-f="all">Todas<span class="c">20</span></button><button class="f" type="button" aria-pressed="false" data-f="fyp">Factores y múltiplos<span class="c">10</span></button><button class="f" type="button" aria-pressed="false" data-f="mcm">Mínimo común múltiplo<span class="c">3</span></button><button class="f" type="button" aria-pressed="false" data-f="rzp">Razones y porcentajes<span class="c">4</span></button><button class="f" type="button" aria-pressed="false" data-f="mul">Multiplicación<span class="c">2</span></button><button class="f" type="button" aria-pressed="false" data-f="geo">Geometría<span class="c">1</span></button></div>
+      <div class="tiles" id="tiles"><a class="tile" data-c="geo" style="--dot:var(--accent)" href="https://francoiro.github.io/tercero/geometria/" target="_blank" rel="noopener"><div class="top"><b>Del plano al cuerpo</b><span class="lv">3.º</span></div><p>Prismas y pirámides de 2D a 3D; se nombran caras, aristas y vértices.</p><div class="go"><span>tercero</span><span>Visitar →</span></div></a><a class="tile" data-c="mul" style="--dot:var(--c4)" href="https://francoiro.github.io/rectanguloarreglo/" target="_blank" rel="noopener"><div class="top"><b>Construye rectángulos</b><span class="lv">3.º–6.º</span></div><p>Todos los arreglos rectangulares de un número del 1 al 100.</p><div class="go"><span>rectanguloarreglo</span><span>Visitar →</span></div></a><a class="tile" data-c="mul" style="--dot:var(--c4)" href="https://francoiro.github.io/sexto/tablapitagorica.html" target="_blank" rel="noopener"><div class="top"><b>Tabla pitagórica</b><span class="lv">3.º–6.º</span></div><p>Al tocar un producto se iluminan los factores que lo forman.</p><div class="go"><span>sexto</span><span>Visitar →</span></div></a><a class="tile" data-c="fyp" style="--dot:var(--accent)" href="https://francoiro.github.io/sexto/criba.html" target="_blank" rel="noopener"><div class="top"><b>Criba de Eratóstenes</b><span class="lv">6.º</span></div><p>Pintar del 1 al 100 para separar primos, compuestos y el 1.</p><div class="go"><span>sexto</span><span>Visitar →</span></div></a><a class="tile" data-c="fyp" style="--dot:var(--accent)" href="https://francoiro.github.io/sexto/arboldefactores.html" target="_blank" rel="noopener"><div class="top"><b>Árbol de factores</b><span class="lv">6.º</span></div><p>De los pares de factores al árbol de factores primos.</p><div class="go"><span>sexto</span><span>Visitar →</span></div></a><a class="tile" data-c="fyp" style="--dot:var(--accent)" href="https://francoiro.github.io/sexto/factoresvsmultiplos.html" target="_blank" rel="noopener"><div class="top"><b>Factores vs. Múltiplos</b><span class="lv">6.º</span></div><p>Clasificar números arrastrándolos, organizado por estaciones.</p><div class="go"><span>sexto</span><span>Visitar →</span></div></a><a class="tile" data-c="fyp" style="--dot:var(--accent)" href="https://francoiro.github.io/sexto/factoromultiplo.html" target="_blank" rel="noopener"><div class="top"><b>Factor o múltiplo</b><span class="lv">6.º</span></div><p>Explorar los factores y los primeros diez múltiplos de un número.</p><div class="go"><span>sexto</span><span>Visitar →</span></div></a><a class="tile" data-c="fyp" style="--dot:var(--accent)" href="https://francoiro.github.io/sexto/carrerafyp.html" target="_blank" rel="noopener"><div class="top"><b>Carrera de factores y múltiplos</b><span class="lv">6.º</span></div><p>Juego de tablero para todo el curso, por equipos o al azar.</p><div class="go"><span>sexto</span><span>Visitar →</span></div></a><a class="tile" data-c="fyp" style="--dot:var(--accent)" href="https://francoiro.github.io/multiplos/" target="_blank" rel="noopener"><div class="top"><b>Cazador de múltiplos</b><span class="lv">5.º–6.º</span></div><p>¿Es múltiplo o no? Tres niveles de dificultad.</p><div class="go"><span>multiplos</span><span>Visitar →</span></div></a><a class="tile" data-c="fyp" style="--dot:var(--accent)" href="https://francoiro.github.io/sexto/triviafactoresymutiplos.html" target="_blank" rel="noopener"><div class="top"><b>Trivia verdadero o falso</b><span class="lv">6.º</span></div><p>Afirmaciones sobre factores y múltiplos con su justificación.</p><div class="go"><span>sexto</span><span>Visitar →</span></div></a><a class="tile" data-c="fyp" style="--dot:var(--accent)" href="https://francoiro.github.io/sexto/kahootfactoresprimos.html" target="_blank" rel="noopener"><div class="top"><b>Quiz de factores primos</b><span class="lv">6.º</span></div><p>Seis preguntas para resolver en parejas.</p><div class="go"><span>sexto</span><span>Visitar →</span></div></a><a class="tile" data-c="fyp" style="--dot:var(--accent)" href="https://francoiro.github.io/sexto/decodificador.html" target="_blank" rel="noopener"><div class="top"><b>Decodificador</b><span class="lv">6.º</span></div><p>Descomponer en primos revela una imagen oculta.</p><div class="go"><span>sexto</span><span>Visitar →</span></div></a><a class="tile" data-c="fyp" style="--dot:var(--accent)" href="https://francoiro.github.io/sexto/rompecabezasmultiplos.html" target="_blank" rel="noopener"><div class="top"><b>Rompecabezas de claves</b><span class="lv">6.º</span></div><p>Cada clave descifrada libera una pieza del rompecabezas.</p><div class="go"><span>sexto</span><span>Visitar →</span></div></a><a class="tile" data-c="mcm" style="--dot:var(--accent-2)" href="https://francoiro.github.io/mcm/" target="_blank" rel="noopener"><div class="top"><b>Explorando el MCM</b><span class="lv">6.º</span></div><p>Paso a paso por los múltiplos hasta el mínimo común.</p><div class="go"><span>mcm</span><span>Visitar →</span></div></a><a class="tile" data-c="mcm" style="--dot:var(--accent-2)" href="https://francoiro.github.io/sexto/dino.html" target="_blank" rel="noopener"><div class="top"><b>Dino Jump</b><span class="lv">6.º</span></div><p>¿En qué segundo saltan juntos dos dinosaurios con ritmos distintos?</p><div class="go"><span>sexto</span><span>Visitar →</span></div></a><a class="tile" data-c="mcm" style="--dot:var(--accent-2)" href="https://francoiro.github.io/sexto/kahootmcm.html" target="_blank" rel="noopener"><div class="top"><b>Problemas de MCM</b><span class="lv">6.º</span></div><p>Guía para leer y resolver problemas de mínimo común múltiplo.</p><div class="go"><span>sexto</span><span>Visitar →</span></div></a><a class="tile" data-c="rzp" style="--dot:var(--c3)" href="https://francoiro.github.io/sexto/razonesfutbol.html" target="_blank" rel="noopener"><div class="top"><b>Somos DT</b><span class="lv">6.º</span></div><p>Razón goles por partido para decidir a quién convocar.</p><div class="go"><span>sexto</span><span>Visitar →</span></div></a><a class="tile" data-c="rzp" style="--dot:var(--c3)" href="https://francoiro.github.io/sexto/vendedor.html" target="_blank" rel="noopener"><div class="top"><b>Sponsors: ¿qué bebida elegimos?</b><span class="lv">6.º</span></div><p>Comparar razones agua:azúcar de tres bebidas.</p><div class="go"><span>sexto</span><span>Visitar →</span></div></a><a class="tile" data-c="rzp" style="--dot:var(--c3)" href="https://francoiro.github.io/sexto/mundial1.html" target="_blank" rel="noopener"><div class="top"><b>Álbum del Mundial</b><span class="lv">6.º</span></div><p>Justificar con porcentajes qué grilla representa la colección.</p><div class="go"><span>sexto</span><span>Visitar →</span></div></a><a class="tile" data-c="rzp" style="--dot:var(--c3)" href="https://francoiro.github.io/sexto/tombolaporcentaje.html" target="_blank" rel="noopener"><div class="top"><b>Tómbola de porcentajes</b><span class="lv">6.º</span></div><p>Sacar bolitas y cantar porcentajes, como un bingo.</p><div class="go"><span>sexto</span><span>Visitar →</span></div></a></div>
+      <p class="rlabel">repositorios</p>
+      <div class="repos"><a class="rp" href="https://github.com/FranCoiro/sexto" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 5a2 2 0 0 1 2-2h11v15H6a2 2 0 0 0-2 2V5Z"/><path d="M4 20a2 2 0 0 0 2 2h11v-4"/></svg><b>sexto</b><small>16 recursos de 6.º básico: factores, múltiplos, MCM, razones y porcentajes</small></a><a class="rp" href="https://github.com/FranCoiro/tercero" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 5a2 2 0 0 1 2-2h11v15H6a2 2 0 0 0-2 2V5Z"/><path d="M4 20a2 2 0 0 0 2 2h11v-4"/></svg><b>tercero</b><small>Geometría de 3.º básico: del plano al cuerpo</small></a><a class="rp" href="https://github.com/FranCoiro/mcm" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 5a2 2 0 0 1 2-2h11v15H6a2 2 0 0 0-2 2V5Z"/><path d="M4 20a2 2 0 0 0 2 2h11v-4"/></svg><b>mcm</b><small>Explorando el mínimo común múltiplo</small></a><a class="rp" href="https://github.com/FranCoiro/multiplos" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 5a2 2 0 0 1 2-2h11v15H6a2 2 0 0 0-2 2V5Z"/><path d="M4 20a2 2 0 0 0 2 2h11v-4"/></svg><b>multiplos</b><small>Cazador de múltiplos</small></a><a class="rp" href="https://github.com/FranCoiro/rectanguloarreglo" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 5a2 2 0 0 1 2-2h11v15H6a2 2 0 0 0-2 2V5Z"/><path d="M4 20a2 2 0 0 0 2 2h11v-4"/></svg><b>rectanguloarreglo</b><small>Multiplicación como arreglo rectangular</small></a><a class="rp" href="https://github.com/FranCoiro/relme38" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 5a2 2 0 0 1 2-2h11v15H6a2 2 0 0 0-2 2V5Z"/><path d="M4 20a2 2 0 0 0 2 2h11v-4"/></svg><b>relme38</b><small>Presentación de la ponencia en RELME 38</small></a></div>
+    </div>
+  </section>
+
+  <section id="investigacion" aria-labelledby="h-inv">
+    <div class="sec-head reveal">
+      <span class="num">02</span>
+      <h2 id="h-inv">El razonamiento que no queda escrito</h2>
+      <p class="intro">Los estudiantes razonan más de lo que registran, y la evaluación se apoya casi solo en lo registrado. He mirado esa brecha desde tres lugares.</p>
+    </div>
+
+    <div class="research reveal">
+      <div class="tabs" role="tablist" aria-label="Estudios">
+        <button class="tab" role="tab" id="t0" aria-controls="panel" aria-selected="true" data-i="0"><span class="i">A</span><b>Retroalimentación escrita</b><small>Qué devuelve el docente</small></button>
+        <button class="tab" role="tab" id="t1" aria-controls="panel" aria-selected="false" data-i="1" tabindex="-1"><span class="i">B</span><b>Mirada docente</b><small>Qué notan los futuros profesores</small></button>
+        <button class="tab" role="tab" id="t2" aria-controls="panel" aria-selected="false" data-i="2" tabindex="-1"><span class="i">C</span><b>Formación inicial</b><small>Tecnología en la enseñanza</small></button>
+      </div>
+      <div class="panel" id="panel" role="tabpanel" aria-labelledby="t0" aria-live="polite">
+        <div class="big" id="p-big">60,7 %</div>
+        <p class="cap" id="p-cap">de las retroalimentaciones escritas no moviliza lenguaje matemático, aunque casi todas muestran mediación didáctica.</p>
+        <div class="meth" id="p-meth"><span>análisis mixto</span><span>56 producciones · 14 docentes</span><span>MTSK</span></div>
+        <p class="src" id="p-src">Seminario de título, PUCV, 2026.</p>
+      </div>
+    </div>
+
+    <div class="next reveal">
+      <div class="arrow" aria-hidden="true">↳</div>
+      <div>
+        <h3>Andamiaje con realidad aumentada e inteligencia artificial en primer ciclo básico</h3>
+        <p>Mi trabajo se orienta a criterios para que el razonamiento que ocurre al manipular material concreto quede trazable. Es un problema de diseño, y poder construir esos entornos me permite iterarlos en aula con rapidez.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="produccion" aria-labelledby="h-prod">
+    <div class="sec-head reveal">
+      <span class="num">03</span>
+      <h2 id="h-prod">Artículos, ponencias y proyectos</h2>
+    </div>
+    <ul class="timeline reveal">
+      <li><span class="y">2026</span><div><div class="t">Mi Laboratorio Remoto: A Resource-Efficient Remote Laboratory with Flexible Deployment for Contextualized K–12 STEM Education</div><div class="d">Con M. A. Solis et al. <em>IEEE RITA</em>.</div></div><span class="st rev">en revisión</span></li>
+      <li><span class="y">2026</span><div><div class="t">Noticing como razonamiento en un Lesson Study sobre equiprobabilidad</div><div class="d"><em>The International Journal of Science, Mathematics and Technology Learning</em>.</div></div><span class="st rev">en revisión</span></li>
+      <li><span class="y">2026</span><div><div class="t">«¡Muy bien! pero argumenta tu respuesta». El desafío de la retroalimentación matemática en segundo ciclo básico</div><div class="d">Seminario de título, PUCV.</div></div><span class="st ok">defendido</span></li>
+      <li><span class="y">2025</span><div><div class="t">Percepciones de futuros docentes sobre tecnología en la enseñanza de la matemática</div><div class="d">RELME 38, Colombia.</div></div><span class="st pr">ponencia</span></li>
+      <li><span class="y">2025</span><div><div class="t">Jornadas Nacionales de Educación Matemática · Jornada Nacional de Educación Estadística · Jornada de Modelación y Tecnología</div></div><span class="st pr">ponencias</span></li>
+    </ul>
+    <p class="sub">proyectos de investigación</p>
+    <ul class="timeline reveal">
+      <li><span class="y">2024–25</span><div><div class="t">FONDECYT de Iniciación 11230230</div><div class="d">«Pensamiento crítico y argumentación en primer ciclo desde un enfoque sociocultural». IR: Yazna Cisternas Rojas, PUCV.</div></div><span class="st pr">personal técnico</span></li>
+      <li><span class="y">2025–</span><div><div class="t">REALIVIA by MathModel VR</div><div class="d">Modelación matemática con realidad virtual.</div></div><span class="st pr">personal técnico</span></li>
+    </ul>
+    <div class="end"></div>
+  </section>
+</div>
+
+<script>
+(()=>{
+const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
+let C={};
+function readColors(){const s=getComputedStyle(document.documentElement);['ink','soft','faint','line','accent','accent-2','accent-soft','surface','bg'].forEach(k=>C[k]=s.getPropertyValue('--'+k).trim());}
+readColors();
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{readColors();drawAll()});
+new MutationObserver(()=>{readColors();drawAll()}).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+
+function fit(cv){const r=cv.getBoundingClientRect(),d=Math.min(devicePixelRatio||1,2);cv.width=Math.max(1,r.width*d);cv.height=Math.max(1,r.height*d);const x=cv.getContext('2d');x.setTransform(d,0,0,d,0,0);return {x,w:r.width,h:r.height};}
+function alpha(hex,a){const m=hex.replace('#','');if(m.length!==6)return hex;const n=parseInt(m,16);return `rgba(${n>>16&255},${n>>8&255},${n&255},${a})`;}
+
+/* ---------- Prisma de portada ---------- */
+const NAMES={3:'triangular',4:'cuadrado',5:'pentagonal',6:'hexagonal'};
+const P={n:6,h:0,target:1,rx:.45,ry:.6,vy:RM?0:.0045,drag:null};
+const stage=document.getElementById('stage'),pc=document.getElementById('prism'),badge=document.getElementById('badge');
+let PC=fit(pc);
+function rot([x,y,z],rx,ry){const cy=Math.cos(ry),sy=Math.sin(ry),cx=Math.cos(rx),sx=Math.sin(rx);const xx=x*cy+z*sy,zz=-x*sy+z*cy;return [xx,y*cx-zz*sx,y*sx+zz*cx];}
+function solid(n,h){const top=[],bot=[];for(let i=0;i<n;i++){const a=2*Math.PI*i/n-Math.PI/2+(n===4?Math.PI/4:0);const x=Math.cos(a),z=Math.sin(a);bot.push([x,.55,z]);top.push([x,.55-1.1*h,z]);}return {top,bot};}
+function drawSolid(ctx,w,h,n,hh,rx,ry,scale,opts={}){
+  const {top,bot}=solid(n,hh);const cx=w/2,cy=h/2+(opts.dy||0);
+  const pr=p=>{const q=rot(p,rx,ry);const s=scale/(1+q[2]*.18);return [cx+q[0]*s,cy+q[1]*s,q[2]];};
+  const T=top.map(pr),B=bot.map(pr);
+  const faces=[];
+  for(let i=0;i<n;i++){const j=(i+1)%n;faces.push({pts:[B[i],B[j],T[j],T[i]],side:true});}
+  faces.push({pts:T,cap:true});faces.push({pts:B,cap:true});
+  faces.forEach(f=>f.z=f.pts.reduce((s,p)=>s+p[2],0)/f.pts.length);
+  faces.sort((a,b)=>b.z-a.z);
+  faces.forEach((f,k)=>{ctx.beginPath();f.pts.forEach((p,i)=>i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));ctx.closePath();
+    const front=f.z<0;ctx.fillStyle=f.cap?alpha(C['accent-2'],front?.30:.10):alpha(C.accent,front?.20:.07);ctx.fill();
+    ctx.strokeStyle=front?C.ink:alpha(C.ink.length===7?C.ink:'#000000',.25);ctx.lineWidth=front?(opts.lw||1.6):1;ctx.setLineDash(front?[]:[4,4]);ctx.stroke();ctx.setLineDash([]);});
+  if(opts.dots!==false){[...T,...B].forEach(p=>{if(p[2]<.2){ctx.beginPath();ctx.arc(p[0],p[1],opts.r||3.2,0,7);ctx.fillStyle=C['accent-2'];ctx.fill();}})}
+}
+function drawPrism(){const {x,w,h}=PC;x.clearRect(0,0,w,h);
+  // sombra en el piso
+  x.beginPath();x.ellipse(w/2,h*.82,w*.28,w*.05,0,0,7);x.fillStyle=alpha(C.ink.length===7?C.ink:'#000000',.06);x.fill();
+  drawSolid(x,w,h,P.n,P.h,P.rx,P.ry,w*.3,{dy:h*.03,lw:1.8,r:3.6});}
+function loopPrism(){P.h+=(P.target-P.h)*.05;if(!P.drag)P.ry+=P.vy;drawPrism();requestAnimationFrame(loopPrism);}
+stage.addEventListener('pointerdown',e=>{stage.setPointerCapture(e.pointerId);P.drag={x:e.clientX,y:e.clientY,rx:P.rx,ry:P.ry,moved:false};});
+stage.addEventListener('pointermove',e=>{if(!P.drag)return;const dx=e.clientX-P.drag.x,dy=e.clientY-P.drag.y;if(Math.abs(dx)+Math.abs(dy)>4)P.drag.moved=true;P.ry=P.drag.ry+dx*.01;P.rx=Math.max(-.3,Math.min(1.3,P.drag.rx-dy*.01));});
+stage.addEventListener('pointerup',()=>{if(P.drag&&!P.drag.moved){P.n=P.n===6?3:P.n+1;badge.textContent='prisma '+NAMES[P.n];P.h=0;}P.drag=null;});
+stage.addEventListener('pointercancel',()=>P.drag=null);
+stage.tabIndex=0;stage.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();P.n=P.n===6?3:P.n+1;badge.textContent='prisma '+NAMES[P.n];P.h=0;}if(e.key==='ArrowLeft')P.ry-=.2;if(e.key==='ArrowRight')P.ry+=.2;});
+if(RM)P.h=1;
+
+/* ---------- Ilustraciones de tarjetas ---------- */
+const arts=[...document.querySelectorAll('.card')].map(card=>({card,cv:card.querySelector('canvas'),kind:card.dataset.art,t:0,live:false,ctx:null}));
+arts.forEach(a=>a.ctx=fit(a.cv));
+const DRAW={
+  prism(a){const {x,w,h}=a.ctx;x.clearRect(0,0,w,h);const t=a.t;const hh=.5+.5*Math.sin(t*.9);
+    drawSolid(x,w,h,4,1,.4,.6+t*.5,h*.26,{dy:4,lw:1.4,r:2.4});
+    x.save();x.translate(-w*.3,0);drawSolid(x,w,h,3,Math.max(.02,hh),.45,-.4-t*.4,h*.2,{dy:10,lw:1.2,r:2});x.restore();
+    x.save();x.translate(w*.3,0);drawSolid(x,w,h,6,Math.max(.02,1-hh),.5,t*.3,h*.2,{dy:10,lw:1.2,r:2});x.restore();},
+  calendar(a){const {x,w,h}=a.ctx;x.clearRect(0,0,w,h);const cols=10,rows=4,g=6,cw=Math.min(28,(w-60)/cols-g),x0=(w-(cols*(cw+g)-g))/2,y0=(h-(rows*(cw+g)-g))/2+8;
+    const fill=Math.floor(a.t*6)%(cols*rows+12);
+    for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){const i=r*cols+c;const X=x0+c*(cw+g),Y=y0+r*(cw+g);x.beginPath();x.roundRect?x.roundRect(X,Y,cw,cw,6):x.rect(X,Y,cw,cw);
+      if(i<fill){x.fillStyle=(i*7%5===0)?C['accent-2']:C.accent;x.globalAlpha=i===fill-1?.55:.9;x.fill();x.globalAlpha=1;}else{x.strokeStyle=alpha(C.accent,.35);x.lineWidth=1;x.stroke();}}},
+  tiles(a){const {x,w,h}=a.ctx;x.clearRect(0,0,w,h);const cols=8,rows=4,s=Math.min((w-48)/cols,(h-40)/rows),x0=(w-cols*s)/2,y0=(h-rows*s)/2+8;
+    const order=[...Array(cols*rows).keys()].sort((p,q)=>((p*37)%32)-((q*37)%32));const k=Math.floor(a.t*3)%(cols*rows+8);
+    const nums=[12,18,20,24,28,30,36,42,45,48,50,54,60,63,64,70,72,75,80,84,90,96,98,100,105,108,112,120,126,128,135,144];
+    x.font=`500 ${Math.max(9,s*.28)}px "JetBrains Mono", monospace`;x.textAlign='center';x.textBaseline='middle';
+    for(let i=0;i<cols*rows;i++){const c=i%cols,r=Math.floor(i/cols),X=x0+c*s,Y=y0+r*s;const shown=order.indexOf(i)<k;
+      if(shown){const hue=(c+r)/(cols+rows);x.fillStyle=hue<.5?alpha(C.accent,.35+hue):alpha(C['accent-2'],.2+hue*.6);x.fillRect(X+1,Y+1,s-2,s-2);}
+      else{x.fillStyle=C.surface;x.fillRect(X+1,Y+1,s-2,s-2);x.fillStyle=C.soft;x.fillText(nums[i],X+s/2,Y+s/2);}}},
+  signal(a){const {x,w,h}=a.ctx;x.clearRect(0,0,w,h);const pad=24,base=h*.62;x.strokeStyle=alpha(C.accent,.25);x.lineWidth=1;
+    for(let i=0;i<4;i++){const y=pad+18+i*((h-pad*2-10)/3);x.beginPath();x.moveTo(pad,y);x.lineTo(w-pad,y);x.stroke();}
+    const N=80,off=a.t*14;x.beginPath();const pts=[];
+    for(let i=0;i<=N;i++){const X=pad+(w-pad*2)*i/N,v=Math.sin((i+off)*.18)*.6+Math.sin((i+off)*.05)*.9;const Y=base-v*h*.17;pts.push([X,Y,(Math.floor(i+off)%23===0)]);i?x.lineTo(X,Y):x.moveTo(X,Y);}
+    x.strokeStyle=C.accent;x.lineWidth=2;x.stroke();
+    pts.forEach(([X,Y,f])=>{if(f){x.beginPath();x.arc(X,Y,4.5,0,7);x.fillStyle=C['accent-2'];x.fill();x.beginPath();x.moveTo(X,Y+8);x.lineTo(X,h-pad+4);x.strokeStyle=alpha(C['accent-2'],.5);x.setLineDash([3,3]);x.stroke();x.setLineDash([]);}});}
+};
+function drawAll(){drawPrism();arts.forEach(a=>DRAW[a.kind](a));}
+let last=performance.now();
+function loopArts(now){const dt=Math.min(.05,(now-last)/1000);last=now;arts.forEach(a=>{if(a.live&&!RM){a.t+=dt;DRAW[a.kind](a);}});requestAnimationFrame(loopArts);}
+arts.forEach(a=>{a.t=a.kind==='calendar'?4.2:a.kind==='tiles'?6:1.2;});
+const coarse=matchMedia('(hover: none)').matches;
+const io=new IntersectionObserver(es=>es.forEach(e=>{const a=arts.find(z=>z.card===e.target);if(a)a.live=coarse?e.isIntersecting:a.hover&&e.isIntersecting;a&&(a.vis=e.isIntersecting);}),{threshold:.3});
+arts.forEach(a=>{io.observe(a.card);
+  a.card.addEventListener('pointerenter',()=>{a.hover=true;a.live=true;});
+  a.card.addEventListener('pointerleave',()=>{a.hover=false;a.live=coarse&&a.vis;a.card.style.setProperty('--rx','0deg');a.card.style.setProperty('--ry','0deg');});
+  if(!RM&&!coarse)a.card.addEventListener('pointermove',e=>{const r=a.card.getBoundingClientRect();const px=(e.clientX-r.left)/r.width-.5,py=(e.clientY-r.top)/r.height-.5;a.card.style.setProperty('--ry',(px*4)+'deg');a.card.style.setProperty('--rx',(-py*4)+'deg');});
+});
+addEventListener('resize',()=>{PC=fit(pc);arts.forEach(a=>a.ctx=fit(a.cv));drawAll();});
+drawAll();requestAnimationFrame(loopPrism);requestAnimationFrame(loopArts);
+
+/* ---------- Pestañas de investigación ---------- */
+const STUDIES=[
+  {big:60.7,fmt:v=>v.toFixed(1).replace('.',',')+' %',cap:'de las retroalimentaciones escritas no moviliza lenguaje matemático, aunque casi todas muestran mediación didáctica.',meth:['análisis mixto','56 producciones · 14 docentes','MTSK'],src:'Seminario de título, PUCV, 2026.'},
+  {big:4,fmt:v=>Math.round(v)+'',cap:'trayectorias en que futuros docentes reorganizan lo que notan en la actividad de sus estudiantes: de la persistencia subestimada a la reinterpretación del logro.',meth:['Lesson Study','noticing como razonamiento','Bakker et al., 2022'],src:'Artículo en revisión, 2026.'},
+  {big:12,fmt:v=>Math.round(v)+'',cap:'futuros docentes con alta disposición tecnológica: valoran la robótica educativa, pero no logran transferirla al aula de matemática.',meth:['estudio exploratorio','grupo focal','muestra de mejor escenario'],src:'Ponencia en RELME 38, Colombia, 2025.'}
+];
+const tabs=[...document.querySelectorAll('.tab')],panel=document.getElementById('panel');
+const $=id=>document.getElementById(id);
+function show(i,focus){tabs.forEach((t,k)=>{t.setAttribute('aria-selected',k===i);t.tabIndex=k===i?0:-1;});if(focus)tabs[i].focus();panel.setAttribute('aria-labelledby','t'+i);
+  const s=STUDIES[i];$('p-cap').textContent=s.cap;$('p-src').textContent=s.src;$('p-meth').innerHTML=s.meth.map(m=>`<span>${m}</span>`).join('');
+  panel.classList.remove('fade');void panel.offsetWidth;panel.classList.add('fade');
+  if(RM){$('p-big').textContent=s.fmt(s.big);return;}
+  const t0=performance.now();(function step(n){const p=Math.min(1,(n-t0)/700),e=1-Math.pow(1-p,3);$('p-big').textContent=s.fmt(s.big*e);if(p<1)requestAnimationFrame(step);})(t0);}
+tabs.forEach((t,i)=>{t.addEventListener('click',()=>show(i));t.addEventListener('keydown',e=>{if(e.key==='ArrowDown'||e.key==='ArrowRight'){e.preventDefault();show((i+1)%3,true)}if(e.key==='ArrowUp'||e.key==='ArrowLeft'){e.preventDefault();show((i+2)%3,true)}});});
+
+/* ---------- Navegación y aparición ---------- */
+const nav=document.getElementById('nav');const links=[...nav.querySelectorAll('ul a')];
+const secs=links.map(l=>document.querySelector(l.getAttribute('href')));
+function onScroll(){nav.classList.toggle('scrolled',scrollY>40);let cur=-1;secs.forEach((s,i)=>{if(s.getBoundingClientRect().top<innerHeight*.4)cur=i;});links.forEach((l,i)=>l.classList.toggle('on',i===cur));}
+addEventListener('scroll',onScroll,{passive:true});onScroll();
+if(!RM){const els=[...document.querySelectorAll('.reveal')].filter(el=>el.getBoundingClientRect().top>innerHeight);
+  els.forEach(el=>el.classList.add('pre'));
+  const ro=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.remove('pre');ro.unobserve(e.target);}}),{threshold:.08});
+  els.forEach(el=>ro.observe(el));}
+
+
+/* ---------- Filtro del catálogo ---------- */
+const fb=[...document.querySelectorAll('.f')],tl=[...document.querySelectorAll('.tile')];
+fb.forEach(b=>b.addEventListener('click',()=>{const k=b.dataset.f;fb.forEach(x=>x.setAttribute('aria-pressed',x===b));tl.forEach(t=>t.classList.toggle('hide',k!=='all'&&t.dataset.c!==k));}));
+/* ---------- Correo ---------- */
+const mb=$('copy-mail'),ok=$('mail-ok');
+mb.addEventListener('click',()=>{const t=$('mail-txt').textContent;const done=()=>{ok.hidden=false;setTimeout(()=>ok.hidden=true,1600)};
+  const sel=()=>{const r=document.createRange();r.selectNodeContents($('mail-txt'));const s=getSelection();s.removeAllRanges();s.addRange(r);};
+  try{navigator.clipboard.writeText(t).then(done,sel)}catch(e){sel()}});
+})();
+</script>
+
+</body>
+</html>
