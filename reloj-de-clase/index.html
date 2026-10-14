@@ -177,13 +177,17 @@ input[type=range]{accent-color:var(--accent);width:150px}
 .times input{font-family:var(--f-mono);font-size:17px;font-weight:600;text-transform:none;letter-spacing:0}
 .dur{font-family:var(--f-hand);font-size:24px;color:var(--hand);padding-bottom:4px}
 .blist{list-style:none;margin:0;padding:0;display:grid;gap:8px}
-.blist li{display:grid;grid-template-columns:34px minmax(0,1fr) auto 28px;grid-template-areas:"sw name min del" "sw items items items" "sw time time time";gap:2px 10px;align-items:center;padding:8px 8px 8px 8px;border-radius:14px;background:color-mix(in srgb,var(--c) 9%,var(--surface));border:1px solid color-mix(in srgb,var(--c) 30%,var(--surface))}
+.blist li{display:grid;grid-template-columns:34px minmax(0,1fr) auto 28px;grid-template-areas:"sw name min del" "sw items items items" "sw song song song" "sw time time time";gap:2px 10px;align-items:center;padding:8px 8px 8px 8px;border-radius:14px;background:color-mix(in srgb,var(--c) 9%,var(--surface));border:1px solid color-mix(in srgb,var(--c) 30%,var(--surface))}
 .swb{grid-area:sw;width:34px;height:34px;border-radius:10px;border:0;background:var(--c);cursor:pointer;color:var(--chip-ink);font-weight:800;font-family:var(--f-display)}
 .bname{grid-area:name;width:100%;font-weight:700;background:transparent!important;border-color:transparent!important;padding-left:4px!important}
 .bname:hover,.bname:focus{border-color:var(--line)!important;background:var(--surface)!important}
 .bmin{grid-area:min;display:flex;align-items:center;gap:4px;font-size:13px;color:var(--muted)}
-.bitems{grid-area:items;width:100%;font-size:12.5px;background:transparent!important;border-color:transparent!important;padding:2px 4px!important;color:var(--muted)}
-.bitems:hover,.bitems:focus{border-color:var(--line)!important;background:var(--surface)!important;color:var(--ink)}
+.bsong{grid-area:song}
+.bitems,.bsong{width:100%;font-size:12.5px;background:transparent!important;border-color:transparent!important;padding:2px 4px!important;color:var(--muted)}
+.bitems:hover,.bitems:focus,.bsong:hover,.bsong:focus{border-color:var(--line)!important;background:var(--surface)!important;color:var(--ink)}
+.m-song{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:6px 10px;border-radius:12px;background:color-mix(in srgb,var(--c,var(--accent)) 14%,var(--surface))}
+.m-song b{font-family:var(--f-hand);font-size:19px;color:var(--hand);margin-right:auto}
+.m-song iframe{width:168px;aspect-ratio:16/9;border:0;border-radius:8px;display:block;background:#000}
 .m-items{display:flex;gap:6px;flex-wrap:wrap;margin-top:-2px}
 .m-items span{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;padding:4px 10px;border-radius:999px;background:color-mix(in srgb,var(--c,var(--muted)) 16%,var(--surface))}
 .m-items span::before{content:"";width:10px;height:10px;border-radius:3px;border:2px solid var(--c,var(--muted))}
@@ -279,6 +283,7 @@ body:not(.pip) [data-pip-only]{display:none}
               <div class="m-act" id="mAct"></div>
             </div>
             <div class="m-items" id="mItems" hidden></div>
+            <div class="m-song" id="mSong" hidden><b>canción del momento</b><span id="mSongV"></span><button class="btn sm" data-act="songplay" id="mSongP">▶ Reproducir</button><button class="btn sm" data-act="songstop" id="mSongS" hidden>Detener canción</button></div>
             <div class="m-bar" id="mBar"></div>
             <div class="m-foot"><span id="mFL"></span><span><button class="m-end" data-act="editend" id="mEnd" title="Cambiar la hora de salida"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg><span id="mEndT"></span></button><input type="time" id="mEndIn" class="m-end-in" hidden aria-label="Hora de salida"></span></div>
             <div class="m-timer" id="mTimer" hidden><span class="m-tl">cronómetro</span><span class="m-tt" id="mTT">00:00</span><button class="btn sm" data-act="tpause" id="mTP">Pausa</button><button class="btn sm" data-act="tstop">Quitar</button></div>
@@ -405,7 +410,7 @@ const R2B={id:'mrm-2b',v:2,name:'2° básico · Mi ruta matemática',start:'08:0
   {name:'Escucho lo que haremos',min:5,color:4},
   {name:'Trabajo, participo y aprendo',min:25,color:0},
   {name:'Revisamos',min:7,color:3},
-  {name:'Pausa activa',min:5,color:1},
+  {name:'Pausa activa',min:5,color:1,song:'https://www.youtube.com/watch?v=F8sFFTJgyqw'},
   {name:'Trabajo, participo y aprendo',min:22,color:0},
   {name:'Revisamos lo que aprendimos',min:15,color:5}]};
 let cfg=store.get('rc.cfg',null)||{start:R2B.start,end:R2B.end,chime:true,routeId:R2B.id,blocks:JSON.parse(JSON.stringify(R2B.blocks))};
@@ -457,7 +462,7 @@ function advance(){
   if(i>=n-1){endClass();return}
   if(t<run.cs)return;
   run.sched=run.sched.slice();run.sched[i]={...run.sched[i],end:t};
-  run.idx=i+1;run.sched=fit(run.blocks,run.sched,i+1,t,run.ce);
+  run.idx=i+1;run.sched=fit(run.blocks,run.sched,i+1,t,run.ce);songAuto=true;
   run.prompted=-1;run.ask=false;saveRun();if(cfg.chime)chime();render();
 }
 function extend(m){
@@ -514,14 +519,14 @@ function timerTick(){if(timer&&!timer.paused&&!timer.done&&Date.now()>=timer.end
 
 // ---------- barra ----------
 const mini=$('mini');
-const M={chip:$('mChip'),name:$('mName'),sub:$('mSub'),time:$('mTime'),cap:$('mCap'),act:$('mAct'),bar:$('mBar'),fl:$('mFL'),items:$('mItems'),endT:$('mEndT'),endB:$('mEnd'),endIn:$('mEndIn'),timer:$('mTimer'),tt:$('mTT'),tp:$('mTP'),ask:$('mAsk'),askTxt:$('mAskTxt'),askB:$('mAskB')};
+const M={chip:$('mChip'),name:$('mName'),sub:$('mSub'),time:$('mTime'),cap:$('mCap'),act:$('mAct'),bar:$('mBar'),fl:$('mFL'),items:$('mItems'),song:$('mSong'),songV:$('mSongV'),songP:$('mSongP'),songS:$('mSongS'),endT:$('mEndT'),endB:$('mEnd'),endIn:$('mEndIn'),timer:$('mTimer'),tt:$('mTT'),tp:$('mTP'),ask:$('mAsk'),askTxt:$('mAskTxt'),askB:$('mAskB')};
 let keys={};
 const ARROW='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
 const CLOCK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M9 2h6"/></svg>';
 const PLAY='<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 5v14l12-7z"/></svg>';
 mini.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b)return;const a=b.dataset.act;
   ({start:()=>startClass('agenda'),ensayo:()=>startClass('ensayo'),now:()=>startClass('ahora'),next:advance,advance,finish:endClass,
-    ext2:()=>extend(2),ext5:()=>extend(5),later:()=>{if(run){run.ask=false;saveRun();render()}},tpause:tPause,tstop:tStop,tobig:()=>openPip('timer'),editend:editEnd}[a]||(()=>{}))()});
+    ext2:()=>extend(2),ext5:()=>extend(5),later:()=>{if(run){run.ask=false;saveRun();render()}},tpause:tPause,tstop:tStop,tobig:()=>openPip('timer'),editend:editEnd,songplay:playSong,songstop:stopSong}[a]||(()=>{}))()});
 function editEnd(){const ce=run?run.ce:todayAt(cfg.start)+durMin()*MIN;M.endIn.value=clk(ce);M.endB.hidden=true;M.endIn.hidden=false;M.endIn.focus()}
 function closeEnd(apply){if(M.endIn.hidden)return;M.endIn.hidden=true;M.endB.hidden=false;const v=M.endIn.value;if(!apply||!/^\d\d:\d\d$/.test(v))return;
   if(!run){cfg.end=v;saveCfg();renderEditor();toast(`Salida a las ${v}`);return}
@@ -532,6 +537,14 @@ function closeEnd(apply){if(M.endIn.hidden)return;M.endIn.hidden=true;M.endB.hid
   if(run.sched[i].end>now()){run.prompted=-1;run.ask=false}saveRun();keys={};render();toast(`Salida de esta clase: ${v}. Los momentos se reajustaron.`)}
 M.endIn.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();closeEnd(true)}else if(e.key==='Escape')closeEnd(false)});
 M.endIn.addEventListener('blur',()=>closeEnd(true));
+// ---------- canción por momento ----------
+let songKey='',songUrl='',songAuto=false;
+const ytId=u=>{const m=String(u||'').match(/(?:v=|youtu\.be\/|shorts\/|embed\/|live\/)([\w-]{11})/);return m?m[1]:null};
+function playSong(){const id=ytId(songUrl);if(!id){M.songV.textContent='El link no es de YouTube';return}
+  M.songV.innerHTML=`<iframe src="https://www.youtube.com/embed/${id}?autoplay=1&rel=0&playsinline=1" allow="autoplay; encrypted-media; fullscreen" allowfullscreen title="Canción del momento"></iframe>`;
+  M.songP.hidden=true;M.songS.hidden=false}
+function stopSong(){M.songV.innerHTML='';M.songP.hidden=false;M.songS.hidden=true}
+function syncSong(url,key){if(key===songKey)return;songKey=key;songUrl=url||'';stopSong();M.song.hidden=!url;if(url&&songAuto)playSong();songAuto=false}
 const ftimer=$('ftimer');
 const F={cls:$('ftCls'),disp:$('ftDisp'),lab:$('ftLab'),ring:$('ftRing'),prg:$('ftPrg'),btns:$('ftBtns'),music:[...document.querySelectorAll('#ftMusic button')]};
 ftimer.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b)return;const a=b.dataset.act;
@@ -558,6 +571,7 @@ function render(){
     if(t>cur.end){view=view.slice();view[idx]={...cur,end:t};if(idx<blocks.length-1)view=fit(blocks,view,idx+1,t,ce)}}
   else{blocks=cfg.blocks;cs=todayAt(cfg.start);ce=cs+durMin()*MIN;view=fit(blocks,[],0,cs,ce)}
   {const it=run&&!(t<run.cs)&&run.blocks[run.idx].items||[],k=it.join('|');if(keys.items!==k){keys.items=k;M.items.hidden=!it.length;M.items.innerHTML=it.map(x=>`<span>${esc(x)}</span>`).join('')}}
+  syncSong(run&&!(t<run.cs)&&run.blocks[run.idx].song,run&&!(t<run.cs)&&run.blocks[run.idx].song?run.cs+'|'+run.idx:'');
   mini.classList.toggle('idle',!run);mini.classList.toggle('noclock',cfg.showClock===false);
   const n=blocks.length,endAll=Math.max(ce,view[n-1].end),total=Math.max(1,endAll-cs),pre=run&&t<cs;
 
@@ -615,6 +629,7 @@ function renderEditor(){
     <span class="bmin"><input type="number" id="bm${i}" data-i="${i}" min="1" max="300" value="${b.min}" aria-label="Minutos de ${esc(b.name)}">min</span>
     ${i===n-1?'<span class="fixed" title="El cierre termina siempre a la hora de salida">fijo</span>':`<button class="del" data-del="${i}" aria-label="Eliminar ${esc(b.name)}">×</button>`}
     <input type="text" class="bitems" id="bi${i}" data-i="${i}" value="${esc((b.items||[]).join('; '))}" placeholder="Indicadores para los estudiantes (separa con ;)" aria-label="Indicadores de ${esc(b.name)}">
+    <input type="url" class="bsong" id="bs${i}" data-i="${i}" value="${esc(b.song||'')}" placeholder="Canción: link de YouTube (opcional)" aria-label="Canción de ${esc(b.name)}">
     <span class="btime" id="bt${i}"></span></li>`).join('');
   updatePreview();
 }
@@ -627,7 +642,7 @@ function updatePreview(){
   renderRoutes();
 }
 $('pList').addEventListener('input',e=>{const i=+e.target.dataset.i;if(isNaN(i))return;
-  if(e.target.classList.contains('bname'))cfg.blocks[i].name=e.target.value||'Momento';else if(e.target.classList.contains('bitems'))cfg.blocks[i].items=e.target.value.split(';').map(x=>x.trim()).filter(Boolean);else cfg.blocks[i].min=Math.max(1,+e.target.value||1);saveCfg();updatePreview()});
+  if(e.target.classList.contains('bname'))cfg.blocks[i].name=e.target.value||'Momento';else if(e.target.classList.contains('bsong'))cfg.blocks[i].song=e.target.value.trim()||undefined;else if(e.target.classList.contains('bitems'))cfg.blocks[i].items=e.target.value.split(';').map(x=>x.trim()).filter(Boolean);else cfg.blocks[i].min=Math.max(1,+e.target.value||1);saveCfg();updatePreview()});
 $('pList').addEventListener('click',e=>{const d=e.target.closest('[data-del]');if(d){cfg.blocks.splice(+d.dataset.del,1);saveCfg();renderEditor();return}
   const c=e.target.closest('[data-col]');if(c){const i=+c.dataset.col,b=cfg.blocks[i],cur=b.color!=null?b.color:(i===cfg.blocks.length-1?5:i%5);b.color=(cur+1)%PAL.length;saveCfg();renderEditor();const f=document.querySelector(`[data-col="${i}"]`);if(f)f.focus()}});
 $('pAdd').onclick=()=>{const used=cfg.blocks.map(b=>b.color);const free=[0,1,2,3,4].find(c=>!used.includes(c));cfg.blocks.splice(cfg.blocks.length-1,0,{name:'Nuevo momento',min:10,color:free!=null?free:3});saveCfg();renderEditor();const el=$('bn'+(cfg.blocks.length-2));if(el){el.focus();el.select()}};
@@ -683,6 +698,8 @@ if(!routes)routes=[{id:'ex90',name:"Ejemplo · Bloque 90'",start:'08:00',end:'09
     routes=routes.filter(x=>x.id!==R2B.id);routes.unshift(r2);seen.push(R2B.id+'@'+R2B.v);
     if(!run){cfg.start=r2.start;cfg.end=r2.end;cfg.blocks=JSON.parse(JSON.stringify(r2.blocks));cfg.routeId=r2.id;saveCfg()}
     store.set('rc.seen',seen);store.set('rc.routes',routes)}}
+{const seen=store.get('rc.seen',[]);if(!seen.includes('mrm-2b-song')){const add=bl=>bl.forEach(b=>{if(/pausa activa/i.test(b.name)&&!b.song)b.song='https://www.youtube.com/watch?v=F8sFFTJgyqw'});
+  const r=routes.find(x=>x.id==='mrm-2b');if(r)add(r.blocks);if(cfg.routeId==='mrm-2b'){add(cfg.blocks);saveCfg()}seen.push('mrm-2b-song');store.set('rc.seen',seen);store.set('rc.routes',routes)}}
 const saveRoutes=()=>store.set('rc.routes',routes);
 const snap=()=>({start:cfg.start,end:cfg.end,blocks:JSON.parse(JSON.stringify(cfg.blocks))});
 const sameAs=r=>JSON.stringify({start:r.start,end:r.end,blocks:r.blocks})===JSON.stringify(snap());
@@ -709,7 +726,7 @@ $('rExp').onclick=()=>{const data=JSON.stringify({app:'reloj-de-clase',version:1
   try{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([data],{type:'application/json'}));a.download='rutas-de-clase.json';document.body.appendChild(a);a.click();a.remove();toast('Se descargó rutas-de-clase.json')}catch(e){toast('No se pudo descargar aquí')}};
 $('rImp').onclick=()=>$('rFile').click();
 $('rFile').onchange=e=>{const f=e.target.files[0];if(!f)return;f.text().then(t=>{const d=JSON.parse(t),list=Array.isArray(d)?d:d.routes;let n=0;
-  (list||[]).forEach(r=>{if(r&&r.name&&Array.isArray(r.blocks)&&r.blocks.length){routes.push({id:'r'+Date.now()+n,name:String(r.name),start:r.start||'08:00',end:r.end||'09:30',blocks:r.blocks.map(b=>({name:String(b.name||'Momento'),min:Math.max(1,+b.min||1),color:b.color,items:Array.isArray(b.items)?b.items.map(String):undefined}))});n++}});
+  (list||[]).forEach(r=>{if(r&&r.name&&Array.isArray(r.blocks)&&r.blocks.length){routes.push({id:'r'+Date.now()+n,name:String(r.name),start:r.start||'08:00',end:r.end||'09:30',blocks:r.blocks.map(b=>({name:String(b.name||'Momento'),min:Math.max(1,+b.min||1),color:b.color,items:Array.isArray(b.items)?b.items.map(String):undefined,song:b.song?String(b.song):undefined}))});n++}});
   saveRoutes();renderRoutes();toast(n?`Se importaron ${n} rutas`:'El archivo no tiene rutas válidas')}).catch(()=>toast('No se pudo leer el archivo'));e.target.value=''};
 {const c=curRoute();if(c)$('rName').value=c.name}
 
