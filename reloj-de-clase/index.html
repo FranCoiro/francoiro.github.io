@@ -79,6 +79,29 @@ h2{font-family:var(--f-display);font-weight:800;font-size:22px;margin:0;letter-s
 .m-name{font-family:var(--f-display);font-weight:800;font-size:clamp(19px,4.4cqi,30px);line-height:1.05;letter-spacing:-.02em;overflow:hidden;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;text-wrap:balance}
 .m-chip{display:none!important}
 .m-sub:empty{display:none}
+.m-barw{position:relative}
+.mini.kids .m-barw{padding-top:32px}
+.m-pet{position:absolute;top:0;left:0;border:0;background:none;padding:0;cursor:pointer;font-size:30px;line-height:1;transform:translateX(-50%);transition:left .8s ease;font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif}
+.m-pet>span{display:inline-block;animation:walk .45s ease-in-out infinite alternate;transform-origin:50% 100%}
+.m-pet.rest>span{animation:none}
+@keyframes walk{from{transform:translateY(0) rotate(-7deg)}to{transform:translateY(-5px) rotate(7deg)}}
+.pipmode .mini.kids .m-barw{padding-top:28px}
+.pipmode .m-pet{font-size:26px}
+.m-kick{display:none;font-size:12px;text-transform:uppercase;letter-spacing:.12em;font-weight:700;color:var(--muted);margin-bottom:2px}
+.mini.quick .m-kick{display:block}
+.flinks{display:grid;gap:8px;padding:10px 12px 12px;background:var(--surface)}
+.fl-list,.lk-groups{display:grid;gap:10px}
+.lk-g>small{display:block;font-family:var(--f-hand);font-size:17px;color:var(--hand);margin-bottom:4px}
+.lk-g>div{display:flex;flex-wrap:wrap;gap:6px}
+.lk{display:inline-flex;align-items:center;gap:6px;max-width:100%;padding:6px 11px;border-radius:10px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);text-decoration:none;font-weight:700;font-size:13.5px}
+.lk:hover{border-color:var(--accent)}
+.lk span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lk-x{border:0;background:none;color:var(--muted);cursor:pointer;font-size:16px;padding:0 0 0 4px}
+.lk-x:hover{color:var(--warn)}
+.lk-form{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1.4fr) auto auto;gap:6px;margin-top:14px}
+.lk-form select{border:1.5px solid var(--line);background:var(--bg);border-radius:10px;padding:6px 8px;font:inherit}
+@media (max-width:620px){.lk-form{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}}
+.lk-empty{color:var(--muted);font-size:13px}
 .mini:not(.quick) .seg span{display:none}
 .mini:not(.quick) .m-bar{height:14px}
 .mini:not(.quick) .seg b{border-radius:6px}
@@ -124,37 +147,38 @@ h2{font-family:var(--f-display);font-weight:800;font-size:22px;margin:0;letter-s
 .mini.quick .m-name{font-size:clamp(44px,13cqi,84px);line-height:.9;-webkit-line-clamp:1}
 .mini.quick .m-sub{font-size:15px}
 .mini.quick .seg span{text-align:center;font-family:var(--f-mono);font-size:13px}
-body.pip .mini.quick .m-name{font-size:clamp(40px,12cqi,72px)}
+.pipmode .mini.quick .m-name{font-size:clamp(40px,12cqi,72px)}
 .mini.idle .m-top{grid-template-columns:minmax(0,1fr) auto}
 .mini.idle .m-act{grid-column:1/-1}
 @container (max-width:380px){ .m-act .btn{flex:1;justify-content:center} .m-chip{width:36px;height:36px;font-size:16px} }
 
-body.pip{margin:0;padding:0;background:var(--surface);background-image:none}
-body.pip .mini{padding:8px 10px 6px;gap:6px}
-body.pip .m-top{grid-template-columns:minmax(0,1fr) auto auto;gap:4px 10px}
-body.pip .m-act{grid-column:auto;gap:5px}
-body.pip .mini.idle .m-act{grid-column:1/-1}
-body.pip .m-now{gap:8px}
-body.pip .m-chip{width:34px;height:34px;font-size:17px;border-radius:10px}
-body.pip .m-name{font-size:clamp(17px,4.8cqi,28px);-webkit-line-clamp:1}
-body.pip .m-sub{font-size:11.5px;margin-top:0}
-body.pip .m-time{font-size:clamp(26px,7.5cqi,44px)}
-body.pip .m-cap{font-size:13px}
-body.pip .m-act .btn{padding:5px 9px;font-size:13px;border-radius:10px}
-body.pip .btn.icon svg{width:16px;height:16px}
-body.pip .m-bar{height:26px;border-radius:8px}
-body.pip .seg b{border-radius:7px}
-body.pip .seg span{line-height:26px;font-size:12.5px;padding:0 6px}
-body.pip .mark{top:-4px;bottom:-4px}
-body.pip .m-foot{font-size:12px;min-height:20px}
-body.pip .m-items span{font-size:11.5px;padding:2px 8px}
-body.pip .m-timer{padding-top:6px}
-body.pip .m-tt{font-size:19px}
-body.pip .nx{display:none}
-body.pip .m-cap{display:none}
-body.pip .mini.quick .m-cap{display:block}
-body.pip .mini:not(.quick) .m-bar{height:14px}
-body.pip .mini{border-radius:0;min-height:100vh;justify-content:center;padding:12px 16px 10px}
+body.pip{margin:0;padding:0;background:var(--surface);background-image:none;overflow:hidden}
+.pipmode .mini{padding:8px 10px 6px;gap:6px}
+.pipmode .m-top{grid-template-columns:minmax(0,1fr) auto auto;gap:4px 10px}
+.pipmode .m-act{grid-column:auto;gap:5px}
+.pipmode .mini.idle .m-act{grid-column:1/-1}
+.pipmode .m-now{gap:8px}
+.pipmode .m-chip{width:34px;height:34px;font-size:17px;border-radius:10px}
+.pipmode .m-name{font-size:clamp(17px,4.8cqi,28px);-webkit-line-clamp:1}
+.pipmode .m-sub{font-size:11.5px;margin-top:0}
+.pipmode .m-time{font-size:clamp(26px,7.5cqi,44px)}
+.pipmode .m-cap{font-size:13px}
+.pipmode .m-act .btn{padding:5px 9px;font-size:13px;border-radius:10px}
+.pipmode .btn.icon svg{width:16px;height:16px}
+.pipmode .m-bar{height:26px;border-radius:8px}
+.pipmode .seg b{border-radius:7px}
+.pipmode .seg span{line-height:26px;font-size:12.5px;padding:0 6px}
+.pipmode .mark{top:-4px;bottom:-4px}
+.pipmode .m-foot{font-size:12px;min-height:20px}
+.pipmode .m-items span{font-size:11.5px;padding:2px 8px}
+.pipmode .m-timer{padding-top:6px}
+.pipmode .m-tt{font-size:19px}
+.pipmode .nx{display:none}
+.pipmode .m-cap{display:none}
+.pipmode .mini.quick .m-cap{display:block}
+.pipmode .mini:not(.quick) .m-bar{height:14px}
+.pipmode .mini{border-radius:0;justify-content:center;padding:12px 16px 10px}
+body.pip .mini{min-height:100vh}
 
 .slot-wrap{border:1px solid var(--line);border-radius:19px;overflow:hidden}
 .popped{border:2px dashed var(--line);border-radius:18px;padding:26px 18px;text-align:center;display:grid;gap:8px;justify-items:center;color:var(--muted)}
@@ -333,7 +357,7 @@ body:not(.pip) [data-pip-only]{display:none}
     </div>
   </header>
   <div class="note" id="note" hidden></div>
-  <nav class="tabs" id="tabs" aria-label="Secciones"><button data-tab="clase">Clase</button><button data-tab="crono">Cronómetro</button><button data-tab="plan">Rutas y planificación</button></nav>
+  <nav class="tabs" id="tabs" aria-label="Secciones"><button data-tab="clase">Clase</button><button data-tab="crono">Cronómetro</button><button data-tab="links">Enlaces</button><button data-tab="plan">Planificar</button></nav>
 
   <div class="grid">
     <div class="col">
@@ -342,13 +366,13 @@ body:not(.pip) [data-pip-only]{display:none}
         <div class="slot-wrap" id="slot">
           <div class="mini" id="mini">
             <div class="m-top">
-              <div class="m-now"><span class="m-chip" id="mChip">·</span><div style="min-width:0"><div class="m-name" id="mName">—</div><div class="m-sub" id="mSub"></div></div></div>
+              <div class="m-now"><span class="m-chip" id="mChip">·</span><div style="min-width:0"><div class="m-kick">Momento</div><div class="m-name" id="mName">—</div><div class="m-sub" id="mSub"></div></div></div>
               <div class="m-clock"><div class="m-time" id="mTime">00:00</div><div class="m-cap" id="mCap"></div></div>
               <div class="m-act" id="mAct"></div>
             </div>
             <div class="m-items" id="mItems" hidden></div>
             <div class="m-song" id="mSong" hidden><b>canción del momento</b><span id="mSongV"></span><button class="btn sm" data-act="songplay" id="mSongP">▶ Reproducir</button><button class="btn sm" data-act="songstop" id="mSongS" hidden>Detener canción</button></div>
-            <div class="m-bar" id="mBar"></div>
+            <div class="m-barw"><button class="m-pet" id="mPet" data-act="pet" hidden title="Cambiar personaje" aria-label="Cambiar personaje">🐻</button><div class="m-bar" id="mBar"></div></div>
             <div class="m-prog" id="mProg" hidden><i id="mProgI"></i></div>
             <div class="m-foot"><span id="mFL"></span><span><button class="m-end" data-act="editend" id="mEnd" title="Cambiar la hora de salida"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg><span id="mEndT"></span></button><input type="time" id="mEndIn" class="m-end-in" hidden aria-label="Hora de salida"></span></div>
             <div class="m-timer" id="mTimer" hidden><span class="m-tl">cronómetro</span><span class="m-tt" id="mTT">00:00</span><button class="btn sm" data-act="tpause" id="mTP">Pausa</button><button class="btn sm" data-act="tstop">Quitar</button></div>
@@ -376,6 +400,17 @@ body:not(.pip) [data-pip-only]{display:none}
         </div>
       </section>
 
+      <section class="panel" data-pane="links" hidden>
+        <div class="panel-h"><div class="ttl"><h2>Enlaces rápidos</h2><span class="scrib">a un clic desde la barra</span></div></div>
+        <div class="lk-groups" id="lkView"></div>
+        <form class="lk-form" id="lkForm">
+          <input type="text" id="lkName" placeholder="Nombre (ej: Pausa activa: estiramiento)" aria-label="Nombre del enlace">
+          <input type="text" id="lkUrl" inputmode="url" placeholder="Link (https://…)" aria-label="Dirección del enlace">
+          <select id="lkGroup" aria-label="Grupo"><option>Pausas activas</option><option>Presentaciones</option><option>Carpetas</option><option>Otros</option></select>
+          <button class="btn sm primary" type="submit">Agregar</button>
+        </form>
+        <p class="hint" style="margin-top:10px">Se abren en una pestaña nueva. En la barra flotante, toca el ícono de enlace para verlos.</p>
+      </section>
       <section class="panel" data-pane="crono">
         <div class="panel-h"><div class="ttl"><h2>Cronómetro</h2><span class="scrib">con música</span></div><button class="btn sm" id="tFull"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>Proyectar</button></div>
         <label class="chk" style="margin:-4px 0 14px"><input type="checkbox" id="tAutoPip" checked> Abrir el cronómetro en ventana flotante al iniciarlo</label>
@@ -434,6 +469,7 @@ body:not(.pip) [data-pip-only]{display:none}
         <div class="row" style="margin-top:10px"><button class="btn sm" id="pAdd">+ Agregar momento</button><span class="hint">Toca el número para cambiar el color.</span></div>
         <p class="sum" id="pSum"></p>
         <label class="chk"><input type="checkbox" id="pChime"> Aviso sonoro al terminar cada momento</label>
+        <label class="chk" style="margin-top:6px"><input type="checkbox" id="pKids"> Modo infantil: un animalito camina por la barra (tócalo para cambiarlo)</label>
         <label class="chk" style="margin-top:6px"><input type="checkbox" id="pShowClock"> Mostrar el tiempo que queda en cada momento</label>
         <div class="row" style="margin-top:12px"><button class="btn sm" id="tryBtn">Probar esta ruta a 30× velocidad</button></div>
         <p class="hint" id="pRunNote" hidden style="margin-top:10px">Hay una clase en curso: los cambios se aplican desde la próxima.</p>
@@ -444,6 +480,10 @@ body:not(.pip) [data-pip-only]{display:none}
 </div>
 
 <div id="fHome" hidden>
+  <div class="flinks" id="flinks" hidden>
+    <div class="ft-top"><span class="m-tl">enlaces</span><button class="btn sm" data-act="tobar">Ver barra de clase</button></div>
+    <div class="fl-list" id="flList"></div>
+  </div>
   <div class="ftimer" id="ftimer">
     <div class="ft-top"><span class="m-tl" id="ftCls">cronómetro</span><button class="btn sm" data-act="tobar">Ver barra de clase</button></div>
     <div class="ft-ring" id="ftRing"><svg viewBox="0 0 120 120" aria-hidden="true"><circle class="trk" cx="60" cy="60" r="50"/><circle class="prg" id="ftPrg" cx="60" cy="60" r="50" stroke-dasharray="314.16" stroke-dashoffset="0"/></svg><div class="ft-in"><div class="ft-disp" id="ftDisp">05:00</div><div class="ft-lab" id="ftLab">listo</div></div></div>
@@ -512,7 +552,7 @@ function startClass(mode){
   const blocks=JSON.parse(JSON.stringify(cfg.blocks));
   const sched=fit(blocks,[],0,cs,ce);let idx=0;const t=now();
   if(t>cs){idx=sched.findIndex(s=>t<s.end);if(idx<0)idx=blocks.length-1}
-  run={mode,blocks,cs,ce,idx,sched,prompted:-1,ask:false};
+  run={mode,blocks,cs,ce,idx,sched,prompted:-1,ask:false,pet:pickPet(idlePet)};
   saveRun();wake();keys={};render();
 }
 function endClass(){run=null;sim=null;saveRun();keys={};try{wakeLock&&wakeLock.release()}catch(e){}render()}
@@ -632,14 +672,14 @@ function timerTick(){if(timer&&!timer.paused&&!timer.done&&Date.now()>=timer.end
 
 // ---------- barra ----------
 const mini=$('mini');
-const M={chip:$('mChip'),name:$('mName'),sub:$('mSub'),time:$('mTime'),cap:$('mCap'),act:$('mAct'),bar:$('mBar'),fl:$('mFL'),items:$('mItems'),prog:$('mProg'),progI:$('mProgI'),song:$('mSong'),songV:$('mSongV'),songP:$('mSongP'),songS:$('mSongS'),endT:$('mEndT'),endB:$('mEnd'),endIn:$('mEndIn'),timer:$('mTimer'),tt:$('mTT'),tp:$('mTP'),ask:$('mAsk'),askTxt:$('mAskTxt'),askB:$('mAskB')};
+const M={chip:$('mChip'),name:$('mName'),sub:$('mSub'),time:$('mTime'),cap:$('mCap'),act:$('mAct'),bar:$('mBar'),fl:$('mFL'),items:$('mItems'),pet:$('mPet'),prog:$('mProg'),progI:$('mProgI'),song:$('mSong'),songV:$('mSongV'),songP:$('mSongP'),songS:$('mSongS'),endT:$('mEndT'),endB:$('mEnd'),endIn:$('mEndIn'),timer:$('mTimer'),tt:$('mTT'),tp:$('mTP'),ask:$('mAsk'),askTxt:$('mAskTxt'),askB:$('mAskB')};
 let keys={};
 const ARROW='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
 const CLOCK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M9 2h6"/></svg>';
 const PLAY='<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 5v14l12-7z"/></svg>';
-mini.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b)return;const a=b.dataset.act;
+mini.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b)return;setTimeout(fitPip,60);const a=b.dataset.act;
   ({start:()=>startClass('agenda'),ensayo:()=>startClass('ensayo'),now:()=>startClass('ahora'),next:advance,advance,finish:endClass,
-    ext2:()=>extend(2),ext5:()=>extend(5),later:()=>{if(run){run.ask=false;saveRun();render()}},tpause:tPause,tstop:tStop,tobig:()=>openPip('timer'),qprev:()=>{if(run&&run.quick&&run.idx>0){run.idx--;saveRun();render()}},editend:editEnd,songplay:playSong,songstop:stopSong}[a]||(()=>{}))()});
+    ext2:()=>extend(2),ext5:()=>extend(5),later:()=>{if(run){run.ask=false;saveRun();render()}},tpause:tPause,tstop:tStop,tobig:()=>openPip('timer'),pet:newPet,tolinks:()=>pipWin?openPip('links'):showTab('links'),qprev:()=>{if(run&&run.quick&&run.idx>0){run.idx--;saveRun();render()}},editend:editEnd,songplay:playSong,songstop:stopSong}[a]||(()=>{}))()});
 function editEnd(){const ce=run?run.ce:todayAt(cfg.start)+durMin()*MIN;M.endIn.value=clk(ce);M.endB.hidden=true;M.endIn.hidden=false;M.endIn.focus()}
 function closeEnd(apply){if(M.endIn.hidden)return;M.endIn.hidden=true;M.endB.hidden=false;const v=M.endIn.value;if(!apply||!/^\d\d:\d\d$/.test(v))return;
   if(!run){cfg.end=v;saveCfg();renderEditor();toast(`Salida a las ${v}`);return}
@@ -698,6 +738,7 @@ function render(){
     const st=!run?'':k<idx?'done':k===idx&&!pre?'cur':'';const p=st==='cur'?Math.min(100,(t-s.start)/(s.end-s.start||1)*100):0;
     return `<div class="seg ${st}" style="left:${L}%;width:${W}%;--c:${colorOf(blocks[k],k,n)}" title="${esc(blocks[k].name)} · ${clk(s.start)}–${clk(s.end)}"><b>${st==='cur'?`<i style="width:${p}%"></i>`:''}<span>${esc(blocks[k].name)}</span></b></div>`}).join('')
     +(run&&!pre?`<div class="mark" style="left:${Math.min(100,(t-cs)/total*100)}%"></div>`:'');
+  setPet(run&&!pre?(t-cs)/total*100:0,!run||pre);
 
   if(!run){
     mini.style.removeProperty('--c');M.chip.textContent=n;
@@ -714,7 +755,7 @@ function render(){
     M.fl.textContent=clk(cs);M.endT.textContent=clk(ce);
   }
   const ak=!run?'idle':pre?'pre':'run';
-  if(keys.act!==ak){keys.act=ak;M.act.innerHTML=`<button class="btn icon" data-act="tobig" title="Cronómetro" aria-label="Abrir cronómetro">${CLOCK}</button>`+(ak==='idle'?`<button class="btn primary" data-act="start">${PLAY}Iniciar clase</button>`:ak==='pre'?'<button class="btn" data-act="now">Empezar ahora</button>':`<button class="btn primary" data-act="next" title="Siguiente momento" aria-label="Siguiente momento"><span class="nx">Siguiente</span>${ARROW}</button>`)}
+  if(keys.act!==ak){keys.act=ak;M.act.innerHTML=`<button class="btn icon" data-act="tolinks" title="Enlaces" aria-label="Abrir enlaces">${LINKICON}</button><button class="btn icon" data-act="tobig" title="Cronómetro" aria-label="Abrir cronómetro">${CLOCK}</button>`+(ak==='idle'?`<button class="btn primary" data-act="start">${PLAY}Iniciar clase</button>`:ak==='pre'?'<button class="btn" data-act="now">Empezar ahora</button>':`<button class="btn primary" data-act="next" title="Siguiente momento" aria-label="Siguiente momento"><span class="nx">Siguiente</span>${ARROW}</button>`)}
   const qk=run&&run.ask?run.idx+'-'+run.blocks.length:'';
   if(keys.ask!==qk){keys.ask=qk;M.ask.hidden=!qk;if(qk){const i=run.idx,last=i===run.blocks.length-1;
     M.askTxt.textContent=last?'Llegó la hora de salida':`Terminó «${run.blocks[i].name}». ¿Pasamos a «${run.blocks[i+1].name}»?`;
@@ -736,6 +777,13 @@ function renderTimer(){
   $('tRing').style.strokeDashoffset=timer?RC*(1-L/timer.total):0;
 }
 const AGENDA=(s,k,st,blocks,n)=>`<li class="${st}" style="--c:${colorOf(blocks[k],k,n)}"><span class="num">${k+1}</span><span class="an">${esc(blocks[k].name)}${k===n-1?'<span class="tag">fijo</span>':''}${st==='cur'?'<span class="tag">← ahora</span>':''}</span><span class="at">${clk(s.start)}–${clk(s.end)}</span><span class="ad">${Math.round((s.end-s.start)/MIN)} min</span></li>`;
+const PETS=['🐻','🐱','🐶','🦖','🐢','🐧','🐸','🦊','🐰','🐼','🦄','🐙','🤖','🐝','🐨','🦉','🐌','🐞'];
+const pickPet=not=>{let p;do{p=PETS[Math.floor(Math.random()*PETS.length)]}while(p===not&&PETS.length>1);return p};
+let idlePet=pickPet();
+function setPet(pct,resting){const on=!!cfg.kids;mini.classList.toggle('kids',on);M.pet.hidden=!on;if(!on)return;
+  const ch=(run&&run.pet)||idlePet;if(M.pet.dataset.ch!==ch){M.pet.dataset.ch=ch;M.pet.innerHTML=`<span>${ch}</span>`}
+  M.pet.style.left=Math.max(3,Math.min(97,pct))+'%';M.pet.classList.toggle('rest',!!resting)}
+function newPet(){const p=pickPet((run&&run.pet)||idlePet);if(run){run.pet=p;saveRun()}else idlePet=p;render()}
 function renderQuick(){
   const n=run.blocks.length,idx=run.idx;
   mini.classList.add('quick');mini.classList.remove('idle');mini.style.setProperty('--c',colorOf(null,idx,n));
@@ -745,13 +793,14 @@ function renderQuick(){
   M.progI.style.width=Math.min(100,(t-run.cs)/tot*100)+'%';M.prog.classList.toggle('over',left<0);
   M.fl.textContent=left>=0?`quedan ${Math.ceil(left/MIN)} min`:`${Math.floor(-left/MIN)} min de más`;M.endT.textContent='salida '+clk(run.qEnd);
   M.name.textContent=String(idx+1);M.sub.textContent=`de ${n}`;M.items.hidden=true;keys.items='';syncSong('','');M.ask.hidden=true;keys.ask='';
+  setPet((idx+.5)/n*100,false);
   M.bar.innerHTML=run.blocks.map((b,k)=>`<div class="seg ${k<idx?'done':k===idx?'cur':''}" style="left:${k/n*100}%;width:${100/n}%;--c:${colorOf(null,k,n)}"><b>${k===idx?'<i style="width:100%"></i>':''}<span>${k+1}</span></b></div>`).join('');
   const ak='q'+(idx===0?'f':'')+(idx===n-1?'l':'');
-  if(keys.act!==ak){keys.act=ak;M.act.innerHTML=`<button class="btn icon" data-act="tobig" title="Cronómetro" aria-label="Abrir cronómetro">${CLOCK}</button><button class="btn" data-act="qprev" aria-label="Momento anterior"${idx===0?' disabled':''}>←</button>`+(idx===n-1?'<button class="btn primary" data-act="finish">Terminar</button>':`<button class="btn primary" data-act="next" aria-label="Siguiente momento">${ARROW}</button>`)}
+  if(keys.act!==ak){keys.act=ak;M.act.innerHTML=`<button class="btn icon" data-act="tolinks" title="Enlaces" aria-label="Abrir enlaces">${LINKICON}</button><button class="btn icon" data-act="tobig" title="Cronómetro" aria-label="Abrir cronómetro">${CLOCK}</button><button class="btn" data-act="qprev" aria-label="Momento anterior"${idx===0?' disabled':''}>←</button>`+(idx===n-1?'<button class="btn primary" data-act="finish">Terminar</button>':`<button class="btn primary" data-act="next" aria-label="Siguiente momento">${ARROW}</button>`)}
   $('modeHint').textContent='Modo rápido';
 }
 function startQuick(n){ctx();sim=null;const t=Date.now(),qd=store.get('rc.qdur',90);
-  run={mode:'rapido',quick:true,qEnd:t+qd*MIN,qDone:false,blocks:Array.from({length:n},(_,i)=>({name:String(i+1)})),idx:0,cs:t,ce:t+12*3600*1000,sched:[],prompted:-1,ask:false};
+  run={pet:pickPet(idlePet),mode:'rapido',quick:true,qEnd:t+qd*MIN,qDone:false,blocks:Array.from({length:n},(_,i)=>({name:String(i+1)})),idx:0,cs:t,ce:t+12*3600*1000,sched:[],prompted:-1,ask:false};
   saveRun();wake();keys={};render()}
 function onKey(e){const tg=e.target;if(tg&&(tg.tagName==='INPUT'||tg.tagName==='SELECT'||tg.tagName==='TEXTAREA'||tg.isContentEditable))return;if(!run)return;
   if(e.key==='ArrowRight'||e.key==='PageDown'){e.preventDefault();advance()}else if((e.key==='ArrowLeft'||e.key==='PageUp')&&run.quick){e.preventDefault();if(run.idx>0){run.idx--;saveRun();render()}}}
@@ -795,6 +844,7 @@ $('pAdd').onclick=()=>{const used=cfg.blocks.map(b=>b.color);const free=[0,1,2,3
 $('pStart').onchange=e=>{const d=durMin();cfg.start=e.target.value||cfg.start;cfg.end=m2hm(hm2m(cfg.start)+d);saveCfg();renderEditor()};
 $('pEnd').onchange=e=>{cfg.end=e.target.value||cfg.end;saveCfg();updatePreview()};
 $('pChime').onchange=e=>{cfg.chime=e.target.checked;saveCfg()};
+$('pKids').checked=!!cfg.kids;$('pKids').onchange=e=>{cfg.kids=e.target.checked;saveCfg();render()};
 $('pShowClock').checked=cfg.showClock!==false;$('pShowClock').onchange=e=>{cfg.showClock=e.target.checked;saveCfg();render()};
 document.querySelectorAll('[data-tpl]').forEach(b=>b.onclick=()=>{const m=+b.dataset.tpl;cfg.blocks=JSON.parse(JSON.stringify(m===45?T45:T90));cfg.end=m2hm(hm2m(cfg.start)+m);saveCfg();renderEditor()});
 
@@ -812,26 +862,48 @@ $('tFile').onchange=e=>{const f=e.target.files[0];if(!f)return;try{audioEl.src=U
 $('tTry').onclick=()=>{if(trying){trying=false;stopMusic();$('tTry').textContent='Escuchar'}else{trying=true;ctx();startMusic();$('tTry').textContent='Detener prueba'}};
 $('tFull').onclick=()=>{const c=$('timerCard');try{(document.fullscreenElement?document.exitFullscreen():c.requestFullscreen()).catch(()=>{})}catch(e){}};
 
+// ---------- enlaces rápidos ----------
+const LINKICON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg>';
+let links=store.get('rc.links',null)||[{id:'l1',name:'Canción de pausa activa',url:'https://www.youtube.com/watch?v=F8sFFTJgyqw',group:'Pausas activas'}];
+const GROUPS=['Pausas activas','Presentaciones','Carpetas','Otros'];
+const saveLinks=()=>store.set('rc.links',links);
+const host=u=>{try{return new URL(u).hostname.replace(/^www\./,'')}catch(e){return ''}};
+function linksHTML(editable){
+  if(!links.length)return '<p class="lk-empty">Aún no hay enlaces. Agrégalos en la pestaña Enlaces.</p>';
+  return GROUPS.concat([...new Set(links.map(l=>l.group))].filter(g=>!GROUPS.includes(g))).map(g=>{const ls=links.filter(l=>l.group===g);if(!ls.length)return '';
+    return `<div class="lk-g"><small>${esc(g)}</small><div>${ls.map(l=>`<a class="lk" href="${esc(l.url)}" target="_blank" rel="noopener" title="${esc(host(l.url))}"><span>${esc(l.name)}</span>${editable?`<button class="lk-x" type="button" data-lkdel="${l.id}" aria-label="Quitar ${esc(l.name)}">×</button>`:''}</a>`).join('')}</div></div>`}).join('');
+}
+function renderLinks(){$('lkView').innerHTML=linksHTML(true);$('flList').innerHTML=linksHTML(false)}
+$('lkView').addEventListener('click',e=>{const d=e.target.closest('[data-lkdel]');if(!d)return;e.preventDefault();const i=links.findIndex(l=>l.id===d.dataset.lkdel);if(i<0)return;const [l]=links.splice(i,1);saveLinks();renderLinks();toast(`Se quitó «${l.name}»`,()=>{links.splice(i,0,l);saveLinks();renderLinks()})});
+$('lkForm').addEventListener('submit',e=>{e.preventDefault();let u=$('lkUrl').value.trim();if(!u)return;if(!/^https?:\/\//i.test(u))u='https://'+u;
+  const name=$('lkName').value.trim()||host(u)||u;links.push({id:'l'+Date.now(),name,url:u,group:$('lkGroup').value});saveLinks();renderLinks();$('lkName').value='';$('lkUrl').value='';toast(`Se agregó «${name}»`)});
+const flinks=$('flinks');
+flinks.addEventListener('click',e=>{const b=e.target.closest('[data-act=tobar]');if(b)openPip('bar')});
+renderLinks();
+
 // ---------- ventana flotante ----------
 let pipWin=null,pipMode='bar';
 function showNote(html){const n=$('note');n.innerHTML=html;n.hidden=false}
-function setPipMode(m){pipMode=m;mini.hidden=m!=='bar';ftimer.hidden=m!=='timer';
+function setPipMode(m){pipMode=m;mini.hidden=m!=='bar';ftimer.hidden=m!=='timer';flinks.hidden=m!=='links';
   $('pipLbl').textContent=pipWin&&m==='bar'?'Cerrar barra flotante':'Barra flotante';
-  $('poppedTxt').textContent=m==='timer'?'El cronómetro está flotando':'La barra está flotando';
-  if(pipWin){try{const z=pipSize(m);pipWin.resizeTo(z.width,z.height)}catch(e){}}}
-function pipSize(m){if(m==='timer')return{width:360,height:410};let h=mini.classList.contains('quick')?190:170;if(!M.items.hidden)h+=30;if(!M.song.hidden)h+=110;if(!M.timer.hidden)h+=44;return{width:560,height:h}}
+  $('poppedTxt').textContent=m==='timer'?'El cronómetro está flotando':m==='links'?'Los enlaces están flotando':'La barra está flotando';
+  fitPip()}
+function measure(el,width){const box=document.createElement('div');box.className='pipmode';box.style.cssText=`position:fixed;left:-9999px;top:0;width:${width}px;visibility:hidden`;
+  const c=el.cloneNode(true);c.hidden=false;c.removeAttribute('id');c.style.minHeight='0';box.appendChild(c);document.body.appendChild(box);const h=Math.ceil(c.getBoundingClientRect().height);box.remove();return h}
+function pipSize(m){if(m==='timer')return{width:340,height:390};if(m==='links')return{width:380,height:Math.min(560,measure(flinks,380)+2)};const W=500;return{width:W,height:measure(mini,W)+2}}
+function fitPip(){if(!pipWin)return;const z=pipSize(pipMode);try{pipWin.resizeTo(z.width+(pipWin.outerWidth-pipWin.innerWidth),z.height+(pipWin.outerHeight-pipWin.innerHeight))}catch(e){}}
 function pipCorner(w,z){try{const sx=(screen.availLeft||0)+screen.availWidth-z.width-24,sy=(screen.availTop||0)+24;w.moveTo(sx,sy)}catch(e){}}
 async function openPip(mode){
-  mode=mode==='timer'?'timer':'bar';
+  mode=['timer','links'].includes(mode)?mode:'bar';
   if(pipWin){if(pipMode===mode)pipWin.close();else setPipMode(mode);return}
   if(!('documentPictureInPicture' in window)){showNote('Este navegador no permite ventanas flotantes. Abre la página en <strong>Chrome o Edge</strong> de computador (versión 116 o superior). Dentro de Claude no funciona: usa la versión de GitHub Pages.');return}
   try{
     const w=await documentPictureInPicture.requestWindow(pipSize(mode));
     document.querySelectorAll('style,link[rel=stylesheet]').forEach(n=>w.document.head.appendChild(n.cloneNode(true)));
     const th=document.documentElement.getAttribute('data-theme');if(th)w.document.documentElement.setAttribute('data-theme',th);
-    w.document.addEventListener('keydown',onKey);w.document.title='Reloj de Clase';w.document.body.className='pip';w.document.body.append(mini,ftimer);
+    w.document.addEventListener('keydown',onKey);w.document.title='Reloj de Clase';w.document.body.className='pip pipmode';w.document.body.append(mini,ftimer,flinks);
     pipCorner(w,pipSize(mode));pipWin=w;$('slot').hidden=true;$('popped').hidden=false;setPipMode(mode);keys={};render();
-    w.addEventListener('pagehide',()=>{$('slot').appendChild(mini);$('fHome').appendChild(ftimer);$('slot').hidden=false;$('popped').hidden=true;pipWin=null;setPipMode('bar');keys={};render()});
+    w.addEventListener('pagehide',()=>{$('slot').appendChild(mini);$('fHome').appendChild(ftimer);$('fHome').appendChild(flinks);$('slot').hidden=false;$('popped').hidden=true;pipWin=null;setPipMode('bar');keys={};render()});
   }catch(e){showNote('No se pudo abrir la ventana flotante aquí. Abre la página directamente en Chrome o Edge (fuera de Claude) y vuelve a intentarlo.')}
 }
 $('pipBtn').onclick=()=>openPip('bar');$('pipBack').onclick=()=>pipWin&&pipWin.close();
