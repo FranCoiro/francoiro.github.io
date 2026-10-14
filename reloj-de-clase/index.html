@@ -199,12 +199,16 @@ input[type=range]{accent-color:var(--accent);width:150px}
 .times input{font-family:var(--f-mono);font-size:17px;font-weight:600;text-transform:none;letter-spacing:0}
 .dur{font-family:var(--f-hand);font-size:24px;color:var(--hand);padding-bottom:4px}
 .blist{list-style:none;margin:0;padding:0;display:grid;gap:8px}
-.blist li{display:grid;grid-template-columns:34px minmax(0,1fr) auto 28px;grid-template-areas:"sw name min del" "sw items items items" "sw song song song" "sw time time time";gap:2px 10px;align-items:center;padding:8px 8px 8px 8px;border-radius:14px;background:color-mix(in srgb,var(--c) 9%,var(--surface));border:1px solid color-mix(in srgb,var(--c) 30%,var(--surface))}
+.blist li{display:grid;grid-template-columns:34px minmax(0,1fr) auto 28px 28px;grid-template-areas:"sw name min more del" "sw items items items items" "sw song song song song" "sw time time time time";gap:2px 10px;align-items:center;padding:8px 8px 8px 8px;border-radius:14px;background:color-mix(in srgb,var(--c) 9%,var(--surface));border:1px solid color-mix(in srgb,var(--c) 30%,var(--surface))}
 .swb{grid-area:sw;width:34px;height:34px;border-radius:10px;border:0;background:var(--c);cursor:pointer;color:var(--chip-ink);font-weight:800;font-family:var(--f-display)}
 .bname{grid-area:name;width:100%;font-weight:700;background:transparent!important;border-color:transparent!important;padding-left:4px!important}
 .bname:hover,.bname:focus{border-color:var(--line)!important;background:var(--surface)!important}
 .bmin{grid-area:min;display:flex;align-items:center;gap:4px;font-size:13px;color:var(--muted)}
 .bsong{grid-area:song}
+.blist li:not(.open) .bitems,.blist li:not(.open) .bsong{display:none}
+.more{grid-area:more;border:0;background:none;cursor:pointer;color:var(--muted);width:28px;height:28px;border-radius:8px;font-size:18px;line-height:1;font-weight:700}
+.more:hover,.blist li.open .more{background:var(--track);color:var(--ink)}
+.has{color:var(--hand);font-family:var(--f-hand);font-size:15px;margin-left:6px}
 .bitems,.bsong{width:100%;font-size:12.5px;background:transparent!important;border-color:transparent!important;padding:2px 4px!important;color:var(--muted)}
 .bitems:hover,.bitems:focus,.bsong:hover,.bsong:focus{border-color:var(--line)!important;background:var(--surface)!important;color:var(--ink)}
 .m-song{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:6px 10px;border-radius:12px;background:color-mix(in srgb,var(--c,var(--accent)) 14%,var(--surface))}
@@ -233,12 +237,17 @@ input[type=range]{accent-color:var(--accent);width:150px}
 .note{background:color-mix(in srgb,var(--p1) 22%,var(--surface));border:1.5px solid var(--p1);border-radius:14px;padding:12px 14px;font-size:14px}
 /* rutas guardadas */
 .routes{display:grid;gap:6px;margin-bottom:12px}
-.numroute{border:1.5px dashed var(--line);border-radius:12px;padding:10px 12px;display:grid;gap:8px;margin-bottom:10px}
-.numroute b{display:block;font-family:var(--f-display);font-size:16px}
-.numsel{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
-.numsel .btn{font-family:var(--f-mono);min-width:38px;justify-content:center}
-.numsel .btn.on{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
-.numsel input{width:58px}
+.route.numcard{grid-template-columns:minmax(0,1fr) auto auto;gap:8px;padding:6px 8px 6px 12px;margin:-6px 0 12px;border-style:dashed}
+.numcard .nr{min-width:0}
+.numcard .rn{display:block;font-weight:700}
+.numcard .rm{display:block;font-size:12px;color:var(--muted)}
+.stepper{display:flex;align-items:center;border:1.5px solid var(--line);border-radius:10px;overflow:hidden}
+.route .stepper button{border:0;background:none;cursor:pointer;width:28px;height:28px;font-size:16px;font-weight:700;padding:0;text-align:center}
+.route .stepper button:hover{background:var(--track)}
+.route.numcard .btn{padding:5px 11px;border:1.5px solid var(--line);text-align:center}
+.route.numcard .btn:hover{border-color:var(--muted)}
+.bmin input{width:54px}
+.stepper output{min-width:24px;text-align:center;font-family:var(--f-mono);font-weight:800}
 .route{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;border:1.5px solid var(--line);border-radius:12px;background:var(--surface);overflow:hidden}
 .route.on{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,var(--surface))}
 .route button{border:0;background:none;cursor:pointer;text-align:left;padding:8px 12px;min-width:0}
@@ -377,15 +386,10 @@ body:not(.pip) [data-pip-only]{display:none}
     <div class="col">
       <section class="panel">
         <div class="panel-h"><div class="ttl"><h2>Mis rutas</h2><span class="scrib">clases guardadas</span></div><div class="tpl"><button class="btn sm" id="rExp">Exportar</button><button class="btn sm" id="rImp">Importar</button><input type="file" id="rFile" accept="application/json,.json" hidden></div></div>
-        <div class="numroute">
-          <div><b>Ruta por números</b><span class="hint">Los momentos se llaman 1, 2, 3… y tú escribes en la pizarra qué es cada uno.</span></div>
-          <div class="numsel" id="numSel">
-            <span class="hint">¿Cuántos momentos?</span>
-            <button class="btn sm" data-num="3">3</button><button class="btn sm" data-num="4">4</button><button class="btn sm" data-num="5">5</button><button class="btn sm" data-num="6">6</button><button class="btn sm" data-num="7">7</button><button class="btn sm" data-num="8">8</button>
-            <input type="number" id="numN" min="2" max="12" value="10" aria-label="Otro número de momentos"><button class="btn sm" id="numGo">Usar</button>
-          </div>
-        </div>
         <div class="routes" id="routes"></div>
+        <div class="route numcard" id="numCard"><div class="nr"><span class="rn">Por números</span><span class="rm">momentos 1, 2, 3… para escribir en la pizarra</span></div>
+          <div class="stepper"><button id="numMinus" aria-label="Menos momentos">−</button><output id="numOut">5</output><button id="numPlus" aria-label="Más momentos">+</button></div>
+          <button class="btn sm" id="numGo">Usar</button></div>
         <div class="saverow">
           <input type="text" id="rName" placeholder="Ej: 6° básico · Fracciones" aria-label="Nombre de la ruta">
           <button class="btn sm primary" id="rSave">Guardar</button>
@@ -713,6 +717,7 @@ function plannedView(){const cs=todayAt(cfg.start);return fit(cfg.blocks,[],0,cs
 function renderEditor(){
   $('pStart').value=cfg.start;$('pEnd').value=cfg.end;$('pChime').checked=cfg.chime!==false;const n=cfg.blocks.length;
   $('pList').innerHTML=cfg.blocks.map((b,i)=>`<li style="--c:${colorOf(b,i,n)}">
+    <button class="more" data-more="${i}" title="Indicadores y canción" aria-label="Más opciones de ${esc(b.name)}">⋯</button>
     <button class="swb" data-col="${i}" aria-label="Cambiar color de ${esc(b.name)}">${i+1}</button>
     <input type="text" class="bname" id="bn${i}" data-i="${i}" value="${esc(b.name)}" aria-label="Nombre del momento ${i+1}">
     <span class="bmin"><input type="number" id="bm${i}" data-i="${i}" min="1" max="300" value="${b.min}" aria-label="Minutos de ${esc(b.name)}">min</span>
@@ -720,11 +725,12 @@ function renderEditor(){
     <input type="text" class="bitems" id="bi${i}" data-i="${i}" value="${esc((b.items||[]).join('; '))}" placeholder="Indicadores para los estudiantes (separa con ;)" aria-label="Indicadores de ${esc(b.name)}">
     <input type="url" class="bsong" id="bs${i}" data-i="${i}" value="${esc(b.song||'')}" placeholder="Canción: link de YouTube (opcional)" aria-label="Canción de ${esc(b.name)}">
     <span class="btime" id="bt${i}"></span></li>`).join('');
+  /* filas compactas */
   updatePreview();
 }
 function updatePreview(){
   const v=plannedView(),n=cfg.blocks.length,d=durMin(),sum=cfg.blocks.reduce((a,b)=>a+(+b.min||0),0),cz=+cfg.blocks[n-1].min||0;
-  v.forEach((s,i)=>{const el=$('bt'+i);if(el)el.textContent=`${clk(s.start)} → ${clk(s.end)} · ${Math.round((s.end-s.start)/MIN)} min reales`});
+  v.forEach((s,i)=>{const el=$('bt'+i);if(el){const b=cfg.blocks[i],x=[(b.items||[]).length?'indicadores':'',b.song?'canción':''].filter(Boolean).join(' y ');el.textContent=`${clk(s.start)} → ${clk(s.end)}`+(x?` · con ${x}`:'')}});
   $('pDur').textContent=d+' minutos';
   $('pSum').textContent=sum===d?`Los momentos suman ${sum} min, justo lo que dura la clase.`:`Los momentos suman ${sum} min y la clase dura ${d}. Los intermedios se ajustan en proporción y el cierre mantiene sus ${cz} min.`;
   if(!run)render();
@@ -732,7 +738,7 @@ function updatePreview(){
 }
 $('pList').addEventListener('input',e=>{const i=+e.target.dataset.i;if(isNaN(i))return;
   if(e.target.classList.contains('bname'))cfg.blocks[i].name=e.target.value||'Momento';else if(e.target.classList.contains('bsong'))cfg.blocks[i].song=e.target.value.trim()||undefined;else if(e.target.classList.contains('bitems'))cfg.blocks[i].items=e.target.value.split(';').map(x=>x.trim()).filter(Boolean);else cfg.blocks[i].min=Math.max(1,+e.target.value||1);saveCfg();updatePreview()});
-$('pList').addEventListener('click',e=>{const d=e.target.closest('[data-del]');if(d){cfg.blocks.splice(+d.dataset.del,1);saveCfg();renderEditor();return}
+$('pList').addEventListener('click',e=>{const mo=e.target.closest('[data-more]');if(mo){mo.closest('li').classList.toggle('open');return}const d=e.target.closest('[data-del]');if(d){cfg.blocks.splice(+d.dataset.del,1);saveCfg();renderEditor();return}
   const c=e.target.closest('[data-col]');if(c){const i=+c.dataset.col,b=cfg.blocks[i],cur=b.color!=null?b.color:(i===cfg.blocks.length-1?5:i%5);b.color=(cur+1)%PAL.length;saveCfg();renderEditor();const f=document.querySelector(`[data-col="${i}"]`);if(f)f.focus()}});
 $('pAdd').onclick=()=>{const used=cfg.blocks.map(b=>b.color);const free=[0,1,2,3,4].find(c=>!used.includes(c));cfg.blocks.splice(cfg.blocks.length-1,0,{name:'Nuevo momento',min:10,color:free!=null?free:3});saveCfg();renderEditor();const el=$('bn'+(cfg.blocks.length-2));if(el){el.focus();el.select()}};
 $('pStart').onchange=e=>{const d=durMin();cfg.start=e.target.value||cfg.start;cfg.end=m2hm(hm2m(cfg.start)+d);saveCfg();renderEditor()};
@@ -821,14 +827,15 @@ $('rFile').onchange=e=>{const f=e.target.files[0];if(!f)return;f.text().then(t=>
 {const c=curRoute();if(c)$('rName').value=c.name}
 // ---------- ruta por números ----------
 const numCount=()=>cfg.blocks.every((b,i)=>b.name==='Momento '+(i+1))?cfg.blocks.length:0;
-function markNum(){const n=numCount();document.querySelectorAll('[data-num]').forEach(b=>b.classList.toggle('on',+b.dataset.num===n))}
+let numVal=store.get('rc.num',5);$('numOut').textContent=numVal;
+function markNum(){$('numCard').classList.toggle('on',numCount()>0&&!cfg.routeId)}
 function numRoute(n){if(run){toast('Termina la clase en curso para cambiar de ruta');return}
   n=Math.max(2,Math.min(12,Math.round(+n||5)));const d=durMin(),base=Math.floor(d/n),rem=d-base*n;
   cfg.blocks=Array.from({length:n},(_,i)=>({name:'Momento '+(i+1),min:base+(i<rem?1:0),color:i===n-1?5:i%5}));
   cfg.routeId=null;saveCfg();$('rName').value=`Por números · ${n} momentos`;renderEditor();markNum();toast(`Ruta de ${n} momentos lista. Puedes guardarla con un nombre.`)}
-$('numSel').addEventListener('click',e=>{const b=e.target.closest('[data-num]');if(b)numRoute(b.dataset.num)});
-$('numGo').onclick=()=>numRoute($('numN').value);
-$('numN').addEventListener('keydown',e=>{if(e.key==='Enter')numRoute($('numN').value)});
+const setNum=v=>{numVal=Math.max(2,Math.min(12,v));$('numOut').textContent=numVal;store.set('rc.num',numVal)};
+$('numMinus').onclick=()=>setNum(numVal-1);$('numPlus').onclick=()=>setNum(numVal+1);
+$('numGo').onclick=()=>numRoute(numVal);
 
 // ---------- instalar como app ----------
 {const onPages=/github\.io$/.test(location.hostname),standalone=matchMedia('(display-mode: standalone)').matches||navigator.standalone;
