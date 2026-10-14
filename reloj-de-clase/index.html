@@ -177,11 +177,20 @@ input[type=range]{accent-color:var(--accent);width:150px}
 .times input{font-family:var(--f-mono);font-size:17px;font-weight:600;text-transform:none;letter-spacing:0}
 .dur{font-family:var(--f-hand);font-size:24px;color:var(--hand);padding-bottom:4px}
 .blist{list-style:none;margin:0;padding:0;display:grid;gap:8px}
-.blist li{display:grid;grid-template-columns:34px minmax(0,1fr) auto 28px;grid-template-areas:"sw name min del" "sw time time time";gap:2px 10px;align-items:center;padding:8px 8px 8px 8px;border-radius:14px;background:color-mix(in srgb,var(--c) 9%,var(--surface));border:1px solid color-mix(in srgb,var(--c) 30%,var(--surface))}
+.blist li{display:grid;grid-template-columns:34px minmax(0,1fr) auto 28px;grid-template-areas:"sw name min del" "sw items items items" "sw time time time";gap:2px 10px;align-items:center;padding:8px 8px 8px 8px;border-radius:14px;background:color-mix(in srgb,var(--c) 9%,var(--surface));border:1px solid color-mix(in srgb,var(--c) 30%,var(--surface))}
 .swb{grid-area:sw;width:34px;height:34px;border-radius:10px;border:0;background:var(--c);cursor:pointer;color:var(--chip-ink);font-weight:800;font-family:var(--f-display)}
 .bname{grid-area:name;width:100%;font-weight:700;background:transparent!important;border-color:transparent!important;padding-left:4px!important}
 .bname:hover,.bname:focus{border-color:var(--line)!important;background:var(--surface)!important}
 .bmin{grid-area:min;display:flex;align-items:center;gap:4px;font-size:13px;color:var(--muted)}
+.bitems{grid-area:items;width:100%;font-size:12.5px;background:transparent!important;border-color:transparent!important;padding:2px 4px!important;color:var(--muted)}
+.bitems:hover,.bitems:focus{border-color:var(--line)!important;background:var(--surface)!important;color:var(--ink)}
+.m-items{display:flex;gap:6px;flex-wrap:wrap;margin-top:-2px}
+.m-items span{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;padding:4px 10px;border-radius:999px;background:color-mix(in srgb,var(--c,var(--muted)) 16%,var(--surface))}
+.m-items span::before{content:"";width:10px;height:10px;border-radius:3px;border:2px solid var(--c,var(--muted))}
+.ft-music{display:flex;gap:4px;justify-content:center;flex-wrap:wrap}
+.ft-music button{border:1.5px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:3px 9px;font:inherit;font-size:12px;font-weight:700;cursor:pointer;display:inline-flex;gap:5px;align-items:center}
+.ft-music button::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--dc,var(--muted))}
+.ft-music button.on{border-color:var(--dc,var(--accent));background:color-mix(in srgb,var(--dc,var(--accent)) 22%,var(--surface))}
 .btime{grid-area:time;font-family:var(--f-mono);font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums;padding-left:4px}
 .del{grid-area:del;border:0;background:none;cursor:pointer;color:var(--muted);font-size:20px;width:28px;height:28px;border-radius:8px;line-height:1}
 .del:hover{background:var(--track);color:var(--ink)}
@@ -210,7 +219,7 @@ input[type=range]{accent-color:var(--accent);width:150px}
 .toast button{background:none;border:0;color:var(--p1);font-weight:700;cursor:pointer}
 
 /* cronómetro flotante */
-.ftimer{container-type:size;height:100vh;display:grid;grid-template-rows:auto minmax(0,1fr) auto;gap:6px;padding:10px 12px 12px;background:var(--surface)}
+.ftimer{container-type:size;height:100vh;display:grid;grid-template-rows:auto minmax(0,1fr) auto auto;gap:6px;padding:10px 12px 12px;background:var(--surface)}
 .ft-top{display:flex;justify-content:space-between;align-items:center;gap:8px}
 .ft-top .m-tl{font-size:20px}
 .ft-ring{position:relative;display:grid;place-items:center;min-height:0}
@@ -269,6 +278,7 @@ body:not(.pip) [data-pip-only]{display:none}
               <div class="m-clock"><div class="m-time" id="mTime">00:00</div><div class="m-cap" id="mCap"></div></div>
               <div class="m-act" id="mAct"></div>
             </div>
+            <div class="m-items" id="mItems" hidden></div>
             <div class="m-bar" id="mBar"></div>
             <div class="m-foot"><span id="mFL"></span><span><button class="m-end" data-act="editend" id="mEnd" title="Cambiar la hora de salida"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg><span id="mEndT"></span></button><input type="time" id="mEndIn" class="m-end-in" hidden aria-label="Hora de salida"></span></div>
             <div class="m-timer" id="mTimer" hidden><span class="m-tl">cronómetro</span><span class="m-tt" id="mTT">00:00</span><button class="btn sm" data-act="tpause" id="mTP">Pausa</button><button class="btn sm" data-act="tstop">Quitar</button></div>
@@ -374,6 +384,7 @@ body:not(.pip) [data-pip-only]{display:none}
     <div class="ft-top"><span class="m-tl" id="ftCls">cronómetro</span><button class="btn sm" data-act="tobar">Ver barra de clase</button></div>
     <div class="ft-ring" id="ftRing"><svg viewBox="0 0 120 120" aria-hidden="true"><circle class="trk" cx="60" cy="60" r="50"/><circle class="prg" id="ftPrg" cx="60" cy="60" r="50" stroke-dasharray="314.16" stroke-dashoffset="0"/></svg><div class="ft-in"><div class="ft-disp" id="ftDisp">05:00</div><div class="ft-lab" id="ftLab">listo</div></div></div>
     <div class="ft-btns" id="ftBtns"></div>
+    <div class="ft-music" id="ftMusic"><button data-act="music" data-v="none">Silencio</button><button data-act="music" data-v="calma" style="--dc:var(--p2)">Calma</button><button data-act="music" data-v="lofi" style="--dc:var(--p4)">Lo-fi</button><button data-act="music" data-v="energia" style="--dc:var(--p5)">Energía</button><button data-act="music" data-v="tictac" style="--dc:var(--p1)">Tic-tac</button><button data-act="music" data-v="file" style="--dc:var(--p3)" hidden>Mi audio</button></div>
   </div>
 </div>
 <div class="toast" id="toast" hidden><span id="toastTxt"></span><button id="toastUndo">Deshacer</button></div>
@@ -493,7 +504,7 @@ function timerTick(){if(timer&&!timer.paused&&!timer.done&&Date.now()>=timer.end
 
 // ---------- barra ----------
 const mini=$('mini');
-const M={chip:$('mChip'),name:$('mName'),sub:$('mSub'),time:$('mTime'),cap:$('mCap'),act:$('mAct'),bar:$('mBar'),fl:$('mFL'),endT:$('mEndT'),endB:$('mEnd'),endIn:$('mEndIn'),timer:$('mTimer'),tt:$('mTT'),tp:$('mTP'),ask:$('mAsk'),askTxt:$('mAskTxt'),askB:$('mAskB')};
+const M={chip:$('mChip'),name:$('mName'),sub:$('mSub'),time:$('mTime'),cap:$('mCap'),act:$('mAct'),bar:$('mBar'),fl:$('mFL'),items:$('mItems'),endT:$('mEndT'),endB:$('mEnd'),endIn:$('mEndIn'),timer:$('mTimer'),tt:$('mTT'),tp:$('mTP'),ask:$('mAsk'),askTxt:$('mAskTxt'),askB:$('mAskB')};
 let keys={};
 const ARROW='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
 const CLOCK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M9 2h6"/></svg>';
@@ -512,10 +523,11 @@ function closeEnd(apply){if(M.endIn.hidden)return;M.endIn.hidden=true;M.endB.hid
 M.endIn.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();closeEnd(true)}else if(e.key==='Escape')closeEnd(false)});
 M.endIn.addEventListener('blur',()=>closeEnd(true));
 const ftimer=$('ftimer');
-const F={cls:$('ftCls'),disp:$('ftDisp'),lab:$('ftLab'),ring:$('ftRing'),prg:$('ftPrg'),btns:$('ftBtns')};
+const F={cls:$('ftCls'),disp:$('ftDisp'),lab:$('ftLab'),ring:$('ftRing'),prg:$('ftPrg'),btns:$('ftBtns'),music:[...document.querySelectorAll('#ftMusic button')]};
 ftimer.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b)return;const a=b.dataset.act;
-  ({tset:()=>tStart(+b.dataset.s),tpause:tPause,tplus:tPlus,tstop:tStop,tobar:()=>openPip('bar')}[a]||(()=>{}))()});
+  ({music:()=>{const r=document.querySelector(`input[name=music][value=${b.dataset.v}]`);if(r){r.checked=true;r.dispatchEvent(new Event('change',{bubbles:true}))}},tset:()=>tStart(+b.dataset.s),tpause:tPause,tplus:tPlus,tstop:tStop,tobar:()=>openPip('bar')}[a]||(()=>{}))()});
 function renderFT(){
+  const mv=music();F.music.forEach(x=>{x.classList.toggle('on',x.dataset.v===mv);if(x.dataset.v==='file')x.hidden=!audioEl.src});
   if(run&&run.ask)F.cls.textContent='¡cambio de momento!';else if(run&&now()>=run.cs){const c=run.sched[run.idx];F.cls.textContent=run.blocks[run.idx].name+' · '+(c.end>=now()?fmt(c.end-now()):'+'+fmt(now()-c.end,true))}else F.cls.textContent='cronómetro';
   const L=timer?tLeft():0;
   F.disp.textContent=timer?(timer.done?'¡Tiempo!':fmt(L)):fmt(selSec()*1000);
@@ -535,6 +547,7 @@ function render(){
   if(run){({blocks,cs,ce,idx}=run);view=run.sched;const cur=view[idx];
     if(t>cur.end){view=view.slice();view[idx]={...cur,end:t};if(idx<blocks.length-1)view=fit(blocks,view,idx+1,t,ce)}}
   else{blocks=cfg.blocks;cs=todayAt(cfg.start);ce=cs+durMin()*MIN;view=fit(blocks,[],0,cs,ce)}
+  {const it=run&&!(t<run.cs)&&run.blocks[run.idx].items||[],k=it.join('|');if(keys.items!==k){keys.items=k;M.items.hidden=!it.length;M.items.innerHTML=it.map(x=>`<span>${esc(x)}</span>`).join('')}}
   mini.classList.toggle('idle',!run);mini.classList.toggle('noclock',cfg.showClock===false);
   const n=blocks.length,endAll=Math.max(ce,view[n-1].end),total=Math.max(1,endAll-cs),pre=run&&t<cs;
 
@@ -591,6 +604,7 @@ function renderEditor(){
     <input type="text" class="bname" id="bn${i}" data-i="${i}" value="${esc(b.name)}" aria-label="Nombre del momento ${i+1}">
     <span class="bmin"><input type="number" id="bm${i}" data-i="${i}" min="1" max="300" value="${b.min}" aria-label="Minutos de ${esc(b.name)}">min</span>
     ${i===n-1?'<span class="fixed" title="El cierre termina siempre a la hora de salida">fijo</span>':`<button class="del" data-del="${i}" aria-label="Eliminar ${esc(b.name)}">×</button>`}
+    <input type="text" class="bitems" id="bi${i}" data-i="${i}" value="${esc((b.items||[]).join('; '))}" placeholder="Indicadores para los estudiantes (separa con ;)" aria-label="Indicadores de ${esc(b.name)}">
     <span class="btime" id="bt${i}"></span></li>`).join('');
   updatePreview();
 }
@@ -603,7 +617,7 @@ function updatePreview(){
   renderRoutes();
 }
 $('pList').addEventListener('input',e=>{const i=+e.target.dataset.i;if(isNaN(i))return;
-  if(e.target.classList.contains('bname'))cfg.blocks[i].name=e.target.value||'Momento';else cfg.blocks[i].min=Math.max(1,+e.target.value||1);saveCfg();updatePreview()});
+  if(e.target.classList.contains('bname'))cfg.blocks[i].name=e.target.value||'Momento';else if(e.target.classList.contains('bitems'))cfg.blocks[i].items=e.target.value.split(';').map(x=>x.trim()).filter(Boolean);else cfg.blocks[i].min=Math.max(1,+e.target.value||1);saveCfg();updatePreview()});
 $('pList').addEventListener('click',e=>{const d=e.target.closest('[data-del]');if(d){cfg.blocks.splice(+d.dataset.del,1);saveCfg();renderEditor();return}
   const c=e.target.closest('[data-col]');if(c){const i=+c.dataset.col,b=cfg.blocks[i],cur=b.color!=null?b.color:(i===cfg.blocks.length-1?5:i%5);b.color=(cur+1)%PAL.length;saveCfg();renderEditor();const f=document.querySelector(`[data-col="${i}"]`);if(f)f.focus()}});
 $('pAdd').onclick=()=>{const used=cfg.blocks.map(b=>b.color);const free=[0,1,2,3,4].find(c=>!used.includes(c));cfg.blocks.splice(cfg.blocks.length-1,0,{name:'Nuevo momento',min:10,color:free!=null?free:3});saveCfg();renderEditor();const el=$('bn'+(cfg.blocks.length-2));if(el){el.focus();el.select()}};
@@ -633,13 +647,13 @@ function showNote(html){const n=$('note');n.innerHTML=html;n.hidden=false}
 function setPipMode(m){pipMode=m;mini.hidden=m!=='bar';ftimer.hidden=m!=='timer';
   $('pipLbl').textContent=pipWin&&m==='bar'?'Cerrar barra flotante':'Barra flotante';
   $('poppedTxt').textContent=m==='timer'?'El cronómetro está flotando':'La barra está flotando';
-  if(pipWin){try{m==='timer'?pipWin.resizeTo(360,380):pipWin.resizeTo(660,220)}catch(e){}}}
+  if(pipWin){try{m==='timer'?pipWin.resizeTo(380,430):pipWin.resizeTo(660,250)}catch(e){}}}
 async function openPip(mode){
   mode=mode==='timer'?'timer':'bar';
   if(pipWin){if(pipMode===mode)pipWin.close();else setPipMode(mode);return}
   if(!('documentPictureInPicture' in window)){showNote('Este navegador no permite ventanas flotantes. Abre la página en <strong>Chrome o Edge</strong> de computador (versión 116 o superior). Dentro de Claude no funciona: usa la versión de GitHub Pages.');return}
   try{
-    const w=await documentPictureInPicture.requestWindow(mode==='timer'?{width:360,height:380}:{width:660,height:220});
+    const w=await documentPictureInPicture.requestWindow(mode==='timer'?{width:380,height:430}:{width:660,height:250});
     document.querySelectorAll('style,link[rel=stylesheet]').forEach(n=>w.document.head.appendChild(n.cloneNode(true)));
     const th=document.documentElement.getAttribute('data-theme');if(th)w.document.documentElement.setAttribute('data-theme',th);
     w.document.title='Reloj de Clase';w.document.body.className='pip';w.document.body.append(mini,ftimer);
@@ -653,6 +667,11 @@ $('tAutoPip').checked=store.get('rc.autopip',true);$('tAutoPip').onchange=e=>sto
 // ---------- rutas guardadas ----------
 let routes=store.get('rc.routes',null);
 if(!routes)routes=[{id:'ex90',name:"Ejemplo · Bloque 90'",start:'08:00',end:'09:30',blocks:JSON.parse(JSON.stringify(T90))},{id:'ex45',name:"Ejemplo · Bloque 45'",start:'10:00',end:'10:45',blocks:JSON.parse(JSON.stringify(T45))}];
+const BUILTIN=[{id:'mrm-2b',name:'2° básico · Mi ruta matemática',start:'08:00',end:'09:30',blocks:[
+  {name:'Me preparo',min:10,color:2,items:['Tengo mis materiales','Conozco mi objetivo']},
+  {name:'Participo y aprendo',min:65,color:0,items:['Trabajé y practiqué','Di mi mejor esfuerzo']},
+  {name:'Me responsabilizo',min:15,color:5,items:['Revisé mi trabajo','Pensé qué aprendí']}]}];
+{const seen=store.get('rc.seen',[]);BUILTIN.forEach(r=>{if(!seen.includes(r.id)){if(!routes.some(x=>x.id===r.id))routes.unshift(JSON.parse(JSON.stringify(r)));seen.push(r.id)}});store.set('rc.seen',seen);store.set('rc.routes',routes)}
 const saveRoutes=()=>store.set('rc.routes',routes);
 const snap=()=>({start:cfg.start,end:cfg.end,blocks:JSON.parse(JSON.stringify(cfg.blocks))});
 const sameAs=r=>JSON.stringify({start:r.start,end:r.end,blocks:r.blocks})===JSON.stringify(snap());
@@ -679,7 +698,7 @@ $('rExp').onclick=()=>{const data=JSON.stringify({app:'reloj-de-clase',version:1
   try{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([data],{type:'application/json'}));a.download='rutas-de-clase.json';document.body.appendChild(a);a.click();a.remove();toast('Se descargó rutas-de-clase.json')}catch(e){toast('No se pudo descargar aquí')}};
 $('rImp').onclick=()=>$('rFile').click();
 $('rFile').onchange=e=>{const f=e.target.files[0];if(!f)return;f.text().then(t=>{const d=JSON.parse(t),list=Array.isArray(d)?d:d.routes;let n=0;
-  (list||[]).forEach(r=>{if(r&&r.name&&Array.isArray(r.blocks)&&r.blocks.length){routes.push({id:'r'+Date.now()+n,name:String(r.name),start:r.start||'08:00',end:r.end||'09:30',blocks:r.blocks.map(b=>({name:String(b.name||'Momento'),min:Math.max(1,+b.min||1),color:b.color}))});n++}});
+  (list||[]).forEach(r=>{if(r&&r.name&&Array.isArray(r.blocks)&&r.blocks.length){routes.push({id:'r'+Date.now()+n,name:String(r.name),start:r.start||'08:00',end:r.end||'09:30',blocks:r.blocks.map(b=>({name:String(b.name||'Momento'),min:Math.max(1,+b.min||1),color:b.color,items:Array.isArray(b.items)?b.items.map(String):undefined}))});n++}});
   saveRoutes();renderRoutes();toast(n?`Se importaron ${n} rutas`:'El archivo no tiene rutas válidas')}).catch(()=>toast('No se pudo leer el archivo'));e.target.value=''};
 {const c=curRoute();if(c)$('rName').value=c.name}
 
