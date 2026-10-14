@@ -71,7 +71,7 @@ h2{font-family:var(--f-display);font-weight:800;font-size:22px;margin:0;letter-s
 .m-top{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:6px 16px}
 .m-now{display:flex;gap:12px;align-items:center;min-width:0}
 .m-chip{width:44px;height:44px;border-radius:13px;background:var(--c,var(--track));color:var(--chip-ink);display:grid;place-items:center;font-family:var(--f-display);font-weight:800;font-size:20px;flex:none;box-shadow:0 8px 18px -10px var(--c,var(--shadow))}
-.m-name{font-family:var(--f-display);font-weight:800;font-size:clamp(20px,5cqi,32px);line-height:1.02;letter-spacing:-.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.m-name{font-family:var(--f-display);font-weight:800;font-size:clamp(19px,4.4cqi,30px);line-height:1.05;letter-spacing:-.02em;overflow:hidden;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;text-wrap:balance}
 .m-sub{color:var(--muted);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
 .m-clock{text-align:right}
 .m-time{font-family:var(--f-mono);font-weight:800;font-size:clamp(28px,7.5cqi,52px);line-height:.95;font-variant-numeric:tabular-nums;letter-spacing:-.03em}
@@ -398,7 +398,17 @@ const pad=n=>String(n).padStart(2,'0');
 const MIN=60000;
 const T90=[{name:'Inicio',min:10,color:0},{name:'Exploración',min:25,color:1},{name:'Trabajo en grupos',min:30,color:2},{name:'Puesta en común',min:10,color:4},{name:'Cierre',min:15,color:5}];
 const T45=[{name:'Inicio',min:8,color:0},{name:'Desarrollo',min:27,color:2},{name:'Cierre',min:10,color:5}];
-let cfg=store.get('rc.cfg',null)||{start:'08:00',end:'09:30',chime:true,blocks:JSON.parse(JSON.stringify(T90))};
+const R2B={id:'mrm-2b',v:2,name:'2° básico · Mi ruta matemática',start:'08:00',end:'09:30',blocks:[
+  {name:'Me preparo, tomo asiento',min:3,color:2},
+  {name:'Dejo listos mis materiales',min:3,color:2},
+  {name:'Conozco y escribo mi objetivo',min:5,color:4},
+  {name:'Escucho lo que haremos',min:5,color:4},
+  {name:'Trabajo, participo y aprendo',min:25,color:0},
+  {name:'Revisamos',min:7,color:3},
+  {name:'Pausa activa',min:5,color:1},
+  {name:'Trabajo, participo y aprendo',min:22,color:0},
+  {name:'Revisamos lo que aprendimos',min:15,color:5}]};
+let cfg=store.get('rc.cfg',null)||{start:R2B.start,end:R2B.end,chime:true,routeId:R2B.id,blocks:JSON.parse(JSON.stringify(R2B.blocks))};
 const PAL=['var(--p0)','var(--p1)','var(--p2)','var(--p3)','var(--p4)','var(--p5)'];
 const colorOf=(b,i,n)=>PAL[b&&b.color!=null?b.color:(i===n-1?5:i%5)];
 
@@ -667,11 +677,12 @@ $('tAutoPip').checked=store.get('rc.autopip',true);$('tAutoPip').onchange=e=>sto
 // ---------- rutas guardadas ----------
 let routes=store.get('rc.routes',null);
 if(!routes)routes=[{id:'ex90',name:"Ejemplo · Bloque 90'",start:'08:00',end:'09:30',blocks:JSON.parse(JSON.stringify(T90))},{id:'ex45',name:"Ejemplo · Bloque 45'",start:'10:00',end:'10:45',blocks:JSON.parse(JSON.stringify(T45))}];
-const BUILTIN=[{id:'mrm-2b',name:'2° básico · Mi ruta matemática',start:'08:00',end:'09:30',blocks:[
-  {name:'Me preparo',min:10,color:2,items:['Tengo mis materiales','Conozco mi objetivo']},
-  {name:'Participo y aprendo',min:65,color:0,items:['Trabajé y practiqué','Di mi mejor esfuerzo']},
-  {name:'Me responsabilizo',min:15,color:5,items:['Revisé mi trabajo','Pensé qué aprendí']}]}];
-{const seen=store.get('rc.seen',[]);BUILTIN.forEach(r=>{if(!seen.includes(r.id)){if(!routes.some(x=>x.id===r.id))routes.unshift(JSON.parse(JSON.stringify(r)));seen.push(r.id)}});store.set('rc.seen',seen);store.set('rc.routes',routes)}
+// La ruta de 2° básico queda precargada: aparece primera y, la primera vez, queda activa.
+{const seen=store.get('rc.seen',[]),r2=JSON.parse(JSON.stringify(R2B));
+  if(!seen.includes(R2B.id+'@'+R2B.v)){
+    routes=routes.filter(x=>x.id!==R2B.id);routes.unshift(r2);seen.push(R2B.id+'@'+R2B.v);
+    if(!run){cfg.start=r2.start;cfg.end=r2.end;cfg.blocks=JSON.parse(JSON.stringify(r2.blocks));cfg.routeId=r2.id;saveCfg()}
+    store.set('rc.seen',seen);store.set('rc.routes',routes)}}
 const saveRoutes=()=>store.set('rc.routes',routes);
 const snap=()=>({start:cfg.start,end:cfg.end,blocks:JSON.parse(JSON.stringify(cfg.blocks))});
 const sameAs=r=>JSON.stringify({start:r.start,end:r.end,blocks:r.blocks})===JSON.stringify(snap());
