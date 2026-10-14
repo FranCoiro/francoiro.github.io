@@ -233,6 +233,12 @@ input[type=range]{accent-color:var(--accent);width:150px}
 .note{background:color-mix(in srgb,var(--p1) 22%,var(--surface));border:1.5px solid var(--p1);border-radius:14px;padding:12px 14px;font-size:14px}
 /* rutas guardadas */
 .routes{display:grid;gap:6px;margin-bottom:12px}
+.numroute{border:1.5px dashed var(--line);border-radius:12px;padding:10px 12px;display:grid;gap:8px;margin-bottom:10px}
+.numroute b{display:block;font-family:var(--f-display);font-size:16px}
+.numsel{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.numsel .btn{font-family:var(--f-mono);min-width:38px;justify-content:center}
+.numsel .btn.on{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.numsel input{width:58px}
 .route{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;border:1.5px solid var(--line);border-radius:12px;background:var(--surface);overflow:hidden}
 .route.on{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,var(--surface))}
 .route button{border:0;background:none;cursor:pointer;text-align:left;padding:8px 12px;min-width:0}
@@ -371,6 +377,14 @@ body:not(.pip) [data-pip-only]{display:none}
     <div class="col">
       <section class="panel">
         <div class="panel-h"><div class="ttl"><h2>Mis rutas</h2><span class="scrib">clases guardadas</span></div><div class="tpl"><button class="btn sm" id="rExp">Exportar</button><button class="btn sm" id="rImp">Importar</button><input type="file" id="rFile" accept="application/json,.json" hidden></div></div>
+        <div class="numroute">
+          <div><b>Ruta por números</b><span class="hint">Los momentos se llaman 1, 2, 3… y tú escribes en la pizarra qué es cada uno.</span></div>
+          <div class="numsel" id="numSel">
+            <span class="hint">¿Cuántos momentos?</span>
+            <button class="btn sm" data-num="3">3</button><button class="btn sm" data-num="4">4</button><button class="btn sm" data-num="5">5</button><button class="btn sm" data-num="6">6</button><button class="btn sm" data-num="7">7</button><button class="btn sm" data-num="8">8</button>
+            <input type="number" id="numN" min="2" max="12" value="10" aria-label="Otro número de momentos"><button class="btn sm" id="numGo">Usar</button>
+          </div>
+        </div>
         <div class="routes" id="routes"></div>
         <div class="saverow">
           <input type="text" id="rName" placeholder="Ej: 6° básico · Fracciones" aria-label="Nombre de la ruta">
@@ -787,7 +801,7 @@ function renderRoutes(){
   box.innerHTML=!routes.length?'<div class="empty">Aún no tienes rutas guardadas. Arma la planificación abajo y guárdala con un nombre.</div>':
     routes.map((r,i)=>{const n=r.blocks.length,tot=r.blocks.reduce((a,b)=>a+(+b.min||0),0);
       return `<div class="route ${r.id===cfg.routeId?'on':''}"><button data-load="${i}" aria-label="Usar ${esc(r.name)}"><span class="rn">${esc(r.name)}</span><span class="rm">${r.start}–${r.end} · ${n} momentos</span><span class="route-dots">${r.blocks.map((b,k)=>`<i style="flex:${(+b.min||1)/tot};--c:${colorOf(b,k,n)}"></i>`).join('')}</span></button><button class="rx" data-rdel="${i}" aria-label="Eliminar ${esc(r.name)}">×</button></div>`}).join('');
-  const cur=curRoute();$('rSave').disabled=!cur;
+  const cur=curRoute();$('rSave').disabled=!cur;if(typeof markNum==='function')try{markNum()}catch(e){}
   $('rState').textContent=cur?(sameAs(cur)?`Usando «${cur.name}».`:`Tienes cambios sin guardar en «${cur.name}».`):'Esta planificación no está guardada.';
 }
 function loadRoute(i){const r=routes[i];if(run){toast('Termina la clase en curso para cambiar de ruta');return}
@@ -805,6 +819,16 @@ $('rFile').onchange=e=>{const f=e.target.files[0];if(!f)return;f.text().then(t=>
   (list||[]).forEach(r=>{if(r&&r.name&&Array.isArray(r.blocks)&&r.blocks.length){routes.push({id:'r'+Date.now()+n,name:String(r.name),start:r.start||'08:00',end:r.end||'09:30',blocks:r.blocks.map(b=>({name:String(b.name||'Momento'),min:Math.max(1,+b.min||1),color:b.color,items:Array.isArray(b.items)?b.items.map(String):undefined,song:b.song?String(b.song):undefined}))});n++}});
   saveRoutes();renderRoutes();toast(n?`Se importaron ${n} rutas`:'El archivo no tiene rutas válidas')}).catch(()=>toast('No se pudo leer el archivo'));e.target.value=''};
 {const c=curRoute();if(c)$('rName').value=c.name}
+// ---------- ruta por números ----------
+const numCount=()=>cfg.blocks.every((b,i)=>b.name==='Momento '+(i+1))?cfg.blocks.length:0;
+function markNum(){const n=numCount();document.querySelectorAll('[data-num]').forEach(b=>b.classList.toggle('on',+b.dataset.num===n))}
+function numRoute(n){if(run){toast('Termina la clase en curso para cambiar de ruta');return}
+  n=Math.max(2,Math.min(12,Math.round(+n||5)));const d=durMin(),base=Math.floor(d/n),rem=d-base*n;
+  cfg.blocks=Array.from({length:n},(_,i)=>({name:'Momento '+(i+1),min:base+(i<rem?1:0),color:i===n-1?5:i%5}));
+  cfg.routeId=null;saveCfg();$('rName').value=`Por números · ${n} momentos`;renderEditor();markNum();toast(`Ruta de ${n} momentos lista. Puedes guardarla con un nombre.`)}
+$('numSel').addEventListener('click',e=>{const b=e.target.closest('[data-num]');if(b)numRoute(b.dataset.num)});
+$('numGo').onclick=()=>numRoute($('numN').value);
+$('numN').addEventListener('keydown',e=>{if(e.key==='Enter')numRoute($('numN').value)});
 
 // ---------- instalar como app ----------
 {const onPages=/github\.io$/.test(location.hostname),standalone=matchMedia('(display-mode: standalone)').matches||navigator.standalone;
