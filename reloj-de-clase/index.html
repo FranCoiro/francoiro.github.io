@@ -62,6 +62,8 @@ h2{font-family:var(--f-display);font-weight:800;font-size:22px;margin:0;letter-s
 .btn.sm{padding:5px 11px;font-size:13px;border-radius:10px}
 .btn:disabled{opacity:.4;cursor:default;transform:none}
 .btn svg{width:16px;height:16px;flex:none}
+.btn.icon{padding:8px 10px}
+.btn.icon svg{width:20px;height:20px}
 
 /* ---------- barra de momentos ---------- */
 .mini{position:relative;container-type:inline-size;background:var(--surface);border-radius:18px;padding:16px 18px 12px;display:flex;flex-direction:column;gap:12px;
@@ -252,7 +254,6 @@ body:not(.pip) [data-pip-only]{display:none}
       <span class="badge" id="simBadge" hidden>Ensayo ×30</span>
       <span class="live" id="live">--:--:--</span>
       <button class="btn primary" id="pipBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="14" rx="2"/><rect x="11" y="10" width="8" height="6" rx="1" fill="currentColor"/></svg><span id="pipLbl">Barra flotante</span></button>
-      <button class="btn" id="pipTBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M9 2h6"/></svg><span id="pipTLbl">Cronómetro flotante</span></button>
     </div>
   </header>
   <div class="note" id="note" hidden></div>
@@ -270,7 +271,7 @@ body:not(.pip) [data-pip-only]{display:none}
             </div>
             <div class="m-bar" id="mBar"></div>
             <div class="m-foot"><span id="mFL"></span><span><button class="m-end" data-act="editend" id="mEnd" title="Cambiar la hora de salida"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg><span id="mEndT"></span></button><input type="time" id="mEndIn" class="m-end-in" hidden aria-label="Hora de salida"></span></div>
-            <div class="m-timer" id="mTimer" hidden><span class="m-tl">cronómetro</span><span class="m-tt" id="mTT">00:00</span><button class="btn sm" data-act="tpause" id="mTP">Pausa</button><button class="btn sm" data-act="tstop">Quitar</button><button class="btn sm" data-act="tobig" data-pip-only>Ver grande</button></div>
+            <div class="m-timer" id="mTimer" hidden><span class="m-tl">cronómetro</span><span class="m-tt" id="mTT">00:00</span><button class="btn sm" data-act="tpause" id="mTP">Pausa</button><button class="btn sm" data-act="tstop">Quitar</button></div>
             <div class="m-ask" id="mAsk" hidden><p id="mAskTxt"></p><div class="m-ask-b" id="mAskB"></div></div>
           </div>
         </div>
@@ -495,6 +496,7 @@ const mini=$('mini');
 const M={chip:$('mChip'),name:$('mName'),sub:$('mSub'),time:$('mTime'),cap:$('mCap'),act:$('mAct'),bar:$('mBar'),fl:$('mFL'),endT:$('mEndT'),endB:$('mEnd'),endIn:$('mEndIn'),timer:$('mTimer'),tt:$('mTT'),tp:$('mTP'),ask:$('mAsk'),askTxt:$('mAskTxt'),askB:$('mAskB')};
 let keys={};
 const ARROW='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
+const CLOCK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M9 2h6"/></svg>';
 const PLAY='<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 5v14l12-7z"/></svg>';
 mini.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b)return;const a=b.dataset.act;
   ({start:()=>startClass('agenda'),ensayo:()=>startClass('ensayo'),now:()=>startClass('ahora'),next:advance,advance,finish:endClass,
@@ -510,17 +512,18 @@ function closeEnd(apply){if(M.endIn.hidden)return;M.endIn.hidden=true;M.endB.hid
 M.endIn.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();closeEnd(true)}else if(e.key==='Escape')closeEnd(false)});
 M.endIn.addEventListener('blur',()=>closeEnd(true));
 const ftimer=$('ftimer');
+const F={cls:$('ftCls'),disp:$('ftDisp'),lab:$('ftLab'),ring:$('ftRing'),prg:$('ftPrg'),btns:$('ftBtns')};
 ftimer.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b)return;const a=b.dataset.act;
   ({tset:()=>tStart(+b.dataset.s),tpause:tPause,tplus:tPlus,tstop:tStop,tobar:()=>openPip('bar')}[a]||(()=>{}))()});
 function renderFT(){
-  if(run&&run.ask)$('ftCls').textContent='¡cambio de momento!';else if(run&&now()>=run.cs){const c=run.sched[run.idx];$('ftCls').textContent=run.blocks[run.idx].name+' · '+(c.end>=now()?fmt(c.end-now()):'+'+fmt(now()-c.end,true))}else $('ftCls').textContent='cronómetro';
+  if(run&&run.ask)F.cls.textContent='¡cambio de momento!';else if(run&&now()>=run.cs){const c=run.sched[run.idx];F.cls.textContent=run.blocks[run.idx].name+' · '+(c.end>=now()?fmt(c.end-now()):'+'+fmt(now()-c.end,true))}else F.cls.textContent='cronómetro';
   const L=timer?tLeft():0;
-  $('ftDisp').textContent=timer?(timer.done?'¡Tiempo!':fmt(L)):fmt(selSec()*1000);
-  $('ftLab').textContent=!timer?'elige un tiempo':timer.done?'¡se acabó!':timer.paused?'en pausa':'corriendo';
-  $('ftRing').classList.toggle('done',!!(timer&&timer.done));
-  $('ftPrg').style.strokeDashoffset=timer?314.16*(1-L/timer.total):0;
+  F.disp.textContent=timer?(timer.done?'¡Tiempo!':fmt(L)):fmt(selSec()*1000);
+  F.lab.textContent=!timer?'elige un tiempo':timer.done?'¡se acabó!':timer.paused?'en pausa':'corriendo';
+  F.ring.classList.toggle('done',!!(timer&&timer.done));
+  F.prg.style.strokeDashoffset=timer?314.16*(1-L/timer.total):0;
   const k=!timer?'idle':timer.done?'done':timer.paused?'p':'r';
-  if(keys.ft!==k){keys.ft=k;$('ftBtns').innerHTML=k==='idle'?[60,180,300,600].map(s=>`<button class="btn sm" data-act="tset" data-s="${s}">${s/60}:00</button>`).join(''):
+  if(keys.ft!==k){keys.ft=k;F.btns.innerHTML=k==='idle'?[60,180,300,600].map(s=>`<button class="btn sm" data-act="tset" data-s="${s}">${s/60}:00</button>`).join(''):
     k==='done'?'<button class="btn sm" data-act="tplus">+1 min</button><button class="btn sm primary" data-act="tstop">Listo</button>':
     `<button class="btn sm primary" data-act="tpause">${k==='p'?'Seguir':'Pausa'}</button><button class="btn sm" data-act="tplus">+1 min</button><button class="btn sm" data-act="tstop">Detener</button>`}
 }
@@ -555,7 +558,7 @@ function render(){
     M.fl.textContent=clk(cs);M.endT.textContent=clk(ce);
   }
   const ak=!run?'idle':pre?'pre':'run';
-  if(keys.act!==ak){keys.act=ak;M.act.innerHTML=ak==='idle'?`<button class="btn" data-act="ensayo">Ensayo ×30</button><button class="btn primary" data-act="start">${PLAY}Iniciar clase</button>`:ak==='pre'?'<button class="btn" data-act="now">Empezar ahora</button>':`<button class="btn primary" data-act="next">Siguiente ${ARROW}</button>`}
+  if(keys.act!==ak){keys.act=ak;M.act.innerHTML=`<button class="btn icon" data-act="tobig" title="Cronómetro" aria-label="Abrir cronómetro">${CLOCK}</button>`+(ak==='idle'?`<button class="btn" data-act="ensayo">Ensayo ×30</button><button class="btn primary" data-act="start">${PLAY}Iniciar clase</button>`:ak==='pre'?'<button class="btn" data-act="now">Empezar ahora</button>':`<button class="btn primary" data-act="next">Siguiente ${ARROW}</button>`)}
   const qk=run&&run.ask?run.idx+'-'+run.blocks.length:'';
   if(keys.ask!==qk){keys.ask=qk;M.ask.hidden=!qk;if(qk){const i=run.idx,last=i===run.blocks.length-1;
     M.askTxt.textContent=last?'Llegó la hora de salida':`Terminó «${run.blocks[i].name}». ¿Pasamos a «${run.blocks[i+1].name}»?`;
@@ -629,7 +632,6 @@ let pipWin=null,pipMode='bar';
 function showNote(html){const n=$('note');n.innerHTML=html;n.hidden=false}
 function setPipMode(m){pipMode=m;mini.hidden=m!=='bar';ftimer.hidden=m!=='timer';
   $('pipLbl').textContent=pipWin&&m==='bar'?'Cerrar barra flotante':'Barra flotante';
-  $('pipTLbl').textContent=pipWin&&m==='timer'?'Cerrar cronómetro flotante':'Cronómetro flotante';
   $('poppedTxt').textContent=m==='timer'?'El cronómetro está flotando':'La barra está flotando';
   if(pipWin){try{m==='timer'?pipWin.resizeTo(360,380):pipWin.resizeTo(660,220)}catch(e){}}}
 async function openPip(mode){
@@ -645,7 +647,7 @@ async function openPip(mode){
     w.addEventListener('pagehide',()=>{$('slot').appendChild(mini);$('fHome').appendChild(ftimer);$('slot').hidden=false;$('popped').hidden=true;pipWin=null;setPipMode('bar');keys={};render()});
   }catch(e){showNote('No se pudo abrir la ventana flotante aquí. Abre la página directamente en Chrome o Edge (fuera de Claude) y vuelve a intentarlo.')}
 }
-$('pipBtn').onclick=()=>openPip('bar');$('pipTBtn').onclick=()=>openPip('timer');$('pipBack').onclick=()=>pipWin&&pipWin.close();
+$('pipBtn').onclick=()=>openPip('bar');$('pipBack').onclick=()=>pipWin&&pipWin.close();
 $('tAutoPip').checked=store.get('rc.autopip',true);$('tAutoPip').onchange=e=>store.set('rc.autopip',e.target.checked);
 
 // ---------- rutas guardadas ----------
