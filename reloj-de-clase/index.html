@@ -102,6 +102,8 @@ h2{font-family:var(--f-display);font-weight:800;font-size:22px;margin:0;letter-s
 .m-ask p{margin:0;font-family:var(--f-display);font-weight:800;font-size:clamp(16px,4cqi,22px);letter-spacing:-.01em;text-wrap:balance}
 .m-ask-b{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
 @container (min-width:560px){ .m-top{grid-template-columns:minmax(0,1fr) auto auto} .m-act{grid-column:auto} }
+.mini.idle .m-top{grid-template-columns:minmax(0,1fr) auto}
+.mini.idle .m-act{grid-column:1/-1}
 @container (max-width:380px){ .m-act .btn{flex:1;justify-content:center} .m-chip{width:36px;height:36px;font-size:16px} }
 
 body.pip{margin:0;padding:0;background:var(--surface);background-image:none}
@@ -181,6 +183,40 @@ input[type=range]{accent-color:var(--accent);width:150px}
 .chk input{accent-color:var(--accent);width:18px;height:18px}
 .tpl{display:flex;gap:6px;flex-wrap:wrap}
 .note{background:color-mix(in srgb,var(--p1) 22%,var(--surface));border:1.5px solid var(--p1);border-radius:14px;padding:12px 14px;font-size:14px}
+/* rutas guardadas */
+.routes{display:grid;gap:6px;margin-bottom:12px}
+.route{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;border:1.5px solid var(--line);border-radius:12px;background:var(--surface);overflow:hidden}
+.route.on{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,var(--surface))}
+.route button{border:0;background:none;cursor:pointer;text-align:left;padding:8px 12px;min-width:0}
+.route .rn{display:block;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.route .rm{display:block;font-size:12px;color:var(--muted);font-family:var(--f-mono)}
+.route .rx{color:var(--muted);font-size:20px;padding:6px 12px;line-height:1}
+.route .rx:hover{color:var(--warn)}
+.route-dots{display:flex;width:100%;gap:3px;margin-top:4px}
+.route-dots i{height:5px;border-radius:3px;background:var(--c)}
+.empty{font-size:13px;color:var(--muted);border:1.5px dashed var(--line);border-radius:12px;padding:12px;text-align:center}
+.saverow{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:6px;align-items:center;margin-bottom:6px}
+.saverow input{width:100%}
+@media (max-width:460px){.saverow{grid-template-columns:minmax(0,1fr) auto}.saverow input{grid-column:1/-1}}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--surface);border-radius:12px;padding:10px 14px;display:flex;gap:12px;align-items:center;box-shadow:0 14px 30px -12px var(--shadow);z-index:20;max-width:calc(100% - 32px)}
+.toast button{background:none;border:0;color:var(--p1);font-weight:700;cursor:pointer}
+
+/* cronómetro flotante */
+.ftimer{container-type:size;height:100vh;display:grid;grid-template-rows:auto minmax(0,1fr) auto;gap:6px;padding:10px 12px 12px;background:var(--surface)}
+.ft-top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.ft-top .m-tl{font-size:20px}
+.ft-ring{position:relative;display:grid;place-items:center;min-height:0}
+.ft-ring svg{height:100%;max-width:100%;aspect-ratio:1}
+.ft-ring .trk{fill:none;stroke:var(--track);stroke-width:9}
+.ft-ring .prg{fill:none;stroke:var(--accent);stroke-width:9;stroke-linecap:round;transform:rotate(-90deg);transform-origin:60px 60px;transition:stroke-dashoffset .25s linear}
+.ft-ring.done .prg{stroke:var(--warn)}
+.ft-in{position:absolute;inset:0;display:grid;place-items:center;align-content:center;gap:2px}
+.ft-disp{font-family:var(--f-mono);font-weight:800;font-size:min(16cqh,15cqw);line-height:1;font-variant-numeric:tabular-nums;letter-spacing:-.03em}
+.ft-ring.done .ft-disp{color:var(--warn);animation:blink 1s steps(2) infinite}
+.ft-lab{font-family:var(--f-hand);font-size:min(7cqh,6cqw);color:var(--hand)}
+.ft-btns{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+.ft-btns .btn{font-family:var(--f-mono)}
+body:not(.pip) [data-pip-only]{display:none}
 .how{list-style:none;margin:0;padding:0;display:grid;gap:10px}
 .how li{display:grid;grid-template-columns:10px minmax(0,1fr);gap:10px;align-items:start;font-size:14px;color:var(--muted)}
 .how li::before{content:"";width:10px;height:10px;border-radius:50%;margin-top:6px;background:var(--d)}
@@ -210,6 +246,7 @@ input[type=range]{accent-color:var(--accent);width:150px}
       <span class="badge" id="simBadge" hidden>Ensayo ×30</span>
       <span class="live" id="live">--:--:--</span>
       <button class="btn primary" id="pipBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="14" rx="2"/><rect x="11" y="10" width="8" height="6" rx="1" fill="currentColor"/></svg><span id="pipLbl">Barra flotante</span></button>
+      <button class="btn" id="pipTBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M9 2h6"/></svg><span id="pipTLbl">Cronómetro flotante</span></button>
     </div>
   </header>
   <div class="note" id="note" hidden></div>
@@ -227,12 +264,12 @@ input[type=range]{accent-color:var(--accent);width:150px}
             </div>
             <div class="m-bar" id="mBar"></div>
             <div class="m-foot"><span id="mFL"></span><span id="mFM"></span><span id="mFR"></span></div>
-            <div class="m-timer" id="mTimer" hidden><span class="m-tl">cronómetro</span><span class="m-tt" id="mTT">00:00</span><button class="btn sm" data-act="tpause" id="mTP">Pausa</button><button class="btn sm" data-act="tstop">Quitar</button></div>
+            <div class="m-timer" id="mTimer" hidden><span class="m-tl">cronómetro</span><span class="m-tt" id="mTT">00:00</span><button class="btn sm" data-act="tpause" id="mTP">Pausa</button><button class="btn sm" data-act="tstop">Quitar</button><button class="btn sm" data-act="tobig" data-pip-only>Ver grande</button></div>
             <div class="m-ask" id="mAsk" hidden><p id="mAskTxt"></p><div class="m-ask-b" id="mAskB"></div></div>
           </div>
         </div>
         <div class="popped" id="popped" hidden>
-          <strong>La barra está flotando</strong>
+          <strong id="poppedTxt">La barra está flotando</strong>
           <span>Queda encima de PowerPoint, Canva o cualquier otra aplicación.</span>
           <button class="btn" id="pipBack">Traer de vuelta aquí</button>
         </div>
@@ -248,6 +285,7 @@ input[type=range]{accent-color:var(--accent);width:150px}
 
       <section class="panel">
         <div class="panel-h"><div class="ttl"><h2>Cronómetro</h2><span class="scrib">con música</span></div><button class="btn sm" id="tFull"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>Proyectar</button></div>
+        <label class="chk" style="margin:-4px 0 14px"><input type="checkbox" id="tAutoPip" checked> Abrir el cronómetro en ventana flotante al iniciarlo</label>
         <div class="timer-card" id="timerCard">
           <div class="ring" id="ring">
             <svg viewBox="0 0 120 120" aria-hidden="true"><g id="ticks"></g><circle class="trk" cx="60" cy="60" r="44"/><circle class="prg" id="tRing" cx="60" cy="60" r="44" stroke-dasharray="276.46" stroke-dashoffset="0"/></svg>
@@ -289,6 +327,16 @@ input[type=range]{accent-color:var(--accent);width:150px}
 
     <div class="col">
       <section class="panel">
+        <div class="panel-h"><div class="ttl"><h2>Mis rutas</h2><span class="scrib">clases guardadas</span></div><div class="tpl"><button class="btn sm" id="rExp">Exportar</button><button class="btn sm" id="rImp">Importar</button><input type="file" id="rFile" accept="application/json,.json" hidden></div></div>
+        <div class="routes" id="routes"></div>
+        <div class="saverow">
+          <input type="text" id="rName" placeholder="Ej: 6° básico · Fracciones" aria-label="Nombre de la ruta">
+          <button class="btn sm primary" id="rSave">Guardar</button>
+          <button class="btn sm" id="rSaveNew">Guardar como nueva</button>
+        </div>
+        <p class="hint" id="rState"></p>
+      </section>
+      <section class="panel">
         <div class="panel-h"><div class="ttl"><h2>Planificación</h2></div><div class="tpl"><button class="btn sm" data-tpl="45">Bloque 45'</button><button class="btn sm" data-tpl="90">Bloque 90'</button></div></div>
         <div class="times">
           <label for="pStart">Entrada<input type="time" id="pStart"></label>
@@ -313,6 +361,15 @@ input[type=range]{accent-color:var(--accent);width:150px}
     </div>
   </div>
 </div>
+
+<div id="fHome" hidden>
+  <div class="ftimer" id="ftimer">
+    <div class="ft-top"><span class="m-tl" id="ftCls">cronómetro</span><button class="btn sm" data-act="tobar">Ver barra de clase</button></div>
+    <div class="ft-ring" id="ftRing"><svg viewBox="0 0 120 120" aria-hidden="true"><circle class="trk" cx="60" cy="60" r="50"/><circle class="prg" id="ftPrg" cx="60" cy="60" r="50" stroke-dasharray="314.16" stroke-dashoffset="0"/></svg><div class="ft-in"><div class="ft-disp" id="ftDisp">05:00</div><div class="ft-lab" id="ftLab">listo</div></div></div>
+    <div class="ft-btns" id="ftBtns"></div>
+  </div>
+</div>
+<div class="toast" id="toast" hidden><span id="toastTxt"></span><button id="toastUndo">Deshacer</button></div>
 
 <script>
 (()=>{
@@ -417,10 +474,11 @@ const RC=276.46;
 (()=>{let s='';for(let i=0;i<60;i++){const a=i*6*Math.PI/180,big=i%5===0,r1=big?51:53,r2=57;s+=`<line class="tick${big?' big':''}" x1="${60+r1*Math.sin(a)}" y1="${60-r1*Math.cos(a)}" x2="${60+r2*Math.sin(a)}" y2="${60-r2*Math.cos(a)}"/>`}$('ticks').innerHTML=s})();
 let timer=null,trying=false;
 const tLeft=()=>!timer?0:timer.done?0:timer.paused?timer.left:Math.max(0,timer.end-Date.now());
-function tStart(sec){if(sec<=0)return;ctx();trying=false;$('tTry').textContent='Escuchar';timer={total:sec*1000,end:Date.now()+sec*1000,paused:false,done:false};try{audioEl.currentTime=0}catch(e){}startMusic();tCtl()}
+function tStart(sec){if(sec<=0)return;ctx();trying=false;$('tTry').textContent='Escuchar';timer={total:sec*1000,end:Date.now()+sec*1000,paused:false,done:false};try{audioEl.currentTime=0}catch(e){}startMusic();tCtl();keys.ft=null;
+  if(!pipWin&&$('tAutoPip').checked)openPip('timer')}
 function tPause(){if(!timer||timer.done)return;if(timer.paused){timer.end=Date.now()+timer.left;timer.paused=false;startMusic()}else{timer.left=timer.end-Date.now();timer.paused=true;stopMusic()}tCtl()}
 function tPlus(){if(!timer)return;if(timer.done){timer={total:60000,end:Date.now()+60000,paused:false,done:false};startMusic()}else{if(timer.paused)timer.left+=MIN;else timer.end+=MIN;timer.total+=MIN}tCtl()}
-function tStop(){timer=null;stopMusic();tCtl()}
+function tStop(){timer=null;stopMusic();tCtl();keys.ft=null}
 function tCtl(){const on=!!timer;$('tPause').disabled=!on||timer.done;$('tPlus').disabled=!on;$('tStop').disabled=!on;
   const lbl=on&&timer.paused?'Seguir':'Pausa';$('tPause').textContent=lbl;M.tp.textContent=lbl;M.tp.disabled=!on||(timer&&timer.done)}
 function timerTick(){if(timer&&!timer.paused&&!timer.done&&Date.now()>=timer.end){timer.done=true;timer.doneAt=Date.now();stopMusic();alarm();tCtl()}
@@ -434,7 +492,22 @@ const ARROW='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-w
 const PLAY='<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 5v14l12-7z"/></svg>';
 mini.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b)return;const a=b.dataset.act;
   ({start:()=>startClass('agenda'),ensayo:()=>startClass('ensayo'),now:()=>startClass('ahora'),next:advance,advance,finish:endClass,
-    ext2:()=>extend(2),ext5:()=>extend(5),later:()=>{if(run){run.ask=false;saveRun();render()}},tpause:tPause,tstop:tStop}[a]||(()=>{}))()});
+    ext2:()=>extend(2),ext5:()=>extend(5),later:()=>{if(run){run.ask=false;saveRun();render()}},tpause:tPause,tstop:tStop,tobig:()=>openPip('timer')}[a]||(()=>{}))()});
+const ftimer=$('ftimer');
+ftimer.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b)return;const a=b.dataset.act;
+  ({tset:()=>tStart(+b.dataset.s),tpause:tPause,tplus:tPlus,tstop:tStop,tobar:()=>openPip('bar')}[a]||(()=>{}))()});
+function renderFT(){
+  if(run&&run.ask)$('ftCls').textContent='¡cambio de momento!';else if(run&&now()>=run.cs){const c=run.sched[run.idx];$('ftCls').textContent=run.blocks[run.idx].name+' · '+(c.end>=now()?fmt(c.end-now()):'+'+fmt(now()-c.end,true))}else $('ftCls').textContent='cronómetro';
+  const L=timer?tLeft():0;
+  $('ftDisp').textContent=timer?(timer.done?'¡Tiempo!':fmt(L)):fmt(selSec()*1000);
+  $('ftLab').textContent=!timer?'elige un tiempo':timer.done?'¡se acabó!':timer.paused?'en pausa':'corriendo';
+  $('ftRing').classList.toggle('done',!!(timer&&timer.done));
+  $('ftPrg').style.strokeDashoffset=timer?314.16*(1-L/timer.total):0;
+  const k=!timer?'idle':timer.done?'done':timer.paused?'p':'r';
+  if(keys.ft!==k){keys.ft=k;$('ftBtns').innerHTML=k==='idle'?[60,180,300,600].map(s=>`<button class="btn sm" data-act="tset" data-s="${s}">${s/60}:00</button>`).join(''):
+    k==='done'?'<button class="btn sm" data-act="tplus">+1 min</button><button class="btn sm primary" data-act="tstop">Listo</button>':
+    `<button class="btn sm primary" data-act="tpause">${k==='p'?'Seguir':'Pausa'}</button><button class="btn sm" data-act="tplus">+1 min</button><button class="btn sm" data-act="tstop">Detener</button>`}
+}
 
 function render(){
   const t=now();
@@ -443,6 +516,7 @@ function render(){
   if(run){({blocks,cs,ce,idx}=run);view=run.sched;const cur=view[idx];
     if(t>cur.end){view=view.slice();view[idx]={...cur,end:t};if(idx<blocks.length-1)view=fit(blocks,view,idx+1,t,ce)}}
   else{blocks=cfg.blocks;cs=todayAt(cfg.start);ce=cs+durMin()*MIN;view=fit(blocks,[],0,cs,ce)}
+  mini.classList.toggle('idle',!run);
   const n=blocks.length,endAll=Math.max(ce,view[n-1].end),total=Math.max(1,endAll-cs),pre=run&&t<cs;
 
   M.bar.innerHTML=view.map((s,k)=>{const L=(s.start-cs)/total*100,W=(s.end-s.start)/total*100;if(W<=0)return'';
@@ -452,7 +526,7 @@ function render(){
 
   if(!run){
     mini.style.removeProperty('--c');M.chip.textContent=n;
-    M.name.textContent='Clase lista';M.sub.textContent=`${n} momentos · ${cfg.start} a ${cfg.end}`;
+    M.name.textContent=(curRoute()||{}).name||'Clase lista';M.sub.textContent=`${n} momentos · ${cfg.start} a ${cfg.end}`;
     M.time.textContent=durMin()+"'";M.time.classList.remove('over');M.cap.textContent='minutos de clase';
     M.fl.textContent=clk(cs);M.fm.textContent='Sin iniciar';M.fr.textContent=clk(endAll);
   }else{
@@ -482,9 +556,10 @@ function render(){
     return `<li class="${st}" style="--c:${colorOf(blocks[k],k,n)}"><span class="num">${k+1}</span><span class="an">${esc(blocks[k].name)}${k===n-1?'<span class="tag">fijo</span>':''}${st==='cur'?'<span class="tag">← ahora</span>':''}</span><span class="at">${clk(s.start)}–${clk(s.end)}</span><span class="ad">${Math.round((s.end-s.start)/MIN)} min</span></li>`}).join('');
   $('endBtn').disabled=!run;$('pRunNote').hidden=!run;
   $('modeHint').textContent=!run?'':run.mode==='ensayo'?'Ensayo a 30× velocidad':run.mode==='ahora'?'Iniciada ahora':'Según tu horario';
+  renderFT();
 }
 function tick(){
-  if(run){const t=now(),b=run.sched[run.idx];if(t>=run.cs&&t>=b.end&&run.prompted!==run.idx){run.prompted=run.idx;run.ask=true;saveRun();if(cfg.chime)chime()}}
+  if(run){const t=now(),b=run.sched[run.idx];if(t>=run.cs&&t>=b.end&&run.prompted!==run.idx){run.prompted=run.idx;run.ask=true;saveRun();if(cfg.chime)chime();if(pipWin&&pipMode==='timer'&&!timer)setPipMode('bar')}}
   timerTick();render();
 }
 
@@ -507,6 +582,7 @@ function updatePreview(){
   $('pDur').textContent=d+' minutos';
   $('pSum').textContent=sum===d?`Los momentos suman ${sum} min, justo lo que dura la clase.`:`Los momentos suman ${sum} min y la clase dura ${d}. Los intermedios se ajustan en proporción y el cierre mantiene sus ${cz} min.`;
   if(!run)render();
+  renderRoutes();
 }
 $('pList').addEventListener('input',e=>{const i=+e.target.dataset.i;if(isNaN(i))return;
   if(e.target.classList.contains('bname'))cfg.blocks[i].name=e.target.value||'Momento';else cfg.blocks[i].min=Math.max(1,+e.target.value||1);saveCfg();updatePreview()});
@@ -533,21 +609,61 @@ $('tTry').onclick=()=>{if(trying){trying=false;stopMusic();$('tTry').textContent
 $('tFull').onclick=()=>{const c=$('timerCard');try{(document.fullscreenElement?document.exitFullscreen():c.requestFullscreen()).catch(()=>{})}catch(e){}};
 
 // ---------- ventana flotante ----------
-let pipWin=null;
+let pipWin=null,pipMode='bar';
 function showNote(html){const n=$('note');n.innerHTML=html;n.hidden=false}
-async function openPip(){
-  if(pipWin){pipWin.close();return}
-  if(!('documentPictureInPicture' in window)){showNote('Este navegador no permite ventanas flotantes. Abre la página en <strong>Chrome o Edge</strong> de computador (versión 116 o superior). Dentro de Claude no funciona: usa la versión publicada en GitHub Pages o el archivo .html.');return}
+function setPipMode(m){pipMode=m;mini.hidden=m!=='bar';ftimer.hidden=m!=='timer';
+  $('pipLbl').textContent=pipWin&&m==='bar'?'Cerrar barra flotante':'Barra flotante';
+  $('pipTLbl').textContent=pipWin&&m==='timer'?'Cerrar cronómetro flotante':'Cronómetro flotante';
+  $('poppedTxt').textContent=m==='timer'?'El cronómetro está flotando':'La barra está flotando';
+  if(pipWin){try{m==='timer'?pipWin.resizeTo(360,380):pipWin.resizeTo(660,220)}catch(e){}}}
+async function openPip(mode){
+  mode=mode==='timer'?'timer':'bar';
+  if(pipWin){if(pipMode===mode)pipWin.close();else setPipMode(mode);return}
+  if(!('documentPictureInPicture' in window)){showNote('Este navegador no permite ventanas flotantes. Abre la página en <strong>Chrome o Edge</strong> de computador (versión 116 o superior). Dentro de Claude no funciona: usa la versión de GitHub Pages.');return}
   try{
-    const w=await documentPictureInPicture.requestWindow({width:660,height:210});
+    const w=await documentPictureInPicture.requestWindow(mode==='timer'?{width:360,height:380}:{width:660,height:220});
     document.querySelectorAll('style,link[rel=stylesheet]').forEach(n=>w.document.head.appendChild(n.cloneNode(true)));
     const th=document.documentElement.getAttribute('data-theme');if(th)w.document.documentElement.setAttribute('data-theme',th);
-    w.document.title='Reloj de Clase';w.document.body.className='pip';w.document.body.appendChild(mini);
-    $('slot').hidden=true;$('popped').hidden=false;$('pipLbl').textContent='Cerrar barra flotante';pipWin=w;
-    w.addEventListener('pagehide',()=>{$('slot').appendChild(mini);$('slot').hidden=false;$('popped').hidden=true;$('pipLbl').textContent='Barra flotante';pipWin=null});
+    w.document.title='Reloj de Clase';w.document.body.className='pip';w.document.body.append(mini,ftimer);
+    pipWin=w;$('slot').hidden=true;$('popped').hidden=false;setPipMode(mode);keys={};render();
+    w.addEventListener('pagehide',()=>{$('slot').appendChild(mini);$('fHome').appendChild(ftimer);$('slot').hidden=false;$('popped').hidden=true;pipWin=null;setPipMode('bar');keys={};render()});
   }catch(e){showNote('No se pudo abrir la ventana flotante aquí. Abre la página directamente en Chrome o Edge (fuera de Claude) y vuelve a intentarlo.')}
 }
-$('pipBtn').onclick=openPip;$('pipBack').onclick=()=>pipWin&&pipWin.close();
+$('pipBtn').onclick=()=>openPip('bar');$('pipTBtn').onclick=()=>openPip('timer');$('pipBack').onclick=()=>pipWin&&pipWin.close();
+$('tAutoPip').checked=store.get('rc.autopip',true);$('tAutoPip').onchange=e=>store.set('rc.autopip',e.target.checked);
+
+// ---------- rutas guardadas ----------
+let routes=store.get('rc.routes',null);
+if(!routes)routes=[{id:'ex90',name:"Ejemplo · Bloque 90'",start:'08:00',end:'09:30',blocks:JSON.parse(JSON.stringify(T90))},{id:'ex45',name:"Ejemplo · Bloque 45'",start:'10:00',end:'10:45',blocks:JSON.parse(JSON.stringify(T45))}];
+const saveRoutes=()=>store.set('rc.routes',routes);
+const snap=()=>({start:cfg.start,end:cfg.end,blocks:JSON.parse(JSON.stringify(cfg.blocks))});
+const sameAs=r=>JSON.stringify({start:r.start,end:r.end,blocks:r.blocks})===JSON.stringify(snap());
+const curRoute=()=>routes.find(r=>r.id===cfg.routeId);
+let toastT;
+function toast(msg,undo){$('toastTxt').textContent=msg;$('toastUndo').hidden=!undo;$('toastUndo').onclick=()=>{undo&&undo();$('toast').hidden=true};$('toast').hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>{$('toast').hidden=true},5000)}
+function renderRoutes(){
+  const box=$('routes');
+  box.innerHTML=!routes.length?'<div class="empty">Aún no tienes rutas guardadas. Arma la planificación abajo y guárdala con un nombre.</div>':
+    routes.map((r,i)=>{const n=r.blocks.length,tot=r.blocks.reduce((a,b)=>a+(+b.min||0),0);
+      return `<div class="route ${r.id===cfg.routeId?'on':''}"><button data-load="${i}" aria-label="Usar ${esc(r.name)}"><span class="rn">${esc(r.name)}</span><span class="rm">${r.start}–${r.end} · ${n} momentos</span><span class="route-dots">${r.blocks.map((b,k)=>`<i style="flex:${(+b.min||1)/tot};--c:${colorOf(b,k,n)}"></i>`).join('')}</span></button><button class="rx" data-rdel="${i}" aria-label="Eliminar ${esc(r.name)}">×</button></div>`}).join('');
+  const cur=curRoute();$('rSave').disabled=!cur;
+  $('rState').textContent=cur?(sameAs(cur)?`Usando «${cur.name}».`:`Tienes cambios sin guardar en «${cur.name}».`):'Esta planificación no está guardada.';
+}
+function loadRoute(i){const r=routes[i];if(run){toast('Termina la clase en curso para cambiar de ruta');return}
+  cfg.start=r.start;cfg.end=r.end;cfg.blocks=JSON.parse(JSON.stringify(r.blocks));cfg.routeId=r.id;saveCfg();$('rName').value=r.name;renderEditor();toast(`Ruta «${r.name}» lista`)}
+$('routes').addEventListener('click',e=>{const l=e.target.closest('[data-load]');if(l){loadRoute(+l.dataset.load);return}
+  const d=e.target.closest('[data-rdel]');if(d){const i=+d.dataset.rdel,[r]=routes.splice(i,1),was=cfg.routeId===r.id;if(was)cfg.routeId=null;saveRoutes();saveCfg();renderRoutes();
+    toast(`Se eliminó «${r.name}»`,()=>{routes.splice(i,0,r);if(was)cfg.routeId=r.id;saveRoutes();saveCfg();renderRoutes()})}});
+$('rSave').onclick=()=>{const r=curRoute();if(!r)return;Object.assign(r,snap());const nm=$('rName').value.trim();if(nm)r.name=nm;saveRoutes();renderRoutes();toast(`Se guardó «${r.name}»`)};
+$('rSaveNew').onclick=()=>{let nm=$('rName').value.trim()||`Clase de las ${cfg.start}`;const c=curRoute();if(c&&nm===c.name)nm+=' (copia)';
+  const r={id:'r'+Date.now(),name:nm,...snap()};routes.push(r);cfg.routeId=r.id;$('rName').value=nm;saveRoutes();saveCfg();renderRoutes();toast(`Se guardó «${nm}»`)};
+$('rExp').onclick=()=>{const data=JSON.stringify({app:'reloj-de-clase',version:1,routes},null,2);
+  try{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([data],{type:'application/json'}));a.download='rutas-de-clase.json';document.body.appendChild(a);a.click();a.remove();toast('Se descargó rutas-de-clase.json')}catch(e){toast('No se pudo descargar aquí')}};
+$('rImp').onclick=()=>$('rFile').click();
+$('rFile').onchange=e=>{const f=e.target.files[0];if(!f)return;f.text().then(t=>{const d=JSON.parse(t),list=Array.isArray(d)?d:d.routes;let n=0;
+  (list||[]).forEach(r=>{if(r&&r.name&&Array.isArray(r.blocks)&&r.blocks.length){routes.push({id:'r'+Date.now()+n,name:String(r.name),start:r.start||'08:00',end:r.end||'09:30',blocks:r.blocks.map(b=>({name:String(b.name||'Momento'),min:Math.max(1,+b.min||1),color:b.color}))});n++}});
+  saveRoutes();renderRoutes();toast(n?`Se importaron ${n} rutas`:'El archivo no tiene rutas válidas')}).catch(()=>toast('No se pudo leer el archivo'));e.target.value=''};
+{const c=curRoute();if(c)$('rName').value=c.name}
 
 renderEditor();tCtl();render();setInterval(tick,250);
 })();
