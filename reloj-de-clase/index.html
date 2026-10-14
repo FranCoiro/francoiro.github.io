@@ -1,4 +1,4 @@
-<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="theme-color" content="#1d3a33"><link rel="apple-touch-icon" href="apple-touch-icon.png">
 <title>Reloj de Clase</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -115,6 +115,28 @@ h2{font-family:var(--f-display);font-weight:800;font-size:22px;margin:0;letter-s
 @container (max-width:380px){ .m-act .btn{flex:1;justify-content:center} .m-chip{width:36px;height:36px;font-size:16px} }
 
 body.pip{margin:0;padding:0;background:var(--surface);background-image:none}
+body.pip .mini{padding:8px 10px 6px;gap:6px}
+body.pip .m-top{grid-template-columns:minmax(0,1fr) auto auto;gap:4px 10px}
+body.pip .m-act{grid-column:auto;gap:5px}
+body.pip .mini.idle .m-act{grid-column:1/-1}
+body.pip .m-now{gap:8px}
+body.pip .m-chip{width:30px;height:30px;font-size:15px;border-radius:9px}
+body.pip .m-name{font-size:clamp(15px,4.4cqi,22px);-webkit-line-clamp:1}
+body.pip .m-sub{font-size:11.5px;margin-top:0}
+body.pip .m-time{font-size:clamp(22px,6.5cqi,34px)}
+body.pip .m-cap{font-size:13px}
+body.pip .m-act .btn{padding:5px 9px;font-size:13px;border-radius:10px}
+body.pip .btn.icon svg{width:16px;height:16px}
+body.pip .m-bar{height:22px;border-radius:8px}
+body.pip .seg b{border-radius:7px}
+body.pip .seg span{line-height:22px;font-size:11px;padding:0 6px}
+body.pip .mark{top:-4px;bottom:-4px}
+body.pip .m-foot{font-size:11px;min-height:18px}
+body.pip .m-items span{font-size:11.5px;padding:2px 8px}
+body.pip .m-timer{padding-top:6px}
+body.pip .m-tt{font-size:19px}
+body.pip .nx{display:none}
+body.pip .m-cap{display:none}
 body.pip .mini{border-radius:0;min-height:100vh;justify-content:center;padding:12px 16px 10px}
 
 .slot-wrap{border:1px solid var(--line);border-radius:19px;overflow:hidden}
@@ -271,6 +293,7 @@ body:not(.pip) [data-pip-only]{display:none}
     <div class="top-r">
       <span class="badge" id="simBadge" hidden>Ensayo ×30</span>
       <span class="live" id="live">--:--:--</span>
+      <button class="btn" id="installBtn" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5M4 19h16"/></svg>Instalar en este equipo</button>
       <button class="btn primary" id="pipBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="14" rx="2"/><rect x="11" y="10" width="8" height="6" rx="1" fill="currentColor"/></svg><span id="pipLbl">Barra flotante</span></button>
     </div>
   </header>
@@ -647,7 +670,7 @@ function render(){
     M.fl.textContent=clk(cs);M.endT.textContent=clk(ce);
   }
   const ak=!run?'idle':pre?'pre':'run';
-  if(keys.act!==ak){keys.act=ak;M.act.innerHTML=`<button class="btn icon" data-act="tobig" title="Cronómetro" aria-label="Abrir cronómetro">${CLOCK}</button>`+(ak==='idle'?`<button class="btn" data-act="ensayo">Ensayo ×30</button><button class="btn primary" data-act="start">${PLAY}Iniciar clase</button>`:ak==='pre'?'<button class="btn" data-act="now">Empezar ahora</button>':`<button class="btn primary" data-act="next">Siguiente ${ARROW}</button>`)}
+  if(keys.act!==ak){keys.act=ak;M.act.innerHTML=`<button class="btn icon" data-act="tobig" title="Cronómetro" aria-label="Abrir cronómetro">${CLOCK}</button>`+(ak==='idle'?`<button class="btn" data-act="ensayo">Ensayo ×30</button><button class="btn primary" data-act="start">${PLAY}Iniciar clase</button>`:ak==='pre'?'<button class="btn" data-act="now">Empezar ahora</button>':`<button class="btn primary" data-act="next" title="Siguiente momento" aria-label="Siguiente momento"><span class="nx">Siguiente</span>${ARROW}</button>`)}
   const qk=run&&run.ask?run.idx+'-'+run.blocks.length:'';
   if(keys.ask!==qk){keys.ask=qk;M.ask.hidden=!qk;if(qk){const i=run.idx,last=i===run.blocks.length-1;
     M.askTxt.textContent=last?'Llegó la hora de salida':`Terminó «${run.blocks[i].name}». ¿Pasamos a «${run.blocks[i+1].name}»?`;
@@ -724,13 +747,14 @@ function showNote(html){const n=$('note');n.innerHTML=html;n.hidden=false}
 function setPipMode(m){pipMode=m;mini.hidden=m!=='bar';ftimer.hidden=m!=='timer';
   $('pipLbl').textContent=pipWin&&m==='bar'?'Cerrar barra flotante':'Barra flotante';
   $('poppedTxt').textContent=m==='timer'?'El cronómetro está flotando':'La barra está flotando';
-  if(pipWin){try{m==='timer'?pipWin.resizeTo(380,430):pipWin.resizeTo(660,250)}catch(e){}}}
+  if(pipWin){try{const z=pipSize(m);pipWin.resizeTo(z.width,z.height)}catch(e){}}}
+function pipSize(m){if(m==='timer')return{width:300,height:340};let h=128;if(!M.items.hidden)h+=28;if(!M.song.hidden)h+=110;if(!M.timer.hidden)h+=40;return{width:440,height:h}}
 async function openPip(mode){
   mode=mode==='timer'?'timer':'bar';
   if(pipWin){if(pipMode===mode)pipWin.close();else setPipMode(mode);return}
   if(!('documentPictureInPicture' in window)){showNote('Este navegador no permite ventanas flotantes. Abre la página en <strong>Chrome o Edge</strong> de computador (versión 116 o superior). Dentro de Claude no funciona: usa la versión de GitHub Pages.');return}
   try{
-    const w=await documentPictureInPicture.requestWindow(mode==='timer'?{width:380,height:430}:{width:660,height:250});
+    const w=await documentPictureInPicture.requestWindow(pipSize(mode));
     document.querySelectorAll('style,link[rel=stylesheet]').forEach(n=>w.document.head.appendChild(n.cloneNode(true)));
     const th=document.documentElement.getAttribute('data-theme');if(th)w.document.documentElement.setAttribute('data-theme',th);
     w.document.title='Reloj de Clase';w.document.body.className='pip';w.document.body.append(mini,ftimer);
@@ -782,6 +806,19 @@ $('rFile').onchange=e=>{const f=e.target.files[0];if(!f)return;f.text().then(t=>
   saveRoutes();renderRoutes();toast(n?`Se importaron ${n} rutas`:'El archivo no tiene rutas válidas')}).catch(()=>toast('No se pudo leer el archivo'));e.target.value=''};
 {const c=curRoute();if(c)$('rName').value=c.name}
 
+// ---------- instalar como app ----------
+{const onPages=/github\.io$/.test(location.hostname),standalone=matchMedia('(display-mode: standalone)').matches||navigator.standalone;
+  let deferred=null;
+  if(onPages){const l=document.createElement('link');l.rel='manifest';l.href='manifest.webmanifest';document.head.appendChild(l);
+    try{navigator.serviceWorker&&navigator.serviceWorker.register('sw.js').catch(()=>{})}catch(e){}
+    if(!standalone)$('installBtn').hidden=false}
+  addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferred=e;$('installBtn').hidden=false});
+  addEventListener('appinstalled',()=>{$('installBtn').hidden=true;toast('Reloj de Clase quedó instalado en este equipo')});
+  $('installBtn').onclick=()=>{
+    if(deferred){deferred.prompt();deferred.userChoice.finally(()=>{deferred=null});return}
+    showNote('<strong>Para instalarla:</strong> en Chrome o Edge, abre el menú (los tres puntos) y elige <em>Guardar y compartir → Instalar página como app</em> (en Edge: <em>Aplicaciones → Instalar este sitio</em>). En iPad o iPhone: botón Compartir → <em>Agregar a pantalla de inicio</em>. Una vez instalada abre sin internet y tus rutas siguen ahí. <button class="btn sm" id="dlHtml" style="margin-left:6px">O descargar el archivo .html</button>');
+    const d=$('dlHtml');if(d)d.onclick=()=>fetch(location.href).then(r=>r.blob()).then(b=>{const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='reloj-de-clase.html';document.body.appendChild(a);a.click();a.remove();toast('Se descargó reloj-de-clase.html')}).catch(()=>toast('No se pudo descargar'))};
+}
 renderEditor();tCtl();render();setInterval(tick,250);
 })();
 </script>
