@@ -124,7 +124,7 @@ h2{font-family:var(--f-display);font-weight:800;font-size:22px;margin:0;letter-s
 .mini.quick .m-name{font-size:clamp(44px,13cqi,84px);line-height:.9;-webkit-line-clamp:1}
 .mini.quick .m-sub{font-size:15px}
 .mini.quick .seg span{text-align:center;font-family:var(--f-mono);font-size:13px}
-body.pip .mini.quick .m-name{font-size:clamp(34px,11cqi,56px)}
+body.pip .mini.quick .m-name{font-size:clamp(40px,12cqi,72px)}
 .mini.idle .m-top{grid-template-columns:minmax(0,1fr) auto}
 .mini.idle .m-act{grid-column:1/-1}
 @container (max-width:380px){ .m-act .btn{flex:1;justify-content:center} .m-chip{width:36px;height:36px;font-size:16px} }
@@ -135,23 +135,25 @@ body.pip .m-top{grid-template-columns:minmax(0,1fr) auto auto;gap:4px 10px}
 body.pip .m-act{grid-column:auto;gap:5px}
 body.pip .mini.idle .m-act{grid-column:1/-1}
 body.pip .m-now{gap:8px}
-body.pip .m-chip{width:30px;height:30px;font-size:15px;border-radius:9px}
-body.pip .m-name{font-size:clamp(15px,4.4cqi,22px);-webkit-line-clamp:1}
+body.pip .m-chip{width:34px;height:34px;font-size:17px;border-radius:10px}
+body.pip .m-name{font-size:clamp(17px,4.8cqi,28px);-webkit-line-clamp:1}
 body.pip .m-sub{font-size:11.5px;margin-top:0}
-body.pip .m-time{font-size:clamp(22px,6.5cqi,34px)}
+body.pip .m-time{font-size:clamp(26px,7.5cqi,44px)}
 body.pip .m-cap{font-size:13px}
 body.pip .m-act .btn{padding:5px 9px;font-size:13px;border-radius:10px}
 body.pip .btn.icon svg{width:16px;height:16px}
-body.pip .m-bar{height:22px;border-radius:8px}
+body.pip .m-bar{height:26px;border-radius:8px}
 body.pip .seg b{border-radius:7px}
-body.pip .seg span{line-height:22px;font-size:11px;padding:0 6px}
+body.pip .seg span{line-height:26px;font-size:12.5px;padding:0 6px}
 body.pip .mark{top:-4px;bottom:-4px}
-body.pip .m-foot{font-size:11px;min-height:18px}
+body.pip .m-foot{font-size:12px;min-height:20px}
 body.pip .m-items span{font-size:11.5px;padding:2px 8px}
 body.pip .m-timer{padding-top:6px}
 body.pip .m-tt{font-size:19px}
 body.pip .nx{display:none}
 body.pip .m-cap{display:none}
+body.pip .mini.quick .m-cap{display:block}
+body.pip .mini:not(.quick) .m-bar{height:14px}
 body.pip .mini{border-radius:0;min-height:100vh;justify-content:center;padding:12px 16px 10px}
 
 .slot-wrap{border:1px solid var(--line);border-radius:19px;overflow:hidden}
@@ -739,9 +741,9 @@ function renderQuick(){
   mini.classList.add('quick');mini.classList.remove('idle');mini.style.setProperty('--c',colorOf(null,idx,n));
   if(!run.qEnd)run.qEnd=run.cs+90*MIN;
   mini.classList.remove('noclock');const t=now(),left=run.qEnd-t,tot=run.qEnd-run.cs;
-  M.time.textContent=left>=0?fmt(left):'+'+fmt(-left,true);M.time.classList.toggle('over',left<0);M.cap.textContent=left>=0?'quedan de clase':'de tiempo extra';
+  M.time.textContent=fmt(t-run.cs,true);M.time.classList.toggle('over',left<0);M.cap.textContent=left>=0?'llevamos de clase':'ya pasó la hora de salida';
   M.progI.style.width=Math.min(100,(t-run.cs)/tot*100)+'%';M.prog.classList.toggle('over',left<0);
-  M.fl.textContent=`llevamos ${Math.floor((t-run.cs)/MIN)} min`;M.endT.textContent='salida '+clk(run.qEnd);
+  M.fl.textContent=left>=0?`quedan ${Math.ceil(left/MIN)} min`:`${Math.floor(-left/MIN)} min de más`;M.endT.textContent='salida '+clk(run.qEnd);
   M.name.textContent=String(idx+1);M.sub.textContent=`de ${n}`;M.items.hidden=true;keys.items='';syncSong('','');M.ask.hidden=true;keys.ask='';
   M.bar.innerHTML=run.blocks.map((b,k)=>`<div class="seg ${k<idx?'done':k===idx?'cur':''}" style="left:${k/n*100}%;width:${100/n}%;--c:${colorOf(null,k,n)}"><b>${k===idx?'<i style="width:100%"></i>':''}<span>${k+1}</span></b></div>`).join('');
   const ak='q'+(idx===0?'f':'')+(idx===n-1?'l':'');
@@ -817,7 +819,8 @@ function setPipMode(m){pipMode=m;mini.hidden=m!=='bar';ftimer.hidden=m!=='timer'
   $('pipLbl').textContent=pipWin&&m==='bar'?'Cerrar barra flotante':'Barra flotante';
   $('poppedTxt').textContent=m==='timer'?'El cronómetro está flotando':'La barra está flotando';
   if(pipWin){try{const z=pipSize(m);pipWin.resizeTo(z.width,z.height)}catch(e){}}}
-function pipSize(m){if(m==='timer')return{width:300,height:340};let h=128;if(!M.items.hidden)h+=28;if(!M.song.hidden)h+=110;if(!M.timer.hidden)h+=40;return{width:440,height:h}}
+function pipSize(m){if(m==='timer')return{width:360,height:410};let h=mini.classList.contains('quick')?190:170;if(!M.items.hidden)h+=30;if(!M.song.hidden)h+=110;if(!M.timer.hidden)h+=44;return{width:560,height:h}}
+function pipCorner(w,z){try{const sx=(screen.availLeft||0)+screen.availWidth-z.width-24,sy=(screen.availTop||0)+24;w.moveTo(sx,sy)}catch(e){}}
 async function openPip(mode){
   mode=mode==='timer'?'timer':'bar';
   if(pipWin){if(pipMode===mode)pipWin.close();else setPipMode(mode);return}
@@ -827,7 +830,7 @@ async function openPip(mode){
     document.querySelectorAll('style,link[rel=stylesheet]').forEach(n=>w.document.head.appendChild(n.cloneNode(true)));
     const th=document.documentElement.getAttribute('data-theme');if(th)w.document.documentElement.setAttribute('data-theme',th);
     w.document.addEventListener('keydown',onKey);w.document.title='Reloj de Clase';w.document.body.className='pip';w.document.body.append(mini,ftimer);
-    pipWin=w;$('slot').hidden=true;$('popped').hidden=false;setPipMode(mode);keys={};render();
+    pipCorner(w,pipSize(mode));pipWin=w;$('slot').hidden=true;$('popped').hidden=false;setPipMode(mode);keys={};render();
     w.addEventListener('pagehide',()=>{$('slot').appendChild(mini);$('fHome').appendChild(ftimer);$('slot').hidden=false;$('popped').hidden=true;pipWin=null;setPipMode('bar');keys={};render()});
   }catch(e){showNote('No se pudo abrir la ventana flotante aquí. Abre la página directamente en Chrome o Edge (fuera de Claude) y vuelve a intentarlo.')}
 }
