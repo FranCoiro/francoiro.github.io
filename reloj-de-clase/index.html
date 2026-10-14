@@ -1,0 +1,555 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Reloj de Clase</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Caveat:wght@600;700&family=JetBrains+Mono:wght@600;800&display=swap">
+<style>
+/* Layout: hoja de cuaderno cuadriculado (claro) / pizarra (oscuro); la barra de momentos es la pieza central, cronómetro debajo, planificación al costado */
+:root{
+  --bg:#f2f5f8; --grid:#dde5ee; --surface:#ffffff; --ink:#17212e; --muted:#5b687a; --line:#dfe6ee; --track:#edf1f6; --shadow:#1b2a4a33;
+  --accent:#2f5bd3; --accent-ink:#ffffff; --hand:#2f5bd3; --warn:#e0532f; --chip-ink:#14202b;
+  --p0:#33b38a; --p1:#f2b632; --p2:#4b8df0; --p3:#ec6a9b; --p4:#8f7cf0; --p5:#f07a4a;
+  --f-display:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;
+  --f-body:"Atkinson Hyperlegible","Segoe UI",system-ui,sans-serif;
+  --f-hand:"Caveat","Segoe Print","Bradley Hand",cursive;
+  --f-mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#163029; --grid:#ffffff0a; --surface:#1d3a33; --ink:#f1f5ef; --muted:#a8c1b5; --line:#2d4f46; --track:#254740; --shadow:#00000066;
+  --accent:#ffd45c; --accent-ink:#1d2a24; --hand:#ffd45c; --warn:#ff8a65; --chip-ink:#14202b;
+  --p0:#7fdcb6; --p1:#ffd45c; --p2:#8fbaff; --p3:#ff9cc2; --p4:#c3b2ff; --p5:#ffad7d; color-scheme:dark } }
+:root[data-theme="dark"]{
+  --bg:#163029; --grid:#ffffff0a; --surface:#1d3a33; --ink:#f1f5ef; --muted:#a8c1b5; --line:#2d4f46; --track:#254740; --shadow:#00000066;
+  --accent:#ffd45c; --accent-ink:#1d2a24; --hand:#ffd45c; --warn:#ff8a65; --chip-ink:#14202b;
+  --p0:#7fdcb6; --p1:#ffd45c; --p2:#8fbaff; --p3:#ff9cc2; --p4:#c3b2ff; --p5:#ffad7d; color-scheme:dark }
+
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.45;
+  background-color:var(--bg);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:26px 26px;background-position:-1px -1px}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.app{max-width:1200px;margin:0 auto;padding-block:26px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:22px}
+
+/* encabezado */
+header.top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px}
+.brand{display:flex;align-items:center;gap:14px}
+.logo{width:52px;height:52px;flex:none}
+.brand h1{font-family:var(--f-display);font-weight:800;font-size:clamp(28px,4.2vw,40px);letter-spacing:-.03em;margin:0;line-height:.95}
+.brand p{margin:2px 0 0;font-family:var(--f-hand);font-size:21px;color:var(--hand);line-height:1.1}
+.top-r{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.live{font-family:var(--f-mono);font-weight:800;font-size:20px;font-variant-numeric:tabular-nums;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:8px 12px}
+.badge{font-size:12px;text-transform:uppercase;letter-spacing:.08em;font-weight:700;padding:5px 10px;border-radius:999px;background:var(--p1);color:var(--chip-ink)}
+
+.grid{display:grid;gap:22px;grid-template-columns:minmax(0,1.45fr) minmax(0,1fr);align-items:start}
+@media (max-width:920px){.grid{grid-template-columns:minmax(0,1fr)}}
+.col{display:grid;gap:22px;min-width:0}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:20px;min-width:0;box-shadow:0 18px 40px -28px var(--shadow)}
+.panel-h{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.ttl{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+h2{font-family:var(--f-display);font-weight:800;font-size:22px;margin:0;letter-spacing:-.02em}
+.scrib{font-family:var(--f-hand);font-size:20px;color:var(--hand);line-height:1}
+.hint{color:var(--muted);font-size:13px;margin:0}
+
+.btn{display:inline-flex;align-items:center;gap:7px;border:1.5px solid var(--line);background:var(--surface);border-radius:12px;padding:8px 14px;cursor:pointer;font-weight:700;white-space:nowrap;transition:transform .12s, border-color .12s, background .12s}
+.btn:hover{border-color:var(--muted)}
+.btn:active{transform:translateY(1px)}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);box-shadow:0 6px 16px -8px var(--accent)}
+.btn.primary:hover{filter:brightness(1.07)}
+.btn.sm{padding:5px 11px;font-size:13px;border-radius:10px}
+.btn:disabled{opacity:.4;cursor:default;transform:none}
+.btn svg{width:16px;height:16px;flex:none}
+
+/* ---------- barra de momentos ---------- */
+.mini{position:relative;container-type:inline-size;background:var(--surface);border-radius:18px;padding:16px 18px 12px;display:flex;flex-direction:column;gap:12px;
+  background-image:linear-gradient(135deg,color-mix(in srgb,var(--c,var(--muted)) 12%,transparent),transparent 55%)}
+.m-top{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:6px 16px}
+.m-now{display:flex;gap:12px;align-items:center;min-width:0}
+.m-chip{width:44px;height:44px;border-radius:13px;background:var(--c,var(--track));color:var(--chip-ink);display:grid;place-items:center;font-family:var(--f-display);font-weight:800;font-size:20px;flex:none;box-shadow:0 8px 18px -10px var(--c,var(--shadow))}
+.m-name{font-family:var(--f-display);font-weight:800;font-size:clamp(20px,5cqi,32px);line-height:1.02;letter-spacing:-.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.m-sub{color:var(--muted);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+.m-clock{text-align:right}
+.m-time{font-family:var(--f-mono);font-weight:800;font-size:clamp(28px,7.5cqi,52px);line-height:.95;font-variant-numeric:tabular-nums;letter-spacing:-.03em}
+.m-time.over{color:var(--warn)}
+.m-cap{font-family:var(--f-hand);font-size:17px;color:var(--hand);line-height:1.1}
+.m-time.over + .m-cap{color:var(--warn)}
+.m-act{grid-column:1/-1;display:flex;gap:8px;justify-content:flex-end}
+.m-act:empty{display:none}
+.m-bar{position:relative;height:34px;border-radius:11px;background:var(--track)}
+.seg{position:absolute;top:0;bottom:0;padding-right:3px}
+.seg b{position:absolute;inset:0 3px 0 0;border-radius:9px;background:color-mix(in srgb,var(--c) 22%,var(--surface));overflow:hidden}
+.seg.done b{background:color-mix(in srgb,var(--c) 45%,var(--surface))}
+.seg.cur b{background:color-mix(in srgb,var(--c) 25%,var(--surface));box-shadow:inset 0 0 0 2px var(--c)}
+.seg i{position:absolute;inset:0 auto 0 0;background:repeating-linear-gradient(-45deg,color-mix(in srgb,var(--c) 78%,var(--surface)) 0 10px,color-mix(in srgb,var(--c) 64%,var(--surface)) 10px 20px);background-size:28px 28px;animation:flow 1.6s linear infinite}
+@keyframes flow{to{background-position:28px 0}}
+.seg span{position:relative;display:block;padding:0 9px;font-size:12.5px;font-weight:700;line-height:34px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--ink)}
+.seg.done span{opacity:.75}
+.mark{position:absolute;top:-6px;bottom:-6px;width:4px;margin-left:-2px;background:var(--ink);border-radius:3px;box-shadow:0 0 0 2px var(--surface)}
+.mark::before,.mark::after{content:"";position:absolute;left:50%;width:10px;height:10px;margin-left:-5px;border-radius:50%;background:var(--ink);box-shadow:0 0 0 2px var(--surface)}
+.mark::before{top:-4px}.mark::after{bottom:-4px}
+.m-foot{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums;align-items:center}
+.m-foot span:nth-child(2){text-align:center;color:var(--ink);font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.m-timer{display:flex;align-items:center;gap:10px;border-top:1.5px dashed var(--line);padding-top:10px}
+.m-tl{font-family:var(--f-hand);font-size:19px;color:var(--hand)}
+.m-tt{font-family:var(--f-mono);font-weight:800;font-size:24px;font-variant-numeric:tabular-nums;margin-right:auto}
+.m-tt.done{color:var(--warn);animation:blink 1s steps(2) infinite}
+@keyframes blink{50%{opacity:.25}}
+.m-ask{position:absolute;inset:0;border-radius:inherit;background:color-mix(in srgb,var(--surface) 95%,transparent);display:flex;flex-direction:column;justify-content:center;align-items:center;gap:10px;padding:12px;text-align:center;box-shadow:inset 0 0 0 3px var(--warn);animation:pop .25s ease-out}
+@keyframes pop{from{opacity:0;transform:scale(.98)}}
+.m-ask p{margin:0;font-family:var(--f-display);font-weight:800;font-size:clamp(16px,4cqi,22px);letter-spacing:-.01em;text-wrap:balance}
+.m-ask-b{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+@container (min-width:560px){ .m-top{grid-template-columns:minmax(0,1fr) auto auto} .m-act{grid-column:auto} }
+@container (max-width:380px){ .m-act .btn{flex:1;justify-content:center} .m-chip{width:36px;height:36px;font-size:16px} }
+
+body.pip{margin:0;padding:0;background:var(--surface);background-image:none}
+body.pip .mini{border-radius:0;min-height:100vh;justify-content:center;padding:12px 16px 10px}
+
+.slot-wrap{border:1px solid var(--line);border-radius:19px;overflow:hidden}
+.popped{border:2px dashed var(--line);border-radius:18px;padding:26px 18px;text-align:center;display:grid;gap:8px;justify-items:center;color:var(--muted)}
+.popped strong{font-family:var(--f-display);font-size:19px;color:var(--ink)}
+
+/* agenda */
+.agenda{list-style:none;margin:16px 0 0;padding:0;display:grid;gap:4px}
+.agenda li{display:grid;grid-template-columns:28px minmax(0,1fr) auto auto;gap:12px;align-items:center;padding:8px 10px;border-radius:12px}
+.agenda .num{width:28px;height:28px;border-radius:9px;display:grid;place-items:center;font-weight:800;font-size:13px;background:color-mix(in srgb,var(--c) 30%,var(--surface));color:var(--ink)}
+.agenda li.cur{background:color-mix(in srgb,var(--c) 14%,var(--surface))}
+.agenda li.cur .num{background:var(--c);color:var(--chip-ink)}
+.agenda li.done{color:var(--muted)}
+.agenda li.done .an{text-decoration:line-through;text-decoration-thickness:1.5px;text-decoration-color:var(--c)}
+.an{font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.at{font-family:var(--f-mono);font-size:13px;font-variant-numeric:tabular-nums;color:var(--muted)}
+.ad{font-family:var(--f-mono);font-size:13px;font-variant-numeric:tabular-nums;min-width:54px;text-align:right}
+.tag{font-family:var(--f-hand);font-size:17px;color:var(--hand);margin-left:6px;font-weight:700}
+.foot-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:space-between;margin-top:14px;padding-top:14px;border-top:1px solid var(--line)}
+@media (max-width:460px){.agenda li{grid-template-columns:28px minmax(0,1fr) auto}.at{display:none}}
+
+/* cronómetro */
+.timer-card{display:grid;grid-template-columns:auto minmax(0,1fr);gap:26px;align-items:center}
+@media (max-width:600px){.timer-card{grid-template-columns:minmax(0,1fr);justify-items:center}}
+.ring{position:relative;width:220px;max-width:100%;aspect-ratio:1}
+.ring svg{width:100%;height:100%}
+.ring .tick{stroke:var(--line);stroke-width:1.4;stroke-linecap:round}
+.ring .tick.big{stroke:var(--muted);stroke-width:2}
+.ring .trk{fill:none;stroke:var(--track);stroke-width:10}
+.ring .prg{fill:none;stroke:var(--accent);stroke-width:10;stroke-linecap:round;transition:stroke-dashoffset .25s linear;transform:rotate(-90deg);transform-origin:60px 60px}
+.ring.done .prg{stroke:var(--warn)}
+.ring-in{position:absolute;inset:0;display:grid;place-items:center;align-content:center;gap:4px}
+.t-disp{font-family:var(--f-mono);font-weight:800;font-size:44px;font-variant-numeric:tabular-nums;line-height:1;letter-spacing:-.03em}
+.ring.done .t-disp{color:var(--warn);animation:blink 1s steps(2) infinite}
+.t-lab{font-family:var(--f-hand);font-size:20px;color:var(--hand)}
+.t-ctl{display:grid;gap:14px;min-width:0;width:100%}
+.lbl{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700;margin:0 0 6px}
+.presets{display:flex;flex-wrap:wrap;gap:6px}
+.presets .btn{font-family:var(--f-mono);border-radius:999px;padding:7px 14px}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{position:relative}
+.chip input{position:absolute;opacity:0;pointer-events:none}
+.chip span{display:inline-flex;align-items:center;gap:7px;padding:6px 12px;border-radius:999px;border:1.5px solid var(--line);font-weight:700;font-size:13.5px;cursor:pointer}
+.chip span::before{content:"";width:9px;height:9px;border-radius:50%;background:var(--dc,var(--muted))}
+.chip input:checked + span{background:color-mix(in srgb,var(--dc,var(--accent)) 22%,var(--surface));border-color:var(--dc,var(--accent))}
+.chip input:focus-visible + span{outline:3px solid var(--accent);outline-offset:2px}
+input[type=number],input[type=time],input[type=text]{border:1.5px solid var(--line);background:var(--bg);border-radius:10px;padding:7px 9px;min-width:0}
+input[type=number]{width:66px;font-family:var(--f-mono)}
+input[type=range]{accent-color:var(--accent);width:150px}
+#timerCard:fullscreen{background:var(--bg);display:grid;place-items:center;padding:40px}
+#timerCard:fullscreen .ring{width:min(78vh,78vw)}
+#timerCard:fullscreen .t-disp{font-size:min(15vh,15vw)}
+#timerCard:fullscreen .t-lab{font-size:min(5vh,5vw)}
+#timerCard:fullscreen .t-ctl{display:none}
+
+/* planificación */
+.times{display:flex;gap:12px;flex-wrap:wrap;align-items:end;margin-bottom:16px}
+.times label{display:grid;gap:4px;font-size:12px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+.times input{font-family:var(--f-mono);font-size:17px;font-weight:600;text-transform:none;letter-spacing:0}
+.dur{font-family:var(--f-hand);font-size:24px;color:var(--hand);padding-bottom:4px}
+.blist{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.blist li{display:grid;grid-template-columns:34px minmax(0,1fr) auto 28px;grid-template-areas:"sw name min del" "sw time time time";gap:2px 10px;align-items:center;padding:8px 8px 8px 8px;border-radius:14px;background:color-mix(in srgb,var(--c) 9%,var(--surface));border:1px solid color-mix(in srgb,var(--c) 30%,var(--surface))}
+.swb{grid-area:sw;width:34px;height:34px;border-radius:10px;border:0;background:var(--c);cursor:pointer;color:var(--chip-ink);font-weight:800;font-family:var(--f-display)}
+.bname{grid-area:name;width:100%;font-weight:700;background:transparent!important;border-color:transparent!important;padding-left:4px!important}
+.bname:hover,.bname:focus{border-color:var(--line)!important;background:var(--surface)!important}
+.bmin{grid-area:min;display:flex;align-items:center;gap:4px;font-size:13px;color:var(--muted)}
+.btime{grid-area:time;font-family:var(--f-mono);font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums;padding-left:4px}
+.del{grid-area:del;border:0;background:none;cursor:pointer;color:var(--muted);font-size:20px;width:28px;height:28px;border-radius:8px;line-height:1}
+.del:hover{background:var(--track);color:var(--ink)}
+.fixed{grid-area:del;font-family:var(--f-hand);font-size:17px;color:var(--hand);text-align:center;font-weight:700}
+.sum{font-size:13.5px;color:var(--muted);margin:14px 0 12px;text-wrap:pretty}
+.chk{display:flex;gap:9px;align-items:center;font-size:14px}
+.chk input{accent-color:var(--accent);width:18px;height:18px}
+.tpl{display:flex;gap:6px;flex-wrap:wrap}
+.note{background:color-mix(in srgb,var(--p1) 22%,var(--surface));border:1.5px solid var(--p1);border-radius:14px;padding:12px 14px;font-size:14px}
+.how{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.how li{display:grid;grid-template-columns:10px minmax(0,1fr);gap:10px;align-items:start;font-size:14px;color:var(--muted)}
+.how li::before{content:"";width:10px;height:10px;border-radius:50%;margin-top:6px;background:var(--d)}
+.how b{color:var(--ink)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head><body>
+
+<div class="app">
+  <header class="top">
+    <div class="brand">
+      <svg class="logo" viewBox="0 0 52 52" aria-hidden="true">
+        <circle cx="26" cy="26" r="25" fill="var(--surface)" stroke="var(--line)"/>
+        <path d="M26 8 A18 18 0 0 1 43.1 20.4" fill="none" stroke="var(--p0)" stroke-width="6" stroke-linecap="round"/>
+        <path d="M44 26.5 A18 18 0 0 1 32.5 42.8" fill="none" stroke="var(--p1)" stroke-width="6" stroke-linecap="round"/>
+        <path d="M26 44 A18 18 0 0 1 9.4 33" fill="none" stroke="var(--p2)" stroke-width="6" stroke-linecap="round"/>
+        <path d="M8.3 24 A18 18 0 0 1 19.5 9.2" fill="none" stroke="var(--p5)" stroke-width="6" stroke-linecap="round"/>
+        <path d="M26 26 L26 15 M26 26 L33 30" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
+        <circle cx="26" cy="26" r="3" fill="var(--ink)"/>
+      </svg>
+      <div>
+        <h1>Reloj de Clase</h1>
+        <p>para llegar al cierre a tiempo</p>
+      </div>
+    </div>
+    <div class="top-r">
+      <span class="badge" id="simBadge" hidden>Ensayo ×30</span>
+      <span class="live" id="live">--:--:--</span>
+      <button class="btn primary" id="pipBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="14" rx="2"/><rect x="11" y="10" width="8" height="6" rx="1" fill="currentColor"/></svg><span id="pipLbl">Barra flotante</span></button>
+    </div>
+  </header>
+  <div class="note" id="note" hidden></div>
+
+  <div class="grid">
+    <div class="col">
+      <section class="panel">
+        <div class="panel-h"><div class="ttl"><h2>Ahora</h2><span class="scrib">¿en qué vamos?</span></div><span class="hint" id="modeHint"></span></div>
+        <div class="slot-wrap" id="slot">
+          <div class="mini" id="mini">
+            <div class="m-top">
+              <div class="m-now"><span class="m-chip" id="mChip">·</span><div style="min-width:0"><div class="m-name" id="mName">—</div><div class="m-sub" id="mSub"></div></div></div>
+              <div class="m-clock"><div class="m-time" id="mTime">00:00</div><div class="m-cap" id="mCap"></div></div>
+              <div class="m-act" id="mAct"></div>
+            </div>
+            <div class="m-bar" id="mBar"></div>
+            <div class="m-foot"><span id="mFL"></span><span id="mFM"></span><span id="mFR"></span></div>
+            <div class="m-timer" id="mTimer" hidden><span class="m-tl">cronómetro</span><span class="m-tt" id="mTT">00:00</span><button class="btn sm" data-act="tpause" id="mTP">Pausa</button><button class="btn sm" data-act="tstop">Quitar</button></div>
+            <div class="m-ask" id="mAsk" hidden><p id="mAskTxt"></p><div class="m-ask-b" id="mAskB"></div></div>
+          </div>
+        </div>
+        <div class="popped" id="popped" hidden>
+          <strong>La barra está flotando</strong>
+          <span>Queda encima de PowerPoint, Canva o cualquier otra aplicación.</span>
+          <button class="btn" id="pipBack">Traer de vuelta aquí</button>
+        </div>
+        <ul class="agenda" id="agenda"></ul>
+        <div class="foot-row">
+          <span class="hint">La barra flotante funciona en Chrome o Edge de computador.</span>
+          <div class="row">
+            <button class="btn sm" id="nowBtn">Empezar ahora</button>
+            <button class="btn sm" id="endBtn" disabled>Terminar clase</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-h"><div class="ttl"><h2>Cronómetro</h2><span class="scrib">con música</span></div><button class="btn sm" id="tFull"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>Proyectar</button></div>
+        <div class="timer-card" id="timerCard">
+          <div class="ring" id="ring">
+            <svg viewBox="0 0 120 120" aria-hidden="true"><g id="ticks"></g><circle class="trk" cx="60" cy="60" r="44"/><circle class="prg" id="tRing" cx="60" cy="60" r="44" stroke-dasharray="276.46" stroke-dashoffset="0"/></svg>
+            <div class="ring-in"><div class="t-disp" id="tDisp">05:00</div><div class="t-lab" id="tLab">listo</div></div>
+          </div>
+          <div class="t-ctl">
+            <div>
+              <p class="lbl">Tiempo</p>
+              <div class="presets" id="presets">
+                <button class="btn" data-s="60">1:00</button><button class="btn" data-s="120">2:00</button><button class="btn" data-s="180">3:00</button><button class="btn" data-s="300">5:00</button><button class="btn" data-s="600">10:00</button><button class="btn" data-s="900">15:00</button>
+              </div>
+            </div>
+            <div class="row">
+              <label class="hint" for="tMin">Otro:</label><input type="number" id="tMin" min="0" max="180" value="7"><span class="hint">min</span><input type="number" id="tSec" min="0" max="59" value="30" aria-label="Segundos"><span class="hint">s</span>
+              <button class="btn primary" id="tGo">Iniciar</button>
+            </div>
+            <div>
+              <p class="lbl">Música</p>
+              <div class="chips" id="music">
+                <label class="chip"><input type="radio" name="music" value="none" id="mu0"><span>Silencio</span></label>
+                <label class="chip" style="--dc:var(--p2)"><input type="radio" name="music" value="calma" id="mu1"><span>Calma</span></label>
+                <label class="chip" style="--dc:var(--p4)"><input type="radio" name="music" value="lofi" id="mu2" checked><span>Lo-fi</span></label>
+                <label class="chip" style="--dc:var(--p5)"><input type="radio" name="music" value="energia" id="mu3"><span>Energía</span></label>
+                <label class="chip" style="--dc:var(--p1)"><input type="radio" name="music" value="tictac" id="mu4"><span>Tic-tac</span></label>
+                <label class="chip" style="--dc:var(--p3)"><input type="radio" name="music" value="file" id="mu5"><span>Mi audio</span></label>
+              </div>
+            </div>
+            <div class="row" id="fileRow" hidden><button class="btn sm" id="tPick">Elegir archivo</button><span class="hint" id="tFileName">Ningún archivo elegido</span><input type="file" id="tFile" accept="audio/*" hidden></div>
+            <div class="row"><button class="btn sm" id="tTry">Escuchar</button><label class="hint" for="tVol">Volumen</label><input type="range" id="tVol" min="0" max="100" value="60"></div>
+            <div class="row">
+              <button class="btn" id="tPause" disabled>Pausa</button>
+              <button class="btn" id="tPlus" disabled>+1 min</button>
+              <button class="btn" id="tStop" disabled>Detener</button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div class="col">
+      <section class="panel">
+        <div class="panel-h"><div class="ttl"><h2>Planificación</h2></div><div class="tpl"><button class="btn sm" data-tpl="45">Bloque 45'</button><button class="btn sm" data-tpl="90">Bloque 90'</button></div></div>
+        <div class="times">
+          <label for="pStart">Entrada<input type="time" id="pStart"></label>
+          <label for="pEnd">Salida<input type="time" id="pEnd"></label>
+          <span class="dur" id="pDur"></span>
+        </div>
+        <ol class="blist" id="pList"></ol>
+        <div class="row" style="margin-top:10px"><button class="btn sm" id="pAdd">+ Agregar momento</button><span class="hint">Toca el número para cambiar el color.</span></div>
+        <p class="sum" id="pSum"></p>
+        <label class="chk"><input type="checkbox" id="pChime"> Aviso sonoro al terminar cada momento</label>
+        <p class="hint" id="pRunNote" hidden style="margin-top:10px">Hay una clase en curso: los cambios se aplican desde la próxima.</p>
+      </section>
+      <section class="panel">
+        <div class="panel-h"><div class="ttl"><h2>Cómo funciona</h2></div></div>
+        <ul class="how">
+          <li style="--d:var(--p5)"><span><b>El cierre es fijo.</b> El último momento siempre termina a la hora de salida.</span></li>
+          <li style="--d:var(--p0)"><span><b>Te pregunta antes de avanzar.</b> Al terminar un momento puedes pasar al siguiente o darte 2 o 5 minutos más.</span></li>
+          <li style="--d:var(--p2)"><span><b>Recalcula solo.</b> Si avanzas antes o te atrasas, los momentos que faltan se reparten el tiempo en proporción a lo planificado.</span></li>
+          <li style="--d:var(--p1)"><span><b>Ensayo ×30.</b> Una clase de 90 minutos corre en 3 para probarlo todo.</span></li>
+        </ul>
+      </section>
+    </div>
+  </div>
+</div>
+
+<script>
+(()=>{
+const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const pad=n=>String(n).padStart(2,'0');
+const MIN=60000;
+const T90=[{name:'Inicio',min:10,color:0},{name:'Exploración',min:25,color:1},{name:'Trabajo en grupos',min:30,color:2},{name:'Puesta en común',min:10,color:4},{name:'Cierre',min:15,color:5}];
+const T45=[{name:'Inicio',min:8,color:0},{name:'Desarrollo',min:27,color:2},{name:'Cierre',min:10,color:5}];
+let cfg=store.get('rc.cfg',null)||{start:'08:00',end:'09:30',chime:true,blocks:JSON.parse(JSON.stringify(T90))};
+const PAL=['var(--p0)','var(--p1)','var(--p2)','var(--p3)','var(--p4)','var(--p5)'];
+const colorOf=(b,i,n)=>PAL[b&&b.color!=null?b.color:(i===n-1?5:i%5)];
+
+// ---------- tiempo ----------
+let sim=null;
+const now=()=>sim?sim.t0+(Date.now()-sim.real0)*sim.speed:Date.now();
+const hm2m=hm=>{const[h,m]=(hm||'0:0').split(':').map(Number);return h*60+m};
+const m2hm=m=>{m=((m%1440)+1440)%1440;return pad(Math.floor(m/60))+':'+pad(m%60)};
+const durMin=()=>{let d=hm2m(cfg.end)-hm2m(cfg.start);if(d<=0)d+=1440;return d};
+const todayAt=hm=>{const d=new Date();const[h,m]=hm.split(':').map(Number);d.setHours(h,m,0,0);return d.getTime()};
+const clk=t=>{const d=new Date(t);return pad(d.getHours())+':'+pad(d.getMinutes())};
+const clkS=t=>{const d=new Date(t);return clk(t)+':'+pad(d.getSeconds())};
+function fmt(ms,up){ms=Math.max(0,ms);const s=up?Math.floor(ms/1000):Math.ceil(ms/1000);const h=Math.floor(s/3600),m=Math.floor(s%3600/60),x=s%60;return h?h+':'+pad(m)+':'+pad(x):pad(m)+':'+pad(x)}
+
+// reparte el tiempo desde el bloque i (que empieza en t) hasta el inicio del cierre fijo
+function fit(blocks,sched,i,t,ce){
+  const n=blocks.length,out=sched.slice(),cStart=ce-(+blocks[n-1].min||0)*MIN;
+  if(i>=n-1){out[n-1]={start:t,end:Math.max(ce,t)};return out}
+  const w=blocks.slice(i,n-1).reduce((a,b)=>a+(+b.min||0),0),win=Math.max(0,cStart-t);let s=t;
+  for(let k=i;k<n-1;k++){const d=w?win*(+blocks[k].min||0)/w:win/(n-1-i);out[k]={start:s,end:s+d};s+=d}
+  out[n-1]={start:Math.max(s,cStart),end:Math.max(ce,s)};return out;
+}
+
+// ---------- estado de clase ----------
+let run=store.get('rc.run',null);
+if(run&&(run.mode==='ensayo'||Date.now()>run.ce+30*MIN))run=null;
+const saveRun=()=>store.set('rc.run',run&&run.mode!=='ensayo'?run:null);
+const saveCfg=()=>store.set('rc.cfg',cfg);
+let wakeLock=null;
+const wake=()=>{try{navigator.wakeLock&&navigator.wakeLock.request('screen').then(l=>wakeLock=l).catch(()=>{})}catch(e){}};
+
+function startClass(mode){
+  ctx();sim=null;const dur=durMin()*MIN;let cs,ce;
+  if(mode==='agenda'){cs=todayAt(cfg.start);ce=cs+dur;if(Date.now()>=ce)mode='ahora'}
+  if(mode==='ahora'){cs=Date.now();ce=cs+dur}
+  if(mode==='ensayo'){sim={real0:Date.now(),t0:Date.now(),speed:30};cs=now();ce=cs+dur}
+  const blocks=JSON.parse(JSON.stringify(cfg.blocks));
+  const sched=fit(blocks,[],0,cs,ce);let idx=0;const t=now();
+  if(t>cs){idx=sched.findIndex(s=>t<s.end);if(idx<0)idx=blocks.length-1}
+  run={mode,blocks,cs,ce,idx,sched,prompted:-1,ask:false};
+  saveRun();wake();keys={};render();
+}
+function endClass(){run=null;sim=null;saveRun();keys={};try{wakeLock&&wakeLock.release()}catch(e){}render()}
+function advance(){
+  if(!run)return;const t=now(),n=run.blocks.length,i=run.idx;
+  if(i>=n-1){endClass();return}
+  if(t<run.cs)return;
+  run.sched=run.sched.slice();run.sched[i]={...run.sched[i],end:t};
+  run.idx=i+1;run.sched=fit(run.blocks,run.sched,i+1,t,run.ce);
+  run.prompted=-1;run.ask=false;saveRun();if(cfg.chime)chime();render();
+}
+function extend(m){
+  if(!run)return;const t=now(),n=run.blocks.length,i=run.idx;
+  const e=Math.max(t,run.sched[i].end)+m*MIN;
+  run.sched=run.sched.slice();run.sched[i]={...run.sched[i],end:e};
+  if(i<n-1)run.sched=fit(run.blocks,run.sched,i+1,e,run.ce);else run.ce=e;
+  run.prompted=-1;run.ask=false;saveRun();render();
+}
+
+// ---------- audio ----------
+const mtof=m=>440*Math.pow(2,(m-69)/12);
+let ac=null,master=null,bus=null,seq=null,noiseBuf=null;
+const audioEl=new Audio();audioEl.loop=true;
+const vol=()=>(+$('tVol').value||0)/100;
+const music=()=>{const r=document.querySelector('input[name=music]:checked');return r?r.value:'none'};
+function ctx(){try{if(!ac){ac=new(window.AudioContext||window.webkitAudioContext)();master=ac.createGain();master.gain.value=vol();master.connect(ac.destination);
+  noiseBuf=ac.createBuffer(1,ac.sampleRate,ac.sampleRate);const d=noiseBuf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1}
+  if(ac.state==='suspended')ac.resume()}catch(e){return null}return ac}
+function tone(dest,f,t,dur,type,g,att){att=att||.01;const o=ac.createOscillator(),v=ac.createGain();o.type=type;o.frequency.setValueAtTime(f,t);v.gain.setValueAtTime(.0001,t);v.gain.exponentialRampToValueAtTime(g,t+att);v.gain.exponentialRampToValueAtTime(.0001,t+Math.max(dur,att+.02));o.connect(v);v.connect(dest);o.start(t);o.stop(t+dur+.05)}
+function nz(dest,t,dur,g,hp){const s=ac.createBufferSource();s.buffer=noiseBuf;const f=ac.createBiquadFilter();f.type='highpass';f.frequency.value=hp;const v=ac.createGain();v.gain.setValueAtTime(g,t);v.gain.exponentialRampToValueAtTime(.0001,t+dur);s.connect(f);f.connect(v);v.connect(dest);s.start(t);s.stop(t+dur+.02)}
+function kick(dest,t,g){const o=ac.createOscillator(),v=ac.createGain();o.frequency.setValueAtTime(120,t);o.frequency.exponentialRampToValueAtTime(45,t+.18);v.gain.setValueAtTime(g,t);v.gain.exponentialRampToValueAtTime(.0001,t+.3);o.connect(v);v.connect(dest);o.start(t);o.stop(t+.32)}
+const PROG={calma:[[48,55,64,71],[45,52,60,67],[41,48,57,64],[43,50,59,64]],lofi:[[50,57,60,65],[43,53,59,62],[48,55,59,64],[45,52,55,60]],energia:[[48,55,60,64],[43,50,55,59],[45,52,57,60],[41,48,53,57]]};
+const STY={
+  calma:{bpm:66,play(st,t,d,b){const ch=PROG.calma[Math.floor(st/16)%4];if(st%16===0)ch.forEach(m=>tone(b,mtof(m),t,d*16,'sine',.045,.8));if(st%2===0){const a=[ch[1]+12,ch[2]+12,ch[3]+12,ch[2]+12];tone(b,mtof(a[(st/2)%4]),t,d*3,'triangle',.035,.02)}}},
+  lofi:{bpm:78,play(st,t,d,b){const ch=PROG.lofi[Math.floor(st/8)%4],s=st%8;if(s===0){ch.forEach(m=>tone(b,mtof(m),t,d*7.5,'triangle',.03,.06));tone(b,mtof(ch[0]-12),t,d*3,'sine',.12,.02)}if(s===0||s===5)kick(b,t,.35);if(s===4)nz(b,t,.12,.1,1800);if(s%2===1)nz(b,t,.04,.035,8000);if(s===6)tone(b,mtof(ch[3]+12),t,d*1.5,'sine',.03,.01)}},
+  energia:{bpm:120,play(st,t,d,b){const ch=PROG.energia[Math.floor(st/8)%4],s=st%8,a=[0,1,2,3,2,1,2,3].map(k=>ch[k]+12);tone(b,mtof(a[s]),t,d*.9,'square',.022,.005);if(s%2===0)kick(b,t,.4);else nz(b,t,.05,.05,7000);if(s===0)tone(b,mtof(ch[0]-12),t,d*4,'triangle',.12,.01)}},
+  tictac:{bpm:60,play(st,t,d,b){if(st%2===0)tone(b,st%4===0?1800:1400,t,.05,'square',.05,.001)}}
+};
+function startMusic(style){
+  stopMusic();style=style||music();if(style==='none')return;
+  if(style==='file'){if(audioEl.src){audioEl.volume=vol();audioEl.play().catch(()=>{})}return}
+  if(!ctx())return;const b=ac.createGain();b.connect(master);bus=b;const S=STY[style],d=60/S.bpm/2;let st=0,nx=ac.currentTime+.08;
+  const go=()=>{while(nx<ac.currentTime+1.2){S.play(st,nx,d,b);st++;nx+=d}};go();seq=setInterval(go,200);
+}
+function stopMusic(){clearInterval(seq);seq=null;if(bus&&ac){const b=bus;b.gain.setTargetAtTime(0,ac.currentTime,.08);setTimeout(()=>{try{b.disconnect()}catch(e){}},600)}bus=null;audioEl.pause()}
+function alarm(){if(!ctx())return;const t=ac.currentTime;for(let r=0;r<3;r++)[880,1320,1760].forEach((f,j)=>tone(master,f,t+r*.7+j*.08,1.2,'sine',.22/(j+1),.005))}
+function chime(){if(!ctx())return;const t=ac.currentTime;tone(master,mtof(76),t,.9,'sine',.18,.005);tone(master,mtof(83),t+.18,1.2,'sine',.15,.005)}
+
+// ---------- cronómetro ----------
+const RC=276.46;
+(()=>{let s='';for(let i=0;i<60;i++){const a=i*6*Math.PI/180,big=i%5===0,r1=big?51:53,r2=57;s+=`<line class="tick${big?' big':''}" x1="${60+r1*Math.sin(a)}" y1="${60-r1*Math.cos(a)}" x2="${60+r2*Math.sin(a)}" y2="${60-r2*Math.cos(a)}"/>`}$('ticks').innerHTML=s})();
+let timer=null,trying=false;
+const tLeft=()=>!timer?0:timer.done?0:timer.paused?timer.left:Math.max(0,timer.end-Date.now());
+function tStart(sec){if(sec<=0)return;ctx();trying=false;$('tTry').textContent='Escuchar';timer={total:sec*1000,end:Date.now()+sec*1000,paused:false,done:false};try{audioEl.currentTime=0}catch(e){}startMusic();tCtl()}
+function tPause(){if(!timer||timer.done)return;if(timer.paused){timer.end=Date.now()+timer.left;timer.paused=false;startMusic()}else{timer.left=timer.end-Date.now();timer.paused=true;stopMusic()}tCtl()}
+function tPlus(){if(!timer)return;if(timer.done){timer={total:60000,end:Date.now()+60000,paused:false,done:false};startMusic()}else{if(timer.paused)timer.left+=MIN;else timer.end+=MIN;timer.total+=MIN}tCtl()}
+function tStop(){timer=null;stopMusic();tCtl()}
+function tCtl(){const on=!!timer;$('tPause').disabled=!on||timer.done;$('tPlus').disabled=!on;$('tStop').disabled=!on;
+  const lbl=on&&timer.paused?'Seguir':'Pausa';$('tPause').textContent=lbl;M.tp.textContent=lbl;M.tp.disabled=!on||(timer&&timer.done)}
+function timerTick(){if(timer&&!timer.paused&&!timer.done&&Date.now()>=timer.end){timer.done=true;timer.doneAt=Date.now();stopMusic();alarm();tCtl()}
+  if(timer&&timer.done&&Date.now()-timer.doneAt>12000){timer=null;tCtl()}}
+
+// ---------- barra ----------
+const mini=$('mini');
+const M={chip:$('mChip'),name:$('mName'),sub:$('mSub'),time:$('mTime'),cap:$('mCap'),act:$('mAct'),bar:$('mBar'),fl:$('mFL'),fm:$('mFM'),fr:$('mFR'),timer:$('mTimer'),tt:$('mTT'),tp:$('mTP'),ask:$('mAsk'),askTxt:$('mAskTxt'),askB:$('mAskB')};
+let keys={};
+const ARROW='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
+const PLAY='<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 5v14l12-7z"/></svg>';
+mini.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b)return;const a=b.dataset.act;
+  ({start:()=>startClass('agenda'),ensayo:()=>startClass('ensayo'),now:()=>startClass('ahora'),next:advance,advance,finish:endClass,
+    ext2:()=>extend(2),ext5:()=>extend(5),later:()=>{if(run){run.ask=false;saveRun();render()}},tpause:tPause,tstop:tStop}[a]||(()=>{}))()});
+
+function render(){
+  const t=now();
+  $('live').textContent=clkS(t);$('simBadge').hidden=!sim;
+  let blocks,cs,ce,view,idx=-1;
+  if(run){({blocks,cs,ce,idx}=run);view=run.sched;const cur=view[idx];
+    if(t>cur.end){view=view.slice();view[idx]={...cur,end:t};if(idx<blocks.length-1)view=fit(blocks,view,idx+1,t,ce)}}
+  else{blocks=cfg.blocks;cs=todayAt(cfg.start);ce=cs+durMin()*MIN;view=fit(blocks,[],0,cs,ce)}
+  const n=blocks.length,endAll=Math.max(ce,view[n-1].end),total=Math.max(1,endAll-cs),pre=run&&t<cs;
+
+  M.bar.innerHTML=view.map((s,k)=>{const L=(s.start-cs)/total*100,W=(s.end-s.start)/total*100;if(W<=0)return'';
+    const st=!run?'':k<idx?'done':k===idx&&!pre?'cur':'';const p=st==='cur'?Math.min(100,(t-s.start)/(s.end-s.start||1)*100):0;
+    return `<div class="seg ${st}" style="left:${L}%;width:${W}%;--c:${colorOf(blocks[k],k,n)}" title="${esc(blocks[k].name)} · ${clk(s.start)}–${clk(s.end)}"><b>${st==='cur'?`<i style="width:${p}%"></i>`:''}<span>${esc(blocks[k].name)}</span></b></div>`}).join('')
+    +(run&&!pre?`<div class="mark" style="left:${Math.min(100,(t-cs)/total*100)}%"></div>`:'');
+
+  if(!run){
+    mini.style.removeProperty('--c');M.chip.textContent=n;
+    M.name.textContent='Clase lista';M.sub.textContent=`${n} momentos · ${cfg.start} a ${cfg.end}`;
+    M.time.textContent=durMin()+"'";M.time.classList.remove('over');M.cap.textContent='minutos de clase';
+    M.fl.textContent=clk(cs);M.fm.textContent='Sin iniciar';M.fr.textContent=clk(endAll);
+  }else{
+    const cur=run.sched[idx],left=cur.end-t;
+    if(pre){mini.style.removeProperty('--c');M.chip.textContent='·';M.name.textContent='Antes de empezar';M.sub.textContent=`Primer momento: ${blocks[0].name}`;M.time.textContent=fmt(cs-t);M.time.classList.remove('over');M.cap.textContent='para la entrada'}
+    else{mini.style.setProperty('--c',colorOf(blocks[idx],idx,n));M.chip.textContent=idx+1;M.name.textContent=blocks[idx].name;
+      M.sub.textContent=(idx<n-1?`Luego: ${blocks[idx+1].name}`:'Último momento')+` · ${idx+1} de ${n}`+(sim?' · ensayo':'');
+      if(left>=0){M.time.textContent=fmt(left);M.time.classList.remove('over');M.cap.textContent='quedan en este momento'}
+      else{M.time.textContent='+'+fmt(-left,true);M.time.classList.add('over');M.cap.textContent='de tiempo extra'}}
+    M.fl.textContent=clk(cs);M.fr.textContent=clk(endAll);
+    M.fm.textContent=pre?`Comienza a las ${clk(cs)}`:t<ce?`Quedan ${Math.ceil((ce-t)/MIN)} min · salida ${clk(ce)}`:`Hora de salida (${clk(ce)})`;
+  }
+  const ak=!run?'idle':pre?'pre':'run';
+  if(keys.act!==ak){keys.act=ak;M.act.innerHTML=ak==='idle'?`<button class="btn" data-act="ensayo">Ensayo ×30</button><button class="btn primary" data-act="start">${PLAY}Iniciar clase</button>`:ak==='pre'?'<button class="btn" data-act="now">Empezar ahora</button>':`<button class="btn primary" data-act="next">Siguiente ${ARROW}</button>`}
+  const qk=run&&run.ask?run.idx+'-'+run.blocks.length:'';
+  if(keys.ask!==qk){keys.ask=qk;M.ask.hidden=!qk;if(qk){const i=run.idx,last=i===run.blocks.length-1;
+    M.askTxt.textContent=last?'Llegó la hora de salida':`Terminó «${run.blocks[i].name}». ¿Pasamos a «${run.blocks[i+1].name}»?`;
+    M.askB.innerHTML=(last?'<button class="btn primary" data-act="finish">Terminar clase</button>':`<button class="btn primary" data-act="advance">Sí, avanzar ${ARROW}</button>`)+'<button class="btn" data-act="ext2">+2 min</button><button class="btn" data-act="ext5">+5 min</button><button class="btn" data-act="later">Ahora no</button>'}}
+  M.timer.hidden=!timer;
+  if(timer){M.tt.textContent=timer.done?'¡Tiempo!':fmt(tLeft());M.tt.classList.toggle('done',timer.done)}
+  const L=timer?tLeft():null;
+  $('tDisp').textContent=timer?(timer.done?'¡Tiempo!':fmt(L)):fmt(selSec()*1000);
+  $('tLab').textContent=!timer?'listo':timer.done?'¡se acabó!':timer.paused?'en pausa':'corriendo';
+  $('ring').classList.toggle('done',!!(timer&&timer.done));
+  $('tRing').style.strokeDashoffset=timer?RC*(1-L/timer.total):0;
+  $('agenda').innerHTML=view.map((s,k)=>{const st=!run?'':k<idx?'done':k===idx&&!pre?'cur':'';
+    return `<li class="${st}" style="--c:${colorOf(blocks[k],k,n)}"><span class="num">${k+1}</span><span class="an">${esc(blocks[k].name)}${k===n-1?'<span class="tag">fijo</span>':''}${st==='cur'?'<span class="tag">← ahora</span>':''}</span><span class="at">${clk(s.start)}–${clk(s.end)}</span><span class="ad">${Math.round((s.end-s.start)/MIN)} min</span></li>`}).join('');
+  $('endBtn').disabled=!run;$('pRunNote').hidden=!run;
+  $('modeHint').textContent=!run?'':run.mode==='ensayo'?'Ensayo a 30× velocidad':run.mode==='ahora'?'Iniciada ahora':'Según tu horario';
+}
+function tick(){
+  if(run){const t=now(),b=run.sched[run.idx];if(t>=run.cs&&t>=b.end&&run.prompted!==run.idx){run.prompted=run.idx;run.ask=true;saveRun();if(cfg.chime)chime()}}
+  timerTick();render();
+}
+
+// ---------- planificación ----------
+const selSec=()=>Math.max(0,(+$('tMin').value||0)*60+(+$('tSec').value||0));
+function plannedView(){const cs=todayAt(cfg.start);return fit(cfg.blocks,[],0,cs,cs+durMin()*MIN)}
+function renderEditor(){
+  $('pStart').value=cfg.start;$('pEnd').value=cfg.end;$('pChime').checked=cfg.chime!==false;const n=cfg.blocks.length;
+  $('pList').innerHTML=cfg.blocks.map((b,i)=>`<li style="--c:${colorOf(b,i,n)}">
+    <button class="swb" data-col="${i}" aria-label="Cambiar color de ${esc(b.name)}">${i+1}</button>
+    <input type="text" class="bname" id="bn${i}" data-i="${i}" value="${esc(b.name)}" aria-label="Nombre del momento ${i+1}">
+    <span class="bmin"><input type="number" id="bm${i}" data-i="${i}" min="1" max="300" value="${b.min}" aria-label="Minutos de ${esc(b.name)}">min</span>
+    ${i===n-1?'<span class="fixed" title="El cierre termina siempre a la hora de salida">fijo</span>':`<button class="del" data-del="${i}" aria-label="Eliminar ${esc(b.name)}">×</button>`}
+    <span class="btime" id="bt${i}"></span></li>`).join('');
+  updatePreview();
+}
+function updatePreview(){
+  const v=plannedView(),n=cfg.blocks.length,d=durMin(),sum=cfg.blocks.reduce((a,b)=>a+(+b.min||0),0),cz=+cfg.blocks[n-1].min||0;
+  v.forEach((s,i)=>{const el=$('bt'+i);if(el)el.textContent=`${clk(s.start)} → ${clk(s.end)} · ${Math.round((s.end-s.start)/MIN)} min reales`});
+  $('pDur').textContent=d+' minutos';
+  $('pSum').textContent=sum===d?`Los momentos suman ${sum} min, justo lo que dura la clase.`:`Los momentos suman ${sum} min y la clase dura ${d}. Los intermedios se ajustan en proporción y el cierre mantiene sus ${cz} min.`;
+  if(!run)render();
+}
+$('pList').addEventListener('input',e=>{const i=+e.target.dataset.i;if(isNaN(i))return;
+  if(e.target.classList.contains('bname'))cfg.blocks[i].name=e.target.value||'Momento';else cfg.blocks[i].min=Math.max(1,+e.target.value||1);saveCfg();updatePreview()});
+$('pList').addEventListener('click',e=>{const d=e.target.closest('[data-del]');if(d){cfg.blocks.splice(+d.dataset.del,1);saveCfg();renderEditor();return}
+  const c=e.target.closest('[data-col]');if(c){const i=+c.dataset.col,b=cfg.blocks[i],cur=b.color!=null?b.color:(i===cfg.blocks.length-1?5:i%5);b.color=(cur+1)%PAL.length;saveCfg();renderEditor();const f=document.querySelector(`[data-col="${i}"]`);if(f)f.focus()}});
+$('pAdd').onclick=()=>{const used=cfg.blocks.map(b=>b.color);const free=[0,1,2,3,4].find(c=>!used.includes(c));cfg.blocks.splice(cfg.blocks.length-1,0,{name:'Nuevo momento',min:10,color:free!=null?free:3});saveCfg();renderEditor();const el=$('bn'+(cfg.blocks.length-2));if(el){el.focus();el.select()}};
+$('pStart').onchange=e=>{const d=durMin();cfg.start=e.target.value||cfg.start;cfg.end=m2hm(hm2m(cfg.start)+d);saveCfg();renderEditor()};
+$('pEnd').onchange=e=>{cfg.end=e.target.value||cfg.end;saveCfg();updatePreview()};
+$('pChime').onchange=e=>{cfg.chime=e.target.checked;saveCfg()};
+document.querySelectorAll('[data-tpl]').forEach(b=>b.onclick=()=>{const m=+b.dataset.tpl;cfg.blocks=JSON.parse(JSON.stringify(m===45?T45:T90));cfg.end=m2hm(hm2m(cfg.start)+m);saveCfg();renderEditor()});
+
+// ---------- controles ----------
+$('nowBtn').onclick=()=>startClass('ahora');
+$('endBtn').onclick=endClass;
+$('presets').addEventListener('click',e=>{const b=e.target.closest('[data-s]');if(b)tStart(+b.dataset.s)});
+$('tGo').onclick=()=>tStart(selSec());
+['tMin','tSec'].forEach(id=>$(id).addEventListener('input',()=>{if(!timer)render()}));
+$('tPause').onclick=tPause;$('tPlus').onclick=tPlus;$('tStop').onclick=tStop;
+$('tVol').oninput=()=>{if(master)master.gain.value=vol();audioEl.volume=vol()};
+$('music').addEventListener('change',()=>{$('fileRow').hidden=music()!=='file';if(trying||(timer&&!timer.paused&&!timer.done))startMusic()});
+$('tPick').onclick=()=>$('tFile').click();
+$('tFile').onchange=e=>{const f=e.target.files[0];if(!f)return;try{audioEl.src=URL.createObjectURL(f)}catch(err){}$('tFileName').textContent=f.name};
+$('tTry').onclick=()=>{if(trying){trying=false;stopMusic();$('tTry').textContent='Escuchar'}else{trying=true;ctx();startMusic();$('tTry').textContent='Detener prueba'}};
+$('tFull').onclick=()=>{const c=$('timerCard');try{(document.fullscreenElement?document.exitFullscreen():c.requestFullscreen()).catch(()=>{})}catch(e){}};
+
+// ---------- ventana flotante ----------
+let pipWin=null;
+function showNote(html){const n=$('note');n.innerHTML=html;n.hidden=false}
+async function openPip(){
+  if(pipWin){pipWin.close();return}
+  if(!('documentPictureInPicture' in window)){showNote('Este navegador no permite ventanas flotantes. Abre la página en <strong>Chrome o Edge</strong> de computador (versión 116 o superior). Dentro de Claude no funciona: usa la versión publicada en GitHub Pages o el archivo .html.');return}
+  try{
+    const w=await documentPictureInPicture.requestWindow({width:660,height:210});
+    document.querySelectorAll('style,link[rel=stylesheet]').forEach(n=>w.document.head.appendChild(n.cloneNode(true)));
+    const th=document.documentElement.getAttribute('data-theme');if(th)w.document.documentElement.setAttribute('data-theme',th);
+    w.document.title='Reloj de Clase';w.document.body.className='pip';w.document.body.appendChild(mini);
+    $('slot').hidden=true;$('popped').hidden=false;$('pipLbl').textContent='Cerrar barra flotante';pipWin=w;
+    w.addEventListener('pagehide',()=>{$('slot').appendChild(mini);$('slot').hidden=false;$('popped').hidden=true;$('pipLbl').textContent='Barra flotante';pipWin=null});
+  }catch(e){showNote('No se pudo abrir la ventana flotante aquí. Abre la página directamente en Chrome o Edge (fuera de Claude) y vuelve a intentarlo.')}
+}
+$('pipBtn').onclick=openPip;$('pipBack').onclick=()=>pipWin&&pipWin.close();
+
+renderEditor();tCtl();render();setInterval(tick,250);
+})();
+</script>
+</body></html>
