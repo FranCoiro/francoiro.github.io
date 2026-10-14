@@ -90,8 +90,14 @@ h2{font-family:var(--f-display);font-weight:800;font-size:22px;margin:0;letter-s
 .mark{position:absolute;top:-6px;bottom:-6px;width:4px;margin-left:-2px;background:var(--ink);border-radius:3px;box-shadow:0 0 0 2px var(--surface)}
 .mark::before,.mark::after{content:"";position:absolute;left:50%;width:10px;height:10px;margin-left:-5px;border-radius:50%;background:var(--ink);box-shadow:0 0 0 2px var(--surface)}
 .mark::before{top:-4px}.mark::after{bottom:-4px}
-.m-foot{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums;align-items:center}
-.m-foot span:nth-child(2){text-align:center;color:var(--ink);font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.m-foot{display:flex;justify-content:space-between;gap:10px;font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums;align-items:center;min-height:26px}
+.m-end{border:0;background:none;cursor:pointer;font:inherit;color:inherit;padding:2px 6px;margin-right:-6px;border-radius:7px;display:inline-flex;align-items:center;gap:5px}
+.m-end span{border-bottom:1.5px dashed currentColor}
+.m-end svg{width:12px;height:12px;opacity:.7}
+.m-end:hover{background:var(--track);color:var(--ink)}
+.m-end-in{font-family:var(--f-mono);font-size:13px;padding:2px 6px!important;width:auto}
+.mini.noclock .m-clock{display:none}
+.mini.noclock .m-top{grid-template-columns:minmax(0,1fr) auto}
 .m-timer{display:flex;align-items:center;gap:10px;border-top:1.5px dashed var(--line);padding-top:10px}
 .m-tl{font-family:var(--f-hand);font-size:19px;color:var(--hand)}
 .m-tt{font-family:var(--f-mono);font-weight:800;font-size:24px;font-variant-numeric:tabular-nums;margin-right:auto}
@@ -263,7 +269,7 @@ body:not(.pip) [data-pip-only]{display:none}
               <div class="m-act" id="mAct"></div>
             </div>
             <div class="m-bar" id="mBar"></div>
-            <div class="m-foot"><span id="mFL"></span><span id="mFM"></span><span id="mFR"></span></div>
+            <div class="m-foot"><span id="mFL"></span><span><button class="m-end" data-act="editend" id="mEnd" title="Cambiar la hora de salida"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg><span id="mEndT"></span></button><input type="time" id="mEndIn" class="m-end-in" hidden aria-label="Hora de salida"></span></div>
             <div class="m-timer" id="mTimer" hidden><span class="m-tl">cronómetro</span><span class="m-tt" id="mTT">00:00</span><button class="btn sm" data-act="tpause" id="mTP">Pausa</button><button class="btn sm" data-act="tstop">Quitar</button><button class="btn sm" data-act="tobig" data-pip-only>Ver grande</button></div>
             <div class="m-ask" id="mAsk" hidden><p id="mAskTxt"></p><div class="m-ask-b" id="mAskB"></div></div>
           </div>
@@ -275,7 +281,7 @@ body:not(.pip) [data-pip-only]{display:none}
         </div>
         <ul class="agenda" id="agenda"></ul>
         <div class="foot-row">
-          <span class="hint">La barra flotante funciona en Chrome o Edge de computador.</span>
+          <label class="chk"><input type="checkbox" id="pShowClock"> Mostrar el tiempo que queda en cada momento</label>
           <div class="row">
             <button class="btn sm" id="nowBtn">Empezar ahora</button>
             <button class="btn sm" id="endBtn" disabled>Terminar clase</button>
@@ -486,13 +492,23 @@ function timerTick(){if(timer&&!timer.paused&&!timer.done&&Date.now()>=timer.end
 
 // ---------- barra ----------
 const mini=$('mini');
-const M={chip:$('mChip'),name:$('mName'),sub:$('mSub'),time:$('mTime'),cap:$('mCap'),act:$('mAct'),bar:$('mBar'),fl:$('mFL'),fm:$('mFM'),fr:$('mFR'),timer:$('mTimer'),tt:$('mTT'),tp:$('mTP'),ask:$('mAsk'),askTxt:$('mAskTxt'),askB:$('mAskB')};
+const M={chip:$('mChip'),name:$('mName'),sub:$('mSub'),time:$('mTime'),cap:$('mCap'),act:$('mAct'),bar:$('mBar'),fl:$('mFL'),endT:$('mEndT'),endB:$('mEnd'),endIn:$('mEndIn'),timer:$('mTimer'),tt:$('mTT'),tp:$('mTP'),ask:$('mAsk'),askTxt:$('mAskTxt'),askB:$('mAskB')};
 let keys={};
 const ARROW='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
 const PLAY='<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 5v14l12-7z"/></svg>';
 mini.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b)return;const a=b.dataset.act;
   ({start:()=>startClass('agenda'),ensayo:()=>startClass('ensayo'),now:()=>startClass('ahora'),next:advance,advance,finish:endClass,
-    ext2:()=>extend(2),ext5:()=>extend(5),later:()=>{if(run){run.ask=false;saveRun();render()}},tpause:tPause,tstop:tStop,tobig:()=>openPip('timer')}[a]||(()=>{}))()});
+    ext2:()=>extend(2),ext5:()=>extend(5),later:()=>{if(run){run.ask=false;saveRun();render()}},tpause:tPause,tstop:tStop,tobig:()=>openPip('timer'),editend:editEnd}[a]||(()=>{}))()});
+function editEnd(){const ce=run?run.ce:todayAt(cfg.start)+durMin()*MIN;M.endIn.value=clk(ce);M.endB.hidden=true;M.endIn.hidden=false;M.endIn.focus()}
+function closeEnd(apply){if(M.endIn.hidden)return;M.endIn.hidden=true;M.endB.hidden=false;const v=M.endIn.value;if(!apply||!/^\d\d:\d\d$/.test(v))return;
+  if(!run){cfg.end=v;saveCfg();renderEditor();toast(`Salida a las ${v}`);return}
+  const[h,m]=v.split(':').map(Number),d=new Date(run.cs);d.setHours(h,m,0,0);let ce=d.getTime();if(ce<=run.cs)ce+=1440*MIN;
+  const n=run.blocks.length,i=run.idx,minEnd=Math.max(now(),run.sched[i].start)+(i<n-1?(+run.blocks[n-1].min||0)*MIN:0)+MIN;
+  if(ce<minEnd){toast(`Esa hora no deja tiempo suficiente: elige ${clk(minEnd)} o más tarde`);return}
+  run.ce=ce;if(i<n-1)run.sched=fit(run.blocks,run.sched,i,run.sched[i].start,ce);else{run.sched=run.sched.slice();run.sched[i]={...run.sched[i],end:ce}}
+  if(run.sched[i].end>now()){run.prompted=-1;run.ask=false}saveRun();keys={};render();toast(`Salida de esta clase: ${v}. Los momentos se reajustaron.`)}
+M.endIn.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();closeEnd(true)}else if(e.key==='Escape')closeEnd(false)});
+M.endIn.addEventListener('blur',()=>closeEnd(true));
 const ftimer=$('ftimer');
 ftimer.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b)return;const a=b.dataset.act;
   ({tset:()=>tStart(+b.dataset.s),tpause:tPause,tplus:tPlus,tstop:tStop,tobar:()=>openPip('bar')}[a]||(()=>{}))()});
@@ -516,7 +532,7 @@ function render(){
   if(run){({blocks,cs,ce,idx}=run);view=run.sched;const cur=view[idx];
     if(t>cur.end){view=view.slice();view[idx]={...cur,end:t};if(idx<blocks.length-1)view=fit(blocks,view,idx+1,t,ce)}}
   else{blocks=cfg.blocks;cs=todayAt(cfg.start);ce=cs+durMin()*MIN;view=fit(blocks,[],0,cs,ce)}
-  mini.classList.toggle('idle',!run);
+  mini.classList.toggle('idle',!run);mini.classList.toggle('noclock',cfg.showClock===false);
   const n=blocks.length,endAll=Math.max(ce,view[n-1].end),total=Math.max(1,endAll-cs),pre=run&&t<cs;
 
   M.bar.innerHTML=view.map((s,k)=>{const L=(s.start-cs)/total*100,W=(s.end-s.start)/total*100;if(W<=0)return'';
@@ -528,7 +544,7 @@ function render(){
     mini.style.removeProperty('--c');M.chip.textContent=n;
     M.name.textContent=(curRoute()||{}).name||'Clase lista';M.sub.textContent=`${n} momentos · ${cfg.start} a ${cfg.end}`;
     M.time.textContent=durMin()+"'";M.time.classList.remove('over');M.cap.textContent='minutos de clase';
-    M.fl.textContent=clk(cs);M.fm.textContent='Sin iniciar';M.fr.textContent=clk(endAll);
+    M.fl.textContent=clk(cs);M.endT.textContent=clk(ce);
   }else{
     const cur=run.sched[idx],left=cur.end-t;
     if(pre){mini.style.removeProperty('--c');M.chip.textContent='·';M.name.textContent='Antes de empezar';M.sub.textContent=`Primer momento: ${blocks[0].name}`;M.time.textContent=fmt(cs-t);M.time.classList.remove('over');M.cap.textContent='para la entrada'}
@@ -536,8 +552,7 @@ function render(){
       M.sub.textContent=(idx<n-1?`Luego: ${blocks[idx+1].name}`:'Último momento')+` · ${idx+1} de ${n}`+(sim?' · ensayo':'');
       if(left>=0){M.time.textContent=fmt(left);M.time.classList.remove('over');M.cap.textContent='quedan en este momento'}
       else{M.time.textContent='+'+fmt(-left,true);M.time.classList.add('over');M.cap.textContent='de tiempo extra'}}
-    M.fl.textContent=clk(cs);M.fr.textContent=clk(endAll);
-    M.fm.textContent=pre?`Comienza a las ${clk(cs)}`:t<ce?`Quedan ${Math.ceil((ce-t)/MIN)} min · salida ${clk(ce)}`:`Hora de salida (${clk(ce)})`;
+    M.fl.textContent=clk(cs);M.endT.textContent=clk(ce);
   }
   const ak=!run?'idle':pre?'pre':'run';
   if(keys.act!==ak){keys.act=ak;M.act.innerHTML=ak==='idle'?`<button class="btn" data-act="ensayo">Ensayo ×30</button><button class="btn primary" data-act="start">${PLAY}Iniciar clase</button>`:ak==='pre'?'<button class="btn" data-act="now">Empezar ahora</button>':`<button class="btn primary" data-act="next">Siguiente ${ARROW}</button>`}
@@ -592,6 +607,7 @@ $('pAdd').onclick=()=>{const used=cfg.blocks.map(b=>b.color);const free=[0,1,2,3
 $('pStart').onchange=e=>{const d=durMin();cfg.start=e.target.value||cfg.start;cfg.end=m2hm(hm2m(cfg.start)+d);saveCfg();renderEditor()};
 $('pEnd').onchange=e=>{cfg.end=e.target.value||cfg.end;saveCfg();updatePreview()};
 $('pChime').onchange=e=>{cfg.chime=e.target.checked;saveCfg()};
+$('pShowClock').checked=cfg.showClock!==false;$('pShowClock').onchange=e=>{cfg.showClock=e.target.checked;saveCfg();render()};
 document.querySelectorAll('[data-tpl]').forEach(b=>b.onclick=()=>{const m=+b.dataset.tpl;cfg.blocks=JSON.parse(JSON.stringify(m===45?T45:T90));cfg.end=m2hm(hm2m(cfg.start)+m);saveCfg();renderEditor()});
 
 // ---------- controles ----------
