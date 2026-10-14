@@ -77,6 +77,11 @@ h2{font-family:var(--f-display);font-weight:800;font-size:22px;margin:0;letter-s
 .m-now{display:flex;gap:12px;align-items:center;min-width:0}
 .m-chip{width:44px;height:44px;border-radius:13px;background:var(--c,var(--track));color:var(--chip-ink);display:grid;place-items:center;font-family:var(--f-display);font-weight:800;font-size:20px;flex:none;box-shadow:0 8px 18px -10px var(--c,var(--shadow))}
 .m-name{font-family:var(--f-display);font-weight:800;font-size:clamp(19px,4.4cqi,30px);line-height:1.05;letter-spacing:-.02em;overflow:hidden;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;text-wrap:balance}
+.m-chip{display:none!important}
+.m-sub:empty{display:none}
+.mini:not(.quick) .seg span{display:none}
+.mini:not(.quick) .m-bar{height:14px}
+.mini:not(.quick) .seg b{border-radius:6px}
 .m-sub{color:var(--muted);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
 .m-clock{text-align:right}
 .m-time{font-family:var(--f-mono);font-weight:800;font-size:clamp(28px,7.5cqi,52px);line-height:.95;font-variant-numeric:tabular-nums;letter-spacing:-.03em}
@@ -115,7 +120,7 @@ h2{font-family:var(--f-display);font-weight:800;font-size:22px;margin:0;letter-s
 .m-ask p{margin:0;font-family:var(--f-display);font-weight:800;font-size:clamp(16px,4cqi,22px);letter-spacing:-.01em;text-wrap:balance}
 .m-ask-b{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
 @container (min-width:560px){ .m-top{grid-template-columns:minmax(0,1fr) auto auto} .m-act{grid-column:auto} }
-.mini.quick .m-clock,.mini.quick .m-foot,.mini.quick .m-chip{display:none}
+.mini.quick .m-chip{display:none}
 .mini.quick .m-name{font-size:clamp(44px,13cqi,84px);line-height:.9;-webkit-line-clamp:1}
 .mini.quick .m-sub{font-size:15px}
 .mini.quick .seg span{text-align:center;font-family:var(--f-mono);font-size:13px}
@@ -251,7 +256,14 @@ input[type=range]{accent-color:var(--accent);width:150px}
 .stepper button{border:0;background:none;cursor:pointer;width:28px;height:28px;font-size:16px;font-weight:700;padding:0;text-align:center}
 .stepper button:hover{background:var(--track)}
 .bmin input{width:54px}
-.quickcard{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:10px;align-items:center;margin-top:14px;padding:12px 14px;border:1.5px dashed var(--line);border-radius:14px}
+.quickcard{display:grid;grid-template-columns:minmax(0,1fr) auto auto auto;gap:10px;align-items:center;margin-top:14px;padding:12px 14px;border:1.5px dashed var(--line);border-radius:14px}
+.seg2{display:flex;border:1.5px solid var(--line);border-radius:10px;overflow:hidden}
+.seg2 button{border:0;background:none;cursor:pointer;padding:5px 10px;font:inherit;font-family:var(--f-mono);font-weight:800;color:var(--muted)}
+.seg2 button.on{background:var(--accent);color:var(--accent-ink)}
+@media (max-width:560px){.quickcard{grid-template-columns:minmax(0,1fr) auto}.quickcard>div:first-child{grid-column:1/-1}}
+.m-prog{height:6px;border-radius:3px;background:var(--track);overflow:hidden}
+.m-prog i{display:block;height:100%;background:var(--ink);opacity:.55;border-radius:3px}
+.m-prog.over i{background:var(--warn);opacity:1}
 .quickcard b{display:block;font-family:var(--f-display);font-size:17px}
 .stepper output{min-width:24px;text-align:center;font-family:var(--f-mono);font-weight:800}
 .route{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;border:1.5px solid var(--line);border-radius:12px;background:var(--surface);overflow:hidden}
@@ -335,6 +347,7 @@ body:not(.pip) [data-pip-only]{display:none}
             <div class="m-items" id="mItems" hidden></div>
             <div class="m-song" id="mSong" hidden><b>canción del momento</b><span id="mSongV"></span><button class="btn sm" data-act="songplay" id="mSongP">▶ Reproducir</button><button class="btn sm" data-act="songstop" id="mSongS" hidden>Detener canción</button></div>
             <div class="m-bar" id="mBar"></div>
+            <div class="m-prog" id="mProg" hidden><i id="mProgI"></i></div>
             <div class="m-foot"><span id="mFL"></span><span><button class="m-end" data-act="editend" id="mEnd" title="Cambiar la hora de salida"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg><span id="mEndT"></span></button><input type="time" id="mEndIn" class="m-end-in" hidden aria-label="Hora de salida"></span></div>
             <div class="m-timer" id="mTimer" hidden><span class="m-tl">cronómetro</span><span class="m-tt" id="mTT">00:00</span><button class="btn sm" data-act="tpause" id="mTP">Pausa</button><button class="btn sm" data-act="tstop">Quitar</button></div>
             <div class="m-ask" id="mAsk" hidden><p id="mAskTxt"></p><div class="m-ask-b" id="mAskB"></div></div>
@@ -346,7 +359,8 @@ body:not(.pip) [data-pip-only]{display:none}
           <button class="btn" id="pipBack">Traer de vuelta aquí</button>
         </div>
         <div class="quickcard" id="quickCard">
-          <div><b>Modo rápido</b><span class="hint">Solo números, sin tiempos. Avanzas tú con la flecha.</span></div>
+          <div><b>Modo rápido</b><span class="hint">Solo números. Avanzas tú con la flecha.</span></div>
+          <div class="seg2" id="qDur" role="group" aria-label="Duración de la clase"><button data-d="45">45'</button><button data-d="90">90'</button></div>
           <div class="stepper"><button id="qMinus" aria-label="Menos momentos">−</button><output id="qOut">5</output><button id="qPlus" aria-label="Más momentos">+</button></div>
           <button class="btn primary" id="qGo">Empezar</button>
         </div>
@@ -616,7 +630,7 @@ function timerTick(){if(timer&&!timer.paused&&!timer.done&&Date.now()>=timer.end
 
 // ---------- barra ----------
 const mini=$('mini');
-const M={chip:$('mChip'),name:$('mName'),sub:$('mSub'),time:$('mTime'),cap:$('mCap'),act:$('mAct'),bar:$('mBar'),fl:$('mFL'),items:$('mItems'),song:$('mSong'),songV:$('mSongV'),songP:$('mSongP'),songS:$('mSongS'),endT:$('mEndT'),endB:$('mEnd'),endIn:$('mEndIn'),timer:$('mTimer'),tt:$('mTT'),tp:$('mTP'),ask:$('mAsk'),askTxt:$('mAskTxt'),askB:$('mAskB')};
+const M={chip:$('mChip'),name:$('mName'),sub:$('mSub'),time:$('mTime'),cap:$('mCap'),act:$('mAct'),bar:$('mBar'),fl:$('mFL'),items:$('mItems'),prog:$('mProg'),progI:$('mProgI'),song:$('mSong'),songV:$('mSongV'),songP:$('mSongP'),songS:$('mSongS'),endT:$('mEndT'),endB:$('mEnd'),endIn:$('mEndIn'),timer:$('mTimer'),tt:$('mTT'),tp:$('mTP'),ask:$('mAsk'),askTxt:$('mAskTxt'),askB:$('mAskB')};
 let keys={};
 const ARROW='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
 const CLOCK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M9 2h6"/></svg>';
@@ -627,6 +641,7 @@ mini.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b)r
 function editEnd(){const ce=run?run.ce:todayAt(cfg.start)+durMin()*MIN;M.endIn.value=clk(ce);M.endB.hidden=true;M.endIn.hidden=false;M.endIn.focus()}
 function closeEnd(apply){if(M.endIn.hidden)return;M.endIn.hidden=true;M.endB.hidden=false;const v=M.endIn.value;if(!apply||!/^\d\d:\d\d$/.test(v))return;
   if(!run){cfg.end=v;saveCfg();renderEditor();toast(`Salida a las ${v}`);return}
+  if(run.quick){const[h,m]=v.split(':').map(Number),d=new Date(run.cs);d.setHours(h,m,0,0);let e=d.getTime();if(e<=run.cs)e+=1440*MIN;run.qEnd=e;run.qDone=e<=now();saveRun();render();toast(`Salida a las ${v}`);return}
   const[h,m]=v.split(':').map(Number),d=new Date(run.cs);d.setHours(h,m,0,0);let ce=d.getTime();if(ce<=run.cs)ce+=1440*MIN;
   const n=run.blocks.length,i=run.idx,minEnd=Math.max(now(),run.sched[i].start)+(i<n-1?(+run.blocks[n-1].min||0)*MIN:0)+MIN;
   if(ce<minEnd){toast(`Esa hora no deja tiempo suficiente: elige ${clk(minEnd)} o más tarde`);return}
@@ -664,7 +679,7 @@ function renderFT(){
 function render(){
   const t=now();
   $('live').textContent=clkS(t);$('simBadge').hidden=!sim;
-  $('quickCard').hidden=!!run;$('agenda').hidden=!run||!!run.quick;$('nowBtn').hidden=!!run;$('endBtn').hidden=!run;
+  $('quickCard').hidden=!!run;$('agenda').hidden=true;M.prog.hidden=!(run&&run.quick);$('nowBtn').hidden=!!run;$('endBtn').hidden=!run;
   $('footHint').textContent=run&&run.quick?'Con las flechas ← → del teclado también avanzas.':'';
   if(run&&run.quick){renderQuick();renderTimer();renderFT();return}
   mini.classList.remove('quick');
@@ -691,7 +706,7 @@ function render(){
     const cur=run.sched[idx],left=cur.end-t;
     if(pre){mini.style.removeProperty('--c');M.chip.textContent='·';M.name.textContent='Antes de empezar';M.sub.textContent=`Primer momento: ${blocks[0].name}`;M.time.textContent=fmt(cs-t);M.time.classList.remove('over');M.cap.textContent='para la entrada'}
     else{mini.style.setProperty('--c',colorOf(blocks[idx],idx,n));M.chip.textContent=idx+1;M.name.textContent=blocks[idx].name;
-      M.sub.textContent=(idx<n-1?`Luego: ${blocks[idx+1].name}`:'Último momento')+` · ${idx+1} de ${n}`+(sim?' · ensayo':'');
+      M.sub.textContent=sim?'ensayo ×30':'';
       if(left>=0){M.time.textContent=fmt(left);M.time.classList.remove('over');M.cap.textContent='quedan en este momento'}
       else{M.time.textContent='+'+fmt(-left,true);M.time.classList.add('over');M.cap.textContent='de tiempo extra'}}
     M.fl.textContent=clk(cs);M.endT.textContent=clk(ce);
@@ -722,19 +737,25 @@ const AGENDA=(s,k,st,blocks,n)=>`<li class="${st}" style="--c:${colorOf(blocks[k
 function renderQuick(){
   const n=run.blocks.length,idx=run.idx;
   mini.classList.add('quick');mini.classList.remove('idle');mini.style.setProperty('--c',colorOf(null,idx,n));
+  if(!run.qEnd)run.qEnd=run.cs+90*MIN;
+  mini.classList.remove('noclock');const t=now(),left=run.qEnd-t,tot=run.qEnd-run.cs;
+  M.time.textContent=left>=0?fmt(left):'+'+fmt(-left,true);M.time.classList.toggle('over',left<0);M.cap.textContent=left>=0?'quedan de clase':'de tiempo extra';
+  M.progI.style.width=Math.min(100,(t-run.cs)/tot*100)+'%';M.prog.classList.toggle('over',left<0);
+  M.fl.textContent=`llevamos ${Math.floor((t-run.cs)/MIN)} min`;M.endT.textContent='salida '+clk(run.qEnd);
   M.name.textContent=String(idx+1);M.sub.textContent=`de ${n}`;M.items.hidden=true;keys.items='';syncSong('','');M.ask.hidden=true;keys.ask='';
   M.bar.innerHTML=run.blocks.map((b,k)=>`<div class="seg ${k<idx?'done':k===idx?'cur':''}" style="left:${k/n*100}%;width:${100/n}%;--c:${colorOf(null,k,n)}"><b>${k===idx?'<i style="width:100%"></i>':''}<span>${k+1}</span></b></div>`).join('');
   const ak='q'+(idx===0?'f':'')+(idx===n-1?'l':'');
   if(keys.act!==ak){keys.act=ak;M.act.innerHTML=`<button class="btn icon" data-act="tobig" title="Cronómetro" aria-label="Abrir cronómetro">${CLOCK}</button><button class="btn" data-act="qprev" aria-label="Momento anterior"${idx===0?' disabled':''}>←</button>`+(idx===n-1?'<button class="btn primary" data-act="finish">Terminar</button>':`<button class="btn primary" data-act="next" aria-label="Siguiente momento">${ARROW}</button>`)}
   $('modeHint').textContent='Modo rápido';
 }
-function startQuick(n){ctx();sim=null;const t=Date.now();
-  run={mode:'rapido',quick:true,blocks:Array.from({length:n},(_,i)=>({name:String(i+1)})),idx:0,cs:t,ce:t+12*3600*1000,sched:[],prompted:-1,ask:false};
+function startQuick(n){ctx();sim=null;const t=Date.now(),qd=store.get('rc.qdur',90);
+  run={mode:'rapido',quick:true,qEnd:t+qd*MIN,qDone:false,blocks:Array.from({length:n},(_,i)=>({name:String(i+1)})),idx:0,cs:t,ce:t+12*3600*1000,sched:[],prompted:-1,ask:false};
   saveRun();wake();keys={};render()}
 function onKey(e){const tg=e.target;if(tg&&(tg.tagName==='INPUT'||tg.tagName==='SELECT'||tg.tagName==='TEXTAREA'||tg.isContentEditable))return;if(!run)return;
   if(e.key==='ArrowRight'||e.key==='PageDown'){e.preventDefault();advance()}else if((e.key==='ArrowLeft'||e.key==='PageUp')&&run.quick){e.preventDefault();if(run.idx>0){run.idx--;saveRun();render()}}}
 document.addEventListener('keydown',onKey);
 function tick(){
+  if(run&&run.quick&&!run.qDone&&now()>=run.qEnd){run.qDone=true;saveRun();if(cfg.chime)chime()}
   if(run&&!run.quick){const t=now(),b=run.sched[run.idx];if(t>=run.cs&&t>=b.end&&run.prompted!==run.idx){run.prompted=run.idx;run.ask=true;saveRun();if(cfg.chime)chime();if(pipWin&&pipMode==='timer'&&!timer)setPipMode('bar')}}
   timerTick();render();
 }
@@ -870,6 +891,8 @@ $('rFile').onchange=e=>{const f=e.target.files[0];if(!f)return;f.text().then(t=>
 }
 // ---------- modo rápido y pestañas ----------
 {let qv=store.get('rc.quickN',5);const setQ=v=>{qv=Math.max(2,Math.min(20,v));$('qOut').textContent=qv;store.set('rc.quickN',qv)};setQ(qv);
+  const setD=d=>{store.set('rc.qdur',d);document.querySelectorAll('#qDur button').forEach(b=>b.classList.toggle('on',+b.dataset.d===d))};setD(store.get('rc.qdur',90));
+  $('qDur').addEventListener('click',e=>{const b=e.target.closest('[data-d]');if(b)setD(+b.dataset.d)});
   $('qMinus').onclick=()=>setQ(qv-1);$('qPlus').onclick=()=>setQ(qv+1);$('qGo').onclick=()=>startQuick(qv)}
 function showTab(t){document.querySelectorAll('[data-pane]').forEach(p=>p.hidden=p.dataset.pane!==t);document.querySelectorAll('#tabs button').forEach(b=>b.classList.toggle('on',b.dataset.tab===t));store.set('rc.tab',t)}
 $('tabs').addEventListener('click',e=>{const b=e.target.closest('[data-tab]');if(b)showTab(b.dataset.tab)});

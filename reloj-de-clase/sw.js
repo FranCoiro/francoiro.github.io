@@ -1,5 +1,5 @@
 // Reloj de Clase: permite abrir la app sin internet.
-const CACHE = 'reloj-de-clase-v4';
+const CACHE = 'reloj-de-clase-v5';
 const CORE = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', e => {
