@@ -32,7 +32,7 @@ body{margin:0;color:var(--ink);font-family:var(--f-body);font-size:15px;line-hei
   background-size:26px 26px;background-position:-1px -1px}
 button,input,select{font:inherit;color:inherit}
 :focus-visible{outline:3px solid var(--accent);outline-offset:2px}
-.app{max-width:1200px;margin:0 auto;padding-block:26px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:22px}
+.app{max-width:860px;margin:0 auto;padding-block:26px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:22px}
 
 /* encabezado */
 header.top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px}
@@ -44,7 +44,12 @@ header.top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-
 .live{font-family:var(--f-mono);font-weight:800;font-size:20px;font-variant-numeric:tabular-nums;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:8px 12px}
 .badge{font-size:12px;text-transform:uppercase;letter-spacing:.08em;font-weight:700;padding:5px 10px;border-radius:999px;background:var(--p1);color:var(--chip-ink)}
 
-.grid{display:grid;gap:22px;grid-template-columns:minmax(0,1.45fr) minmax(0,1fr);align-items:start}
+.grid{display:grid;gap:22px;grid-template-columns:minmax(0,1fr);align-items:start}
+.col{display:contents}
+.tabs{display:flex;gap:4px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:4px}
+.tabs button{flex:1;border:0;background:none;padding:9px 10px;border-radius:10px;font:inherit;font-weight:700;cursor:pointer;color:var(--muted)}
+.tabs button:hover{color:var(--ink)}
+.tabs button.on{background:var(--accent);color:var(--accent-ink)}
 @media (max-width:920px){.grid{grid-template-columns:minmax(0,1fr)}}
 .col{display:grid;gap:22px;min-width:0}
 .panel{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:20px;min-width:0;box-shadow:0 18px 40px -28px var(--shadow)}
@@ -110,6 +115,11 @@ h2{font-family:var(--f-display);font-weight:800;font-size:22px;margin:0;letter-s
 .m-ask p{margin:0;font-family:var(--f-display);font-weight:800;font-size:clamp(16px,4cqi,22px);letter-spacing:-.01em;text-wrap:balance}
 .m-ask-b{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
 @container (min-width:560px){ .m-top{grid-template-columns:minmax(0,1fr) auto auto} .m-act{grid-column:auto} }
+.mini.quick .m-clock,.mini.quick .m-foot,.mini.quick .m-chip{display:none}
+.mini.quick .m-name{font-size:clamp(44px,13cqi,84px);line-height:.9;-webkit-line-clamp:1}
+.mini.quick .m-sub{font-size:15px}
+.mini.quick .seg span{text-align:center;font-family:var(--f-mono);font-size:13px}
+body.pip .mini.quick .m-name{font-size:clamp(34px,11cqi,56px)}
 .mini.idle .m-top{grid-template-columns:minmax(0,1fr) auto}
 .mini.idle .m-act{grid-column:1/-1}
 @container (max-width:380px){ .m-act .btn{flex:1;justify-content:center} .m-chip{width:36px;height:36px;font-size:16px} }
@@ -237,16 +247,12 @@ input[type=range]{accent-color:var(--accent);width:150px}
 .note{background:color-mix(in srgb,var(--p1) 22%,var(--surface));border:1.5px solid var(--p1);border-radius:14px;padding:12px 14px;font-size:14px}
 /* rutas guardadas */
 .routes{display:grid;gap:6px;margin-bottom:12px}
-.route.numcard{grid-template-columns:minmax(0,1fr) auto auto;gap:8px;padding:6px 8px 6px 12px;margin:-6px 0 12px;border-style:dashed}
-.numcard .nr{min-width:0}
-.numcard .rn{display:block;font-weight:700}
-.numcard .rm{display:block;font-size:12px;color:var(--muted)}
 .stepper{display:flex;align-items:center;border:1.5px solid var(--line);border-radius:10px;overflow:hidden}
-.route .stepper button{border:0;background:none;cursor:pointer;width:28px;height:28px;font-size:16px;font-weight:700;padding:0;text-align:center}
-.route .stepper button:hover{background:var(--track)}
-.route.numcard .btn{padding:5px 11px;border:1.5px solid var(--line);text-align:center}
-.route.numcard .btn:hover{border-color:var(--muted)}
+.stepper button{border:0;background:none;cursor:pointer;width:28px;height:28px;font-size:16px;font-weight:700;padding:0;text-align:center}
+.stepper button:hover{background:var(--track)}
 .bmin input{width:54px}
+.quickcard{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:10px;align-items:center;margin-top:14px;padding:12px 14px;border:1.5px dashed var(--line);border-radius:14px}
+.quickcard b{display:block;font-family:var(--f-display);font-size:17px}
 .stepper output{min-width:24px;text-align:center;font-family:var(--f-mono);font-weight:800}
 .route{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;border:1.5px solid var(--line);border-radius:12px;background:var(--surface);overflow:hidden}
 .route.on{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,var(--surface))}
@@ -313,10 +319,11 @@ body:not(.pip) [data-pip-only]{display:none}
     </div>
   </header>
   <div class="note" id="note" hidden></div>
+  <nav class="tabs" id="tabs" aria-label="Secciones"><button data-tab="clase">Clase</button><button data-tab="crono">Cronómetro</button><button data-tab="plan">Rutas y planificación</button></nav>
 
   <div class="grid">
     <div class="col">
-      <section class="panel">
+      <section class="panel" data-pane="clase">
         <div class="panel-h"><div class="ttl"><h2>Ahora</h2><span class="scrib">¿en qué vamos?</span></div><span class="hint" id="modeHint"></span></div>
         <div class="slot-wrap" id="slot">
           <div class="mini" id="mini">
@@ -338,17 +345,22 @@ body:not(.pip) [data-pip-only]{display:none}
           <span>Queda encima de PowerPoint, Canva o cualquier otra aplicación.</span>
           <button class="btn" id="pipBack">Traer de vuelta aquí</button>
         </div>
+        <div class="quickcard" id="quickCard">
+          <div><b>Modo rápido</b><span class="hint">Solo números, sin tiempos. Avanzas tú con la flecha.</span></div>
+          <div class="stepper"><button id="qMinus" aria-label="Menos momentos">−</button><output id="qOut">5</output><button id="qPlus" aria-label="Más momentos">+</button></div>
+          <button class="btn primary" id="qGo">Empezar</button>
+        </div>
         <ul class="agenda" id="agenda"></ul>
         <div class="foot-row">
-          <label class="chk"><input type="checkbox" id="pShowClock"> Mostrar el tiempo que queda en cada momento</label>
+          <span class="hint" id="footHint"></span>
           <div class="row">
-            <button class="btn sm" id="nowBtn">Empezar ahora</button>
-            <button class="btn sm" id="endBtn" disabled>Terminar clase</button>
+            <button class="btn sm" id="nowBtn">Empezar ahora, sin esperar la hora</button>
+            <button class="btn sm" id="endBtn" hidden>Terminar clase</button>
           </div>
         </div>
       </section>
 
-      <section class="panel">
+      <section class="panel" data-pane="crono">
         <div class="panel-h"><div class="ttl"><h2>Cronómetro</h2><span class="scrib">con música</span></div><button class="btn sm" id="tFull"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>Proyectar</button></div>
         <label class="chk" style="margin:-4px 0 14px"><input type="checkbox" id="tAutoPip" checked> Abrir el cronómetro en ventana flotante al iniciarlo</label>
         <div class="timer-card" id="timerCard">
@@ -384,12 +396,10 @@ body:not(.pip) [data-pip-only]{display:none}
     </div>
 
     <div class="col">
-      <section class="panel">
+      <section class="panel" data-pane="plan">
         <div class="panel-h"><div class="ttl"><h2>Mis rutas</h2><span class="scrib">clases guardadas</span></div><div class="tpl"><button class="btn sm" id="rExp">Exportar</button><button class="btn sm" id="rImp">Importar</button><input type="file" id="rFile" accept="application/json,.json" hidden></div></div>
         <div class="routes" id="routes"></div>
-        <div class="route numcard" id="numCard"><div class="nr"><span class="rn">Por números</span><span class="rm">momentos 1, 2, 3… para escribir en la pizarra</span></div>
-          <div class="stepper"><button id="numMinus" aria-label="Menos momentos">−</button><output id="numOut">5</output><button id="numPlus" aria-label="Más momentos">+</button></div>
-          <button class="btn sm" id="numGo">Usar</button></div>
+        
         <div class="saverow">
           <input type="text" id="rName" placeholder="Ej: 6° básico · Fracciones" aria-label="Nombre de la ruta">
           <button class="btn sm primary" id="rSave">Guardar</button>
@@ -397,7 +407,7 @@ body:not(.pip) [data-pip-only]{display:none}
         </div>
         <p class="hint" id="rState"></p>
       </section>
-      <section class="panel">
+      <section class="panel" data-pane="plan">
         <div class="panel-h"><div class="ttl"><h2>Planificación</h2></div><div class="tpl"><button class="btn sm" data-tpl="45">Bloque 45'</button><button class="btn sm" data-tpl="90">Bloque 90'</button></div></div>
         <div class="times">
           <label for="pStart">Entrada<input type="time" id="pStart"></label>
@@ -408,17 +418,11 @@ body:not(.pip) [data-pip-only]{display:none}
         <div class="row" style="margin-top:10px"><button class="btn sm" id="pAdd">+ Agregar momento</button><span class="hint">Toca el número para cambiar el color.</span></div>
         <p class="sum" id="pSum"></p>
         <label class="chk"><input type="checkbox" id="pChime"> Aviso sonoro al terminar cada momento</label>
+        <label class="chk" style="margin-top:6px"><input type="checkbox" id="pShowClock"> Mostrar el tiempo que queda en cada momento</label>
+        <div class="row" style="margin-top:12px"><button class="btn sm" id="tryBtn">Probar esta ruta a 30× velocidad</button></div>
         <p class="hint" id="pRunNote" hidden style="margin-top:10px">Hay una clase en curso: los cambios se aplican desde la próxima.</p>
       </section>
-      <section class="panel">
-        <div class="panel-h"><div class="ttl"><h2>Cómo funciona</h2></div></div>
-        <ul class="how">
-          <li style="--d:var(--p5)"><span><b>El cierre es fijo.</b> El último momento siempre termina a la hora de salida.</span></li>
-          <li style="--d:var(--p0)"><span><b>Te pregunta antes de avanzar.</b> Al terminar un momento puedes pasar al siguiente o darte 2 o 5 minutos más.</span></li>
-          <li style="--d:var(--p2)"><span><b>Recalcula solo.</b> Si avanzas antes o te atrasas, los momentos que faltan se reparten el tiempo en proporción a lo planificado.</span></li>
-          <li style="--d:var(--p1)"><span><b>Ensayo ×30.</b> Una clase de 90 minutos corre en 3 para probarlo todo.</span></li>
-        </ul>
-      </section>
+      
     </div>
   </div>
 </div>
@@ -497,6 +501,7 @@ function startClass(mode){
 }
 function endClass(){run=null;sim=null;saveRun();keys={};try{wakeLock&&wakeLock.release()}catch(e){}render()}
 function advance(){
+  if(run&&run.quick){if(run.idx<run.blocks.length-1){run.idx++;saveRun();if(cfg.chime)chime();render()}else endClass();return}
   if(!run)return;const t=now(),n=run.blocks.length,i=run.idx;
   if(i>=n-1){endClass();return}
   if(t<run.cs)return;
@@ -618,7 +623,7 @@ const CLOCK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-w
 const PLAY='<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 5v14l12-7z"/></svg>';
 mini.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b)return;const a=b.dataset.act;
   ({start:()=>startClass('agenda'),ensayo:()=>startClass('ensayo'),now:()=>startClass('ahora'),next:advance,advance,finish:endClass,
-    ext2:()=>extend(2),ext5:()=>extend(5),later:()=>{if(run){run.ask=false;saveRun();render()}},tpause:tPause,tstop:tStop,tobig:()=>openPip('timer'),editend:editEnd,songplay:playSong,songstop:stopSong}[a]||(()=>{}))()});
+    ext2:()=>extend(2),ext5:()=>extend(5),later:()=>{if(run){run.ask=false;saveRun();render()}},tpause:tPause,tstop:tStop,tobig:()=>openPip('timer'),qprev:()=>{if(run&&run.quick&&run.idx>0){run.idx--;saveRun();render()}},editend:editEnd,songplay:playSong,songstop:stopSong}[a]||(()=>{}))()});
 function editEnd(){const ce=run?run.ce:todayAt(cfg.start)+durMin()*MIN;M.endIn.value=clk(ce);M.endB.hidden=true;M.endIn.hidden=false;M.endIn.focus()}
 function closeEnd(apply){if(M.endIn.hidden)return;M.endIn.hidden=true;M.endB.hidden=false;const v=M.endIn.value;if(!apply||!/^\d\d:\d\d$/.test(v))return;
   if(!run){cfg.end=v;saveCfg();renderEditor();toast(`Salida a las ${v}`);return}
@@ -644,7 +649,7 @@ ftimer.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b
   ({music:()=>{const r=document.querySelector(`input[name=music][value=${b.dataset.v}]`);if(r){r.checked=true;r.dispatchEvent(new Event('change',{bubbles:true}))}},tset:()=>tStart(+b.dataset.s),tpause:tPause,tplus:tPlus,tstop:tStop,tobar:()=>openPip('bar')}[a]||(()=>{}))()});
 function renderFT(){
   if(F.sel.ownerDocument.activeElement!==F.sel&&F.sel.value!==music())F.sel.value=music();
-  if(run&&run.ask)F.cls.textContent='¡cambio de momento!';else if(run&&now()>=run.cs){const c=run.sched[run.idx];F.cls.textContent=run.blocks[run.idx].name+' · '+(c.end>=now()?fmt(c.end-now()):'+'+fmt(now()-c.end,true))}else F.cls.textContent='cronómetro';
+  if(run&&run.quick)F.cls.textContent=`momento ${run.idx+1} de ${run.blocks.length}`;else if(run&&run.ask)F.cls.textContent='¡cambio de momento!';else if(run&&now()>=run.cs){const c=run.sched[run.idx];F.cls.textContent=run.blocks[run.idx].name+' · '+(c.end>=now()?fmt(c.end-now()):'+'+fmt(now()-c.end,true))}else F.cls.textContent='cronómetro';
   const L=timer?tLeft():0;
   F.disp.textContent=timer?(timer.done?'¡Tiempo!':fmt(L)):fmt(selSec()*1000);
   F.lab.textContent=!timer?'elige un tiempo':timer.done?'¡se acabó!':timer.paused?'en pausa':'corriendo';
@@ -659,6 +664,10 @@ function renderFT(){
 function render(){
   const t=now();
   $('live').textContent=clkS(t);$('simBadge').hidden=!sim;
+  $('quickCard').hidden=!!run;$('agenda').hidden=!run||!!run.quick;$('nowBtn').hidden=!!run;$('endBtn').hidden=!run;
+  $('footHint').textContent=run&&run.quick?'Con las flechas ← → del teclado también avanzas.':'';
+  if(run&&run.quick){renderQuick();renderTimer();renderFT();return}
+  mini.classList.remove('quick');
   let blocks,cs,ce,view,idx=-1;
   if(run){({blocks,cs,ce,idx}=run);view=run.sched;const cur=view[idx];
     if(t>cur.end){view=view.slice();view[idx]={...cur,end:t};if(idx<blocks.length-1)view=fit(blocks,view,idx+1,t,ce)}}
@@ -688,11 +697,19 @@ function render(){
     M.fl.textContent=clk(cs);M.endT.textContent=clk(ce);
   }
   const ak=!run?'idle':pre?'pre':'run';
-  if(keys.act!==ak){keys.act=ak;M.act.innerHTML=`<button class="btn icon" data-act="tobig" title="Cronómetro" aria-label="Abrir cronómetro">${CLOCK}</button>`+(ak==='idle'?`<button class="btn" data-act="ensayo">Ensayo ×30</button><button class="btn primary" data-act="start">${PLAY}Iniciar clase</button>`:ak==='pre'?'<button class="btn" data-act="now">Empezar ahora</button>':`<button class="btn primary" data-act="next" title="Siguiente momento" aria-label="Siguiente momento"><span class="nx">Siguiente</span>${ARROW}</button>`)}
+  if(keys.act!==ak){keys.act=ak;M.act.innerHTML=`<button class="btn icon" data-act="tobig" title="Cronómetro" aria-label="Abrir cronómetro">${CLOCK}</button>`+(ak==='idle'?`<button class="btn primary" data-act="start">${PLAY}Iniciar clase</button>`:ak==='pre'?'<button class="btn" data-act="now">Empezar ahora</button>':`<button class="btn primary" data-act="next" title="Siguiente momento" aria-label="Siguiente momento"><span class="nx">Siguiente</span>${ARROW}</button>`)}
   const qk=run&&run.ask?run.idx+'-'+run.blocks.length:'';
   if(keys.ask!==qk){keys.ask=qk;M.ask.hidden=!qk;if(qk){const i=run.idx,last=i===run.blocks.length-1;
     M.askTxt.textContent=last?'Llegó la hora de salida':`Terminó «${run.blocks[i].name}». ¿Pasamos a «${run.blocks[i+1].name}»?`;
     M.askB.innerHTML=(last?'<button class="btn primary" data-act="finish">Terminar clase</button>':`<button class="btn primary" data-act="advance">Sí, avanzar ${ARROW}</button>`)+'<button class="btn" data-act="ext2">+2 min</button><button class="btn" data-act="ext5">+5 min</button><button class="btn" data-act="later">Ahora no</button>'}}
+  renderTimer();
+  $('agenda').innerHTML=view.map((s,k)=>{const st=!run?'':k<idx?'done':k===idx&&!pre?'cur':'';
+    return AGENDA(s,k,st,blocks,n)}).join('');
+  $('pRunNote').hidden=!run;
+  $('modeHint').textContent=!run?'':run.mode==='ensayo'?'Ensayo a 30× velocidad':run.mode==='ahora'?'Iniciada ahora':'Según tu horario';
+  renderFT();
+}
+function renderTimer(){
   M.timer.hidden=!timer;
   if(timer){M.tt.textContent=timer.done?'¡Tiempo!':fmt(tLeft());M.tt.classList.toggle('done',timer.done)}
   const L=timer?tLeft():null;
@@ -700,14 +717,25 @@ function render(){
   $('tLab').textContent=!timer?'listo':timer.done?'¡se acabó!':timer.paused?'en pausa':'corriendo';
   $('ring').classList.toggle('done',!!(timer&&timer.done));
   $('tRing').style.strokeDashoffset=timer?RC*(1-L/timer.total):0;
-  $('agenda').innerHTML=view.map((s,k)=>{const st=!run?'':k<idx?'done':k===idx&&!pre?'cur':'';
-    return `<li class="${st}" style="--c:${colorOf(blocks[k],k,n)}"><span class="num">${k+1}</span><span class="an">${esc(blocks[k].name)}${k===n-1?'<span class="tag">fijo</span>':''}${st==='cur'?'<span class="tag">← ahora</span>':''}</span><span class="at">${clk(s.start)}–${clk(s.end)}</span><span class="ad">${Math.round((s.end-s.start)/MIN)} min</span></li>`}).join('');
-  $('endBtn').disabled=!run;$('pRunNote').hidden=!run;
-  $('modeHint').textContent=!run?'':run.mode==='ensayo'?'Ensayo a 30× velocidad':run.mode==='ahora'?'Iniciada ahora':'Según tu horario';
-  renderFT();
 }
+const AGENDA=(s,k,st,blocks,n)=>`<li class="${st}" style="--c:${colorOf(blocks[k],k,n)}"><span class="num">${k+1}</span><span class="an">${esc(blocks[k].name)}${k===n-1?'<span class="tag">fijo</span>':''}${st==='cur'?'<span class="tag">← ahora</span>':''}</span><span class="at">${clk(s.start)}–${clk(s.end)}</span><span class="ad">${Math.round((s.end-s.start)/MIN)} min</span></li>`;
+function renderQuick(){
+  const n=run.blocks.length,idx=run.idx;
+  mini.classList.add('quick');mini.classList.remove('idle');mini.style.setProperty('--c',colorOf(null,idx,n));
+  M.name.textContent=String(idx+1);M.sub.textContent=`de ${n}`;M.items.hidden=true;keys.items='';syncSong('','');M.ask.hidden=true;keys.ask='';
+  M.bar.innerHTML=run.blocks.map((b,k)=>`<div class="seg ${k<idx?'done':k===idx?'cur':''}" style="left:${k/n*100}%;width:${100/n}%;--c:${colorOf(null,k,n)}"><b>${k===idx?'<i style="width:100%"></i>':''}<span>${k+1}</span></b></div>`).join('');
+  const ak='q'+(idx===0?'f':'')+(idx===n-1?'l':'');
+  if(keys.act!==ak){keys.act=ak;M.act.innerHTML=`<button class="btn icon" data-act="tobig" title="Cronómetro" aria-label="Abrir cronómetro">${CLOCK}</button><button class="btn" data-act="qprev" aria-label="Momento anterior"${idx===0?' disabled':''}>←</button>`+(idx===n-1?'<button class="btn primary" data-act="finish">Terminar</button>':`<button class="btn primary" data-act="next" aria-label="Siguiente momento">${ARROW}</button>`)}
+  $('modeHint').textContent='Modo rápido';
+}
+function startQuick(n){ctx();sim=null;const t=Date.now();
+  run={mode:'rapido',quick:true,blocks:Array.from({length:n},(_,i)=>({name:String(i+1)})),idx:0,cs:t,ce:t+12*3600*1000,sched:[],prompted:-1,ask:false};
+  saveRun();wake();keys={};render()}
+function onKey(e){const tg=e.target;if(tg&&(tg.tagName==='INPUT'||tg.tagName==='SELECT'||tg.tagName==='TEXTAREA'||tg.isContentEditable))return;if(!run)return;
+  if(e.key==='ArrowRight'||e.key==='PageDown'){e.preventDefault();advance()}else if((e.key==='ArrowLeft'||e.key==='PageUp')&&run.quick){e.preventDefault();if(run.idx>0){run.idx--;saveRun();render()}}}
+document.addEventListener('keydown',onKey);
 function tick(){
-  if(run){const t=now(),b=run.sched[run.idx];if(t>=run.cs&&t>=b.end&&run.prompted!==run.idx){run.prompted=run.idx;run.ask=true;saveRun();if(cfg.chime)chime();if(pipWin&&pipMode==='timer'&&!timer)setPipMode('bar')}}
+  if(run&&!run.quick){const t=now(),b=run.sched[run.idx];if(t>=run.cs&&t>=b.end&&run.prompted!==run.idx){run.prompted=run.idx;run.ask=true;saveRun();if(cfg.chime)chime();if(pipWin&&pipMode==='timer'&&!timer)setPipMode('bar')}}
   timerTick();render();
 }
 
@@ -777,7 +805,7 @@ async function openPip(mode){
     const w=await documentPictureInPicture.requestWindow(pipSize(mode));
     document.querySelectorAll('style,link[rel=stylesheet]').forEach(n=>w.document.head.appendChild(n.cloneNode(true)));
     const th=document.documentElement.getAttribute('data-theme');if(th)w.document.documentElement.setAttribute('data-theme',th);
-    w.document.title='Reloj de Clase';w.document.body.className='pip';w.document.body.append(mini,ftimer);
+    w.document.addEventListener('keydown',onKey);w.document.title='Reloj de Clase';w.document.body.className='pip';w.document.body.append(mini,ftimer);
     pipWin=w;$('slot').hidden=true;$('popped').hidden=false;setPipMode(mode);keys={};render();
     w.addEventListener('pagehide',()=>{$('slot').appendChild(mini);$('fHome').appendChild(ftimer);$('slot').hidden=false;$('popped').hidden=true;pipWin=null;setPipMode('bar');keys={};render()});
   }catch(e){showNote('No se pudo abrir la ventana flotante aquí. Abre la página directamente en Chrome o Edge (fuera de Claude) y vuelve a intentarlo.')}
@@ -825,17 +853,7 @@ $('rFile').onchange=e=>{const f=e.target.files[0];if(!f)return;f.text().then(t=>
   (list||[]).forEach(r=>{if(r&&r.name&&Array.isArray(r.blocks)&&r.blocks.length){routes.push({id:'r'+Date.now()+n,name:String(r.name),start:r.start||'08:00',end:r.end||'09:30',blocks:r.blocks.map(b=>({name:String(b.name||'Momento'),min:Math.max(1,+b.min||1),color:b.color,items:Array.isArray(b.items)?b.items.map(String):undefined,song:b.song?String(b.song):undefined}))});n++}});
   saveRoutes();renderRoutes();toast(n?`Se importaron ${n} rutas`:'El archivo no tiene rutas válidas')}).catch(()=>toast('No se pudo leer el archivo'));e.target.value=''};
 {const c=curRoute();if(c)$('rName').value=c.name}
-// ---------- ruta por números ----------
-const numCount=()=>cfg.blocks.every((b,i)=>b.name==='Momento '+(i+1))?cfg.blocks.length:0;
-let numVal=store.get('rc.num',5);$('numOut').textContent=numVal;
-function markNum(){$('numCard').classList.toggle('on',numCount()>0&&!cfg.routeId)}
-function numRoute(n){if(run){toast('Termina la clase en curso para cambiar de ruta');return}
-  n=Math.max(2,Math.min(12,Math.round(+n||5)));const d=durMin(),base=Math.floor(d/n),rem=d-base*n;
-  cfg.blocks=Array.from({length:n},(_,i)=>({name:'Momento '+(i+1),min:base+(i<rem?1:0),color:i===n-1?5:i%5}));
-  cfg.routeId=null;saveCfg();$('rName').value=`Por números · ${n} momentos`;renderEditor();markNum();toast(`Ruta de ${n} momentos lista. Puedes guardarla con un nombre.`)}
-const setNum=v=>{numVal=Math.max(2,Math.min(12,v));$('numOut').textContent=numVal;store.set('rc.num',numVal)};
-$('numMinus').onclick=()=>setNum(numVal-1);$('numPlus').onclick=()=>setNum(numVal+1);
-$('numGo').onclick=()=>numRoute(numVal);
+
 
 // ---------- instalar como app ----------
 {const onPages=/github\.io$/.test(location.hostname),standalone=matchMedia('(display-mode: standalone)').matches||navigator.standalone;
@@ -850,6 +868,13 @@ $('numGo').onclick=()=>numRoute(numVal);
     showNote('<strong>Para instalarla:</strong> en Chrome o Edge, abre el menú (los tres puntos) y elige <em>Guardar y compartir → Instalar página como app</em> (en Edge: <em>Aplicaciones → Instalar este sitio</em>). En iPad o iPhone: botón Compartir → <em>Agregar a pantalla de inicio</em>. Una vez instalada abre sin internet y tus rutas siguen ahí. <button class="btn sm" id="dlHtml" style="margin-left:6px">O descargar el archivo .html</button>');
     const d=$('dlHtml');if(d)d.onclick=()=>fetch(location.href).then(r=>r.blob()).then(b=>{const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='reloj-de-clase.html';document.body.appendChild(a);a.click();a.remove();toast('Se descargó reloj-de-clase.html')}).catch(()=>toast('No se pudo descargar'))};
 }
+// ---------- modo rápido y pestañas ----------
+{let qv=store.get('rc.quickN',5);const setQ=v=>{qv=Math.max(2,Math.min(20,v));$('qOut').textContent=qv;store.set('rc.quickN',qv)};setQ(qv);
+  $('qMinus').onclick=()=>setQ(qv-1);$('qPlus').onclick=()=>setQ(qv+1);$('qGo').onclick=()=>startQuick(qv)}
+function showTab(t){document.querySelectorAll('[data-pane]').forEach(p=>p.hidden=p.dataset.pane!==t);document.querySelectorAll('#tabs button').forEach(b=>b.classList.toggle('on',b.dataset.tab===t));store.set('rc.tab',t)}
+$('tabs').addEventListener('click',e=>{const b=e.target.closest('[data-tab]');if(b)showTab(b.dataset.tab)});
+showTab(store.get('rc.tab','clase'));
+$('tryBtn').onclick=()=>{startClass('ensayo');showTab('clase')};
 renderEditor();tCtl();render();setInterval(tick,250);
 })();
 </script>
