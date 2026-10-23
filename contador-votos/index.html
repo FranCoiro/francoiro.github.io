@@ -1,0 +1,440 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Contador de votos</title>
+<meta name="description" content="Contador para la pizarra interactiva: cada toque suma una marca de conteo, el número y un ícono en el pictograma.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800&display=swap">
+<style>
+/* Layout: a classroom whiteboard tool. Left: the tally table, where the song buttons are the row labels. Right: the pictogram built from the same rows. One deliberate light look for the projector. */
+:root {
+  --ink: #1F2A44;
+  --ink-soft: #4A5670;
+  --paper: #FBF7EE;
+  --card: #FFFFFF;
+  --line: #E4DCC8;
+  --c1: #E0A21A;   /* canción 1: amarillo mostaza */
+  --c1-soft: #FFF1D0;
+  --c2: #2F6FC0;   /* canción 2: azul */
+  --c2-soft: #E3EEFB;
+  --c3: #D9692A;   /* canción 3: naranjo */
+  --c3-soft: #FCE6D8;
+  --stroke: #1F2A44;
+  --display: 'Fredoka', 'Trebuchet MS', Verdana, sans-serif;
+  --body: 'Nunito', Verdana, sans-serif;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body { margin: 0; }
+[hidden] { display: none !important; }
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 18px;
+}
+.wrap {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(14px, 2vw, 24px);
+  padding-block: clamp(14px, 2.5vw, 32px);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  max-width: 1600px;
+  margin: 0 auto;
+}
+header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 24px;
+}
+h1 {
+  font-family: var(--display);
+  font-weight: 600;
+  font-size: clamp(28px, 4vw, 52px);
+  line-height: 1.1;
+  margin: 0;
+  text-wrap: balance;
+}
+.total {
+  font-family: var(--display);
+  font-weight: 600;
+  font-size: clamp(20px, 2.2vw, 30px);
+  background: var(--ink);
+  color: var(--paper);
+  border-radius: 999px;
+  padding: 8px 22px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.boards {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  gap: clamp(14px, 2vw, 28px);
+  flex: 1;
+}
+@media (max-width: 900px) { .boards { grid-template-columns: minmax(0, 1fr); } }
+.panel {
+  background: var(--card);
+  border: 2px solid var(--line);
+  border-radius: 24px;
+  padding: clamp(14px, 2vw, 26px);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+}
+.panel-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+h2 {
+  font-family: var(--display);
+  font-weight: 600;
+  font-size: clamp(22px, 2.4vw, 32px);
+  margin: 0;
+}
+.key {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 800;
+  color: var(--ink-soft);
+  font-size: clamp(16px, 1.6vw, 22px);
+}
+.colhead {
+  display: grid;
+  grid-template-columns: var(--cols);
+  gap: 14px;
+  font-size: 15px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-soft);
+  padding: 0 4px;
+}
+.tally-panel { --cols: minmax(150px, 0.9fr) minmax(0, 2fr) 92px; }
+.rows { display: flex; flex-direction: column; gap: 12px; flex: 1; }
+.row {
+  display: grid;
+  grid-template-columns: var(--cols);
+  gap: 14px;
+  align-items: center;
+  background: var(--soft);
+  border-radius: 18px;
+  padding: 10px;
+  min-height: 112px;
+}
+.row[data-song="1"] { --tone: var(--c1); --soft: var(--c1-soft); }
+.row[data-song="2"] { --tone: var(--c2); --soft: var(--c2-soft); }
+.row[data-song="3"] { --tone: var(--c3); --soft: var(--c3-soft); }
+.vote {
+  appearance: none;
+  border: 0;
+  border-radius: 16px;
+  background: var(--tone);
+  color: #fff;
+  font-family: var(--display);
+  font-weight: 600;
+  font-size: clamp(22px, 2.2vw, 30px);
+  line-height: 1.1;
+  padding: 16px 12px;
+  min-height: 92px;
+  cursor: pointer;
+  touch-action: manipulation;
+  box-shadow: 0 5px 0 rgba(31, 42, 68, 0.25);
+  transition: transform 80ms ease, box-shadow 80ms ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+.row[data-song="1"] .vote { color: var(--ink); }
+.row[data-song="1"] .marks line.cross { stroke: #B07A00; }
+.vote small { font-family: var(--body); font-weight: 800; font-size: 15px; opacity: 0.85; }
+.vote:active { transform: translateY(4px); box-shadow: 0 1px 0 rgba(31, 42, 68, 0.25); }
+.vote:focus-visible, .ctl:focus-visible, .undo:focus-visible { outline: 4px solid var(--ink); outline-offset: 3px; }
+.marks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 18px;
+  align-items: center;
+  min-height: 64px;
+  min-width: 0;
+}
+.marks svg { width: 62px; height: 60px; flex: none; }
+.marks svg.single { width: 18px; }
+.marks line { stroke: var(--stroke); stroke-width: 6; stroke-linecap: round; }
+.marks line.cross { stroke: var(--tone); stroke-width: 6.5; }
+.marks .new { stroke-dasharray: 80; stroke-dashoffset: 80; animation: draw 260ms ease-out forwards; }
+@keyframes draw { to { stroke-dashoffset: 0; } }
+.empty { color: var(--ink-soft); font-weight: 700; font-size: 17px; opacity: 0.8; }
+.num-cell { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.num {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: clamp(40px, 4vw, 58px);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+.undo {
+  appearance: none;
+  border: 2px solid var(--tone);
+  background: var(--card);
+  color: var(--ink);
+  border-radius: 999px;
+  font-weight: 800;
+  font-size: 15px;
+  padding: 4px 12px;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.undo:disabled { opacity: 0.35; cursor: default; }
+.picto-panel { --cols: minmax(150px, 0.7fr) minmax(0, 3fr); }
+.picto-row { min-height: 112px; background: transparent; border: 2px dashed var(--line); }
+.picto-label {
+  font-family: var(--display);
+  font-weight: 600;
+  font-size: clamp(20px, 2vw, 26px);
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  white-space: nowrap;
+}
+.picto-label::before {
+  content: "";
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--tone);
+  flex: none;
+}
+.icons {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 38px);
+  gap: 8px;
+  align-content: center;
+  min-height: 46px;
+}
+.icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--tone);
+  display: grid;
+  place-items: center;
+}
+.icon svg { width: 20px; height: 20px; }
+.icon svg path { fill: #fff; }
+.row[data-song="1"] .icon svg path { fill: var(--ink); }
+.icon.new { animation: pop 240ms ease-out; }
+@keyframes pop { from { transform: scale(0.3); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+.ctl {
+  appearance: none;
+  border: 2px solid var(--ink);
+  background: var(--card);
+  color: var(--ink);
+  font-family: var(--body);
+  font-weight: 800;
+  font-size: 17px;
+  border-radius: 999px;
+  padding: 10px 18px;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.ctl[aria-pressed="false"] { background: transparent; color: var(--ink-soft); border-style: dashed; }
+.ctl.danger { margin-left: auto; border-color: var(--c3); }
+.ctl.danger.armed { background: var(--c3); color: #fff; }
+.hide-marks .marks > * , .hide-marks .tally-panel .colhead .h-marks { visibility: hidden; }
+.hide-nums .num { visibility: hidden; }
+.hide-picto .picto-panel .rows, .hide-picto .picto-panel .key, .hide-picto .picto-panel .colhead { visibility: hidden; }
+@media (prefers-reduced-motion: reduce) {
+  .marks .new, .icon.new { animation: none; stroke-dashoffset: 0; }
+  .vote { transition: none; }
+}
+</style>
+</head>
+<body>
+<div class="wrap" id="app">
+  <header>
+    <h1>¿Qué canción nos gusta más?</h1>
+    <div class="total" id="total" aria-live="polite">Total: 0 votos</div>
+  </header>
+
+  <div class="boards">
+    <section class="panel tally-panel" aria-labelledby="t-tabla">
+      <div class="panel-head">
+        <h2 id="t-tabla">Tabla de conteo</h2>
+        <span class="key">Toca la canción para sumar un voto</span>
+      </div>
+      <div class="colhead"><span>Canción</span><span class="h-marks">Marcas de conteo</span><span style="text-align:center">Número</span></div>
+      <div class="rows" id="tallyRows"></div>
+    </section>
+
+    <section class="panel picto-panel" aria-labelledby="t-picto">
+      <div class="panel-head">
+        <h2 id="t-picto">Pictograma</h2>
+        <span class="key"><span class="icon" style="--tone: var(--ink); width:30px; height:30px"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 3v10.6A3.5 3.5 0 1 1 15 10.4V6.2L9 7.6v8A3.5 3.5 0 1 1 7 12.4V5.4z"/></svg></span> = 1 voto</span>
+      </div>
+      <div class="colhead"><span>Canción</span><span>Votos</span></div>
+      <div class="rows" id="pictoRows"></div>
+    </section>
+  </div>
+
+  <div class="controls" role="group" aria-label="Mostrar u ocultar">
+    <button class="ctl" id="tMarks" aria-pressed="true">Marcas de conteo</button>
+    <button class="ctl" id="tNums" aria-pressed="true">Números</button>
+    <button class="ctl" id="tPicto" aria-pressed="true">Pictograma</button>
+    <button class="ctl danger" id="reset">Borrar votos</button>
+  </div>
+</div>
+
+<script>
+(function () {
+  var SONGS = [1, 2, 3];
+  var KEY = 'contador-votos-v1';
+  var NOTE = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 3v10.6A3.5 3.5 0 1 1 15 10.4V6.2L9 7.6v8A3.5 3.5 0 1 1 7 12.4V5.4z"/></svg>';
+  var state = { votes: { 1: 0, 2: 0, 3: 0 }, show: { marks: true, nums: true, picto: true } };
+
+  try {
+    var saved = JSON.parse(localStorage.getItem(KEY) || 'null');
+    if (saved && saved.votes) state = saved;
+  } catch (e) {}
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
+
+  var tallyRows = document.getElementById('tallyRows');
+  var pictoRows = document.getElementById('pictoRows');
+  var app = document.getElementById('app');
+
+  SONGS.forEach(function (s) {
+    var r = document.createElement('div');
+    r.className = 'row';
+    r.dataset.song = s;
+    r.innerHTML =
+      '<button class="vote" id="vote' + s + '" aria-label="Sumar un voto a la canción ' + s + '">Canción ' + s + '<small>+1 voto</small></button>' +
+      '<div class="marks" id="marks' + s + '" aria-hidden="true"></div>' +
+      '<div class="num-cell"><span class="num" id="num' + s + '">0</span><button class="undo" id="undo' + s + '" aria-label="Quitar un voto a la canción ' + s + '">− quitar</button></div>';
+    tallyRows.appendChild(r);
+
+    var p = document.createElement('div');
+    p.className = 'row picto-row';
+    p.dataset.song = s;
+    p.innerHTML = '<span class="picto-label">Canción ' + s + '</span><div class="icons" id="icons' + s + '" role="img"></div>';
+    pictoRows.appendChild(p);
+
+    document.getElementById('vote' + s).addEventListener('click', function () { change(s, 1); });
+    document.getElementById('undo' + s).addEventListener('click', function () { change(s, -1); });
+  });
+
+  function groupSvg(n, isNewIndex) {
+    // n = marks in this group (1..5); isNewIndex = index of the mark just added, or -1
+    var xs = [8, 22, 36, 50];
+    var out = '';
+    for (var i = 0; i < Math.min(n, 4); i++) {
+      out += '<line x1="' + xs[i] + '" y1="6" x2="' + xs[i] + '" y2="54"' + (i === isNewIndex ? ' class="new"' : '') + '/>';
+    }
+    if (n === 5) out += '<line class="cross' + (isNewIndex === 4 ? ' new' : '') + '" x1="2" y1="46" x2="58" y2="14"/>';
+    var w = n >= 4 ? 62 : xs[n - 1] + 10;
+    return '<svg viewBox="0 0 ' + w + ' 60" style="width:' + w + 'px">' + out + '</svg>';
+  }
+
+  function render(changedSong, delta) {
+    var total = 0;
+    SONGS.forEach(function (s) {
+      var v = state.votes[s];
+      total += v;
+      var marks = document.getElementById('marks' + s);
+      if (v === 0) {
+        marks.innerHTML = '<span class="empty">Sin votos todavía</span>';
+      } else {
+        var html = '';
+        var full = Math.floor(v / 5), rest = v % 5;
+        var animate = (s === changedSong && delta > 0);
+        for (var g = 0; g < full; g++) {
+          var last = (g === full - 1 && rest === 0 && animate) ? 4 : -1;
+          html += groupSvg(5, last);
+        }
+        if (rest) html += groupSvg(rest, animate ? rest - 1 : -1);
+        marks.innerHTML = html;
+      }
+      document.getElementById('num' + s).textContent = v;
+      document.getElementById('undo' + s).disabled = v === 0;
+
+      var icons = document.getElementById('icons' + s);
+      var ih = '';
+      for (var i = 0; i < v; i++) {
+        ih += '<span class="icon' + (s === changedSong && delta > 0 && i === v - 1 ? ' new' : '') + '">' + NOTE + '</span>';
+      }
+      icons.innerHTML = ih;
+      icons.setAttribute('aria-label', 'Canción ' + s + ': ' + v + (v === 1 ? ' voto' : ' votos'));
+    });
+    document.getElementById('total').textContent = 'Total: ' + total + (total === 1 ? ' voto' : ' votos');
+
+    app.classList.toggle('hide-marks', !state.show.marks);
+    app.classList.toggle('hide-nums', !state.show.nums);
+    app.classList.toggle('hide-picto', !state.show.picto);
+    document.getElementById('tMarks').setAttribute('aria-pressed', state.show.marks);
+    document.getElementById('tNums').setAttribute('aria-pressed', state.show.nums);
+    document.getElementById('tPicto').setAttribute('aria-pressed', state.show.picto);
+  }
+
+  function change(s, d) {
+    state.votes[s] = Math.max(0, state.votes[s] + d);
+    save();
+    render(s, d);
+  }
+
+  function toggler(id, key) {
+    document.getElementById(id).addEventListener('click', function () {
+      state.show[key] = !state.show[key];
+      save();
+      render();
+    });
+  }
+  toggler('tMarks', 'marks');
+  toggler('tNums', 'nums');
+  toggler('tPicto', 'picto');
+
+  var resetBtn = document.getElementById('reset');
+  var armTimer = null;
+  resetBtn.addEventListener('click', function () {
+    if (!resetBtn.classList.contains('armed')) {
+      resetBtn.classList.add('armed');
+      resetBtn.textContent = 'Toca otra vez para borrar';
+      armTimer = setTimeout(disarm, 3000);
+      return;
+    }
+    clearTimeout(armTimer);
+    state.votes = { 1: 0, 2: 0, 3: 0 };
+    save();
+    disarm();
+    render();
+  });
+  function disarm() {
+    resetBtn.classList.remove('armed');
+    resetBtn.textContent = 'Borrar votos';
+  }
+
+  render();
+})();
+</script>
+</body>
+</html>
