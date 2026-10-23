@@ -471,6 +471,7 @@ body:not(.pip) [data-pip-only]{display:none}
         <label class="chk"><input type="checkbox" id="pChime"> Aviso sonoro al terminar cada momento</label>
         <label class="chk" style="margin-top:6px"><input type="checkbox" id="pKids"> Modo infantil: un animalito camina por la barra (tócalo para cambiarlo)</label>
         <label class="chk" style="margin-top:6px"><input type="checkbox" id="pShowClock"> Mostrar el tiempo que queda en cada momento</label>
+        <label class="chk" style="margin-top:6px"><input type="checkbox" id="pFixEnd"> Si empiezo tarde, ajustar los momentos para terminar a la hora de término</label>
         <div class="row" style="margin-top:12px"><button class="btn sm" id="tryBtn">Probar esta ruta a 30× velocidad</button></div>
         <p class="hint" id="pRunNote" hidden style="margin-top:10px">Hay una clase en curso: los cambios se aplican desde la próxima.</p>
       </section>
@@ -512,7 +513,7 @@ const R2B={id:'mrm-2b',v:2,name:'2° básico · Mi ruta matemática',start:'08:0
   {name:'Pausa activa',min:5,color:1,song:'https://www.youtube.com/watch?v=F8sFFTJgyqw'},
   {name:'Trabajo, participo y aprendo',min:22,color:0},
   {name:'Revisamos lo que aprendimos',min:15,color:5}]};
-const C6={id:'clase6-2b',v:2,name:'2° básico · Clase 6 · Pictogramas y tablas de conteo',start:'08:00',end:'09:30',blocks:[
+const C6={id:'clase6-2b',v:3,fixEnd:true,name:'2° básico · Clase 6 · Pictogramas y tablas de conteo',start:'08:00',end:'11:20',blocks:[
   {name:'Inicio de la clase',min:15,color:4},
   {name:'Desarrollo',min:55,color:0},
   {name:'Cierre',min:20,color:5}]};
@@ -553,6 +554,8 @@ function startClass(mode){
   if(mode==='agenda'){cs=todayAt(cfg.start);ce=cs+dur;if(Date.now()>=ce)mode='ahora'}
   if(mode==='ahora'){cs=Date.now();ce=cs+dur}
   if(mode==='ensayo'){sim={real0:Date.now(),t0:Date.now(),speed:30};cs=now();ce=cs+dur}
+  // Término fijo: si se empieza después de la hora, los momentos se reparten para terminar a la hora de término.
+  if(cfg.fixEnd&&mode!=='ensayo'){const t0=Date.now(),endT=todayAt(cfg.end);if(endT>t0&&t0>=cs){cs=t0;ce=endT}}
   const blocks=JSON.parse(JSON.stringify(cfg.blocks));
   const sched=fit(blocks,[],0,cs,ce);let idx=0;const t=now();
   if(t>cs){idx=sched.findIndex(s=>t<s.end);if(idx<0)idx=blocks.length-1}
@@ -849,6 +852,7 @@ $('pStart').onchange=e=>{const d=durMin();cfg.start=e.target.value||cfg.start;cf
 $('pEnd').onchange=e=>{cfg.end=e.target.value||cfg.end;saveCfg();updatePreview()};
 $('pChime').onchange=e=>{cfg.chime=e.target.checked;saveCfg()};
 $('pKids').checked=!!cfg.kids;$('pKids').onchange=e=>{cfg.kids=e.target.checked;saveCfg();render()};
+$('pFixEnd').checked=!!cfg.fixEnd;$('pFixEnd').onchange=e=>{cfg.fixEnd=e.target.checked;saveCfg();render()};
 $('pShowClock').checked=cfg.showClock!==false;$('pShowClock').onchange=e=>{cfg.showClock=e.target.checked;saveCfg();render()};
 document.querySelectorAll('[data-tpl]').forEach(b=>b.onclick=()=>{const m=+b.dataset.tpl;cfg.blocks=JSON.parse(JSON.stringify(m===45?T45:T90));cfg.end=m2hm(hm2m(cfg.start)+m);saveCfg();renderEditor()});
 
@@ -936,7 +940,7 @@ if(!routes)routes=[{id:'ex90',name:"Ejemplo · Bloque 90'",start:'08:00',end:'09
 {const seen=store.get('rc.seen',[]),r6=JSON.parse(JSON.stringify(C6));
   if(!seen.includes(C6.id+'@'+C6.v)){
     routes=routes.filter(x=>x.id!==C6.id);routes.unshift(r6);seen.push(C6.id+'@'+C6.v);
-    if(!run){cfg.start=r6.start;cfg.end=r6.end;cfg.blocks=JSON.parse(JSON.stringify(r6.blocks));cfg.routeId=r6.id;saveCfg()}
+    if(!run){cfg.start=r6.start;cfg.end=r6.end;cfg.blocks=JSON.parse(JSON.stringify(r6.blocks));cfg.routeId=r6.id;cfg.fixEnd=true;saveCfg()}
     store.set('rc.seen',seen);store.set('rc.routes',routes)}}
 const saveRoutes=()=>store.set('rc.routes',routes);
 const snap=()=>({start:cfg.start,end:cfg.end,blocks:JSON.parse(JSON.stringify(cfg.blocks))});
