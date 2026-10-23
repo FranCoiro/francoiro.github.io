@@ -512,18 +512,10 @@ const R2B={id:'mrm-2b',v:2,name:'2° básico · Mi ruta matemática',start:'08:0
   {name:'Pausa activa',min:5,color:1,song:'https://www.youtube.com/watch?v=F8sFFTJgyqw'},
   {name:'Trabajo, participo y aprendo',min:22,color:0},
   {name:'Revisamos lo que aprendimos',min:15,color:5}]};
-const C6={id:'clase6-2b',v:1,name:'2° básico · Clase 6 · Pictogramas y tablas de conteo',start:'08:00',end:'09:30',blocks:[
-  {name:'Dejo listos mis materiales',min:3,color:2,items:['Pegamento','Lápiz grafito','Goma']},
-  {name:'Escucho la ruta de la clase',min:3,color:4},
-  {name:'¿Cómo me siento hoy?',min:4,color:3},
-  {name:'Conozco mi objetivo',min:5,color:4,items:['Registrar en una tabla de conteo los datos de un pictograma']},
-  {name:'Guía: leemos el pictograma (pp. 80 y 81)',min:17,color:0,items:['Libro: pp. 80 y 81','Marcas de 5 en 5']},
-  {name:'Trabajo en mi libro (pp. 82 y 83)',min:20,color:0,items:['Preguntas 1 a 6','Tabla de conteo']},
-  {name:'Pausa activa',min:5,color:1,song:'https://www.youtube.com/watch?v=F8sFFTJgyqw'},
-  {name:'Revisamos las pp. 82 y 83',min:13,color:3},
-  {name:'Escuchamos y votamos',min:7,color:5,items:['Canción 1','Canción 2','Canción 3']},
-  {name:'¿Cómo organizamos la votación?',min:6,color:5,items:['Tabla de conteo','Pictograma']},
-  {name:'Verdadero o falso',min:7,color:5}]};
+const C6={id:'clase6-2b',v:2,name:'2° básico · Clase 6 · Pictogramas y tablas de conteo',start:'08:00',end:'09:30',blocks:[
+  {name:'Inicio de la clase',min:15,color:4},
+  {name:'Desarrollo',min:55,color:0},
+  {name:'Cierre',min:20,color:5}]};
 let cfg=store.get('rc.cfg',null)||{start:R2B.start,end:R2B.end,chime:true,routeId:R2B.id,blocks:JSON.parse(JSON.stringify(R2B.blocks))};
 const PAL=['var(--p0)','var(--p1)','var(--p2)','var(--p3)','var(--p4)','var(--p5)'];
 const colorOf=(b,i,n)=>PAL[b&&b.color!=null?b.color:(i===n-1?5:i%5)];
