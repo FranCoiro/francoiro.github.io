@@ -512,6 +512,18 @@ const R2B={id:'mrm-2b',v:2,name:'2° básico · Mi ruta matemática',start:'08:0
   {name:'Pausa activa',min:5,color:1,song:'https://www.youtube.com/watch?v=F8sFFTJgyqw'},
   {name:'Trabajo, participo y aprendo',min:22,color:0},
   {name:'Revisamos lo que aprendimos',min:15,color:5}]};
+const C6={id:'clase6-2b',v:1,name:'2° básico · Clase 6 · Pictogramas y tablas de conteo',start:'08:00',end:'09:30',blocks:[
+  {name:'Dejo listos mis materiales',min:3,color:2,items:['Pegamento','Lápiz grafito','Goma']},
+  {name:'Escucho la ruta de la clase',min:3,color:4},
+  {name:'¿Cómo me siento hoy?',min:4,color:3},
+  {name:'Conozco mi objetivo',min:5,color:4,items:['Registrar en una tabla de conteo los datos de un pictograma']},
+  {name:'Guía: leemos el pictograma (pp. 80 y 81)',min:17,color:0,items:['Libro: pp. 80 y 81','Marcas de 5 en 5']},
+  {name:'Trabajo en mi libro (pp. 82 y 83)',min:20,color:0,items:['Preguntas 1 a 6','Tabla de conteo']},
+  {name:'Pausa activa',min:5,color:1,song:'https://www.youtube.com/watch?v=F8sFFTJgyqw'},
+  {name:'Revisamos las pp. 82 y 83',min:13,color:3},
+  {name:'Escuchamos y votamos',min:7,color:5,items:['Canción 1','Canción 2','Canción 3']},
+  {name:'¿Cómo organizamos la votación?',min:6,color:5,items:['Tabla de conteo','Pictograma']},
+  {name:'Verdadero o falso',min:7,color:5}]};
 let cfg=store.get('rc.cfg',null)||{start:R2B.start,end:R2B.end,chime:true,routeId:R2B.id,blocks:JSON.parse(JSON.stringify(R2B.blocks))};
 const PAL=['var(--p0)','var(--p1)','var(--p2)','var(--p3)','var(--p4)','var(--p5)'];
 const colorOf=(b,i,n)=>PAL[b&&b.color!=null?b.color:(i===n-1?5:i%5)];
@@ -867,6 +879,14 @@ const LINKICON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strok
 let links=store.get('rc.links',null)||[{id:'l1',name:'Canción de pausa activa',url:'https://www.youtube.com/watch?v=F8sFFTJgyqw',group:'Pausas activas'}];
 const GROUPS=['Pausas activas','Presentaciones','Carpetas','Otros'];
 const saveLinks=()=>store.set('rc.links',links);
+// Enlaces de la clase 6 (2° básico): contador de votos y las tres canciones de la encuesta. Se agregan una sola vez.
+{const seen=store.get('rc.seen',[]);if(!seen.includes('clase6-links')){
+  [{id:'c6-cont',name:'Contador de votos',url:'https://francoiro.github.io/contador-votos/',group:'Otros'},
+   {id:'c6-s1',name:'Encuesta · Canción 1',url:'https://www.youtube.com/watch?v=c_I6jvqHI1I',group:'Pausas activas'},
+   {id:'c6-s2',name:'Encuesta · Canción 2',url:'https://www.youtube.com/watch?v=9cZ7Nl3Ynxo&t=28s',group:'Pausas activas'},
+   {id:'c6-s3',name:'Encuesta · Canción 3',url:'https://www.youtube.com/watch?v=Flc76dRcIdQ&t=45s',group:'Pausas activas'}
+  ].forEach(l=>{if(!links.some(x=>x.url===l.url))links.push(l)});
+  saveLinks();seen.push('clase6-links');store.set('rc.seen',seen)}}
 const host=u=>{try{return new URL(u).hostname.replace(/^www\./,'')}catch(e){return ''}};
 function linksHTML(editable){
   if(!links.length)return '<p class="lk-empty">Aún no hay enlaces. Agrégalos en la pestaña Enlaces.</p>';
@@ -920,6 +940,12 @@ if(!routes)routes=[{id:'ex90',name:"Ejemplo · Bloque 90'",start:'08:00',end:'09
     store.set('rc.seen',seen);store.set('rc.routes',routes)}}
 {const seen=store.get('rc.seen',[]);if(!seen.includes('mrm-2b-song')){const add=bl=>bl.forEach(b=>{if(/pausa activa/i.test(b.name)&&!b.song)b.song='https://www.youtube.com/watch?v=F8sFFTJgyqw'});
   const r=routes.find(x=>x.id==='mrm-2b');if(r)add(r.blocks);if(cfg.routeId==='mrm-2b'){add(cfg.blocks);saveCfg()}seen.push('mrm-2b-song');store.set('rc.seen',seen);store.set('rc.routes',routes)}}
+// La ruta de la clase 6 (2° básico) queda precargada: aparece primera y, la primera vez, queda activa.
+{const seen=store.get('rc.seen',[]),r6=JSON.parse(JSON.stringify(C6));
+  if(!seen.includes(C6.id+'@'+C6.v)){
+    routes=routes.filter(x=>x.id!==C6.id);routes.unshift(r6);seen.push(C6.id+'@'+C6.v);
+    if(!run){cfg.start=r6.start;cfg.end=r6.end;cfg.blocks=JSON.parse(JSON.stringify(r6.blocks));cfg.routeId=r6.id;saveCfg()}
+    store.set('rc.seen',seen);store.set('rc.routes',routes)}}
 const saveRoutes=()=>store.set('rc.routes',routes);
 const snap=()=>({start:cfg.start,end:cfg.end,blocks:JSON.parse(JSON.stringify(cfg.blocks))});
 const sameAs=r=>JSON.stringify({start:r.start,end:r.end,blocks:r.blocks})===JSON.stringify(snap());
