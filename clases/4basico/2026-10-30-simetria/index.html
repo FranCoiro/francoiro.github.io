@@ -1,0 +1,359 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Simetría 4.º básico</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Nunito:wght@400;700;800&display=swap">
+<style>
+/* Proyector de aula: escenario 16:9 que se escala; un solo look claro, colores explícitos */
+:root {
+  --ink: #163A37; --ink-soft: #3F5F5B; --paper: #F6FAF8; --mint: #E4F3EF; --line: #CFE4DF;
+  --teal: #2A9D8F; --teal-d: #1F7A6F; --sun: #F2B134; --sun-l: #FCEBC4; --axis: #E63946;
+  --blue: #2F6FDB; --coral: #E0704F; --grid: #C9D6DB; --white: #FFFFFF;
+  --display: 'Fredoka', 'Trebuchet MS', sans-serif;
+  --body: 'Nunito', Verdana, sans-serif;
+  color-scheme: light;
+}
+html, body { height: 100%; }
+body {
+  background: #0F2A28; color: var(--ink); font-family: var(--body);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 10px; box-sizing: border-box; overflow: hidden;
+}
+.stage {
+  container-type: size; position: relative;
+  width: min(100%, calc((100vh - 84px) * 16 / 9)); aspect-ratio: 16 / 9; max-width: 100%;
+  background: var(--paper); border-radius: 14px; overflow: hidden; cursor: pointer;
+  box-shadow: 0 20px 60px rgba(0,0,0,.35);
+}
+:fullscreen .stage { border-radius: 0; width: min(100vw, calc(100vh * 16 / 9)); }
+:fullscreen body { padding: 0; }
+.slide {
+  position: absolute; inset: 0; padding: 5.5cqw 6.5cqw; display: grid; gap: 3cqw;
+  opacity: 0; visibility: hidden; transition: opacity .45s ease, visibility .45s;
+  background: var(--paper);
+}
+.slide.on { opacity: 1; visibility: visible; }
+.slide.dark { background: var(--ink); color: var(--paper); }
+.slide.mintbg { background: var(--mint); }
+.slide.sunbg { background: var(--sun); }
+.two { grid-template-columns: 1fr 1fr; align-items: center; }
+.col { display: flex; flex-direction: column; gap: 2.2cqw; min-width: 0; }
+h1, h2 { font-family: var(--display); font-weight: 600; margin: 0; line-height: 1.08; text-wrap: balance; }
+h1 { font-size: 10cqw; }
+h2 { font-size: 4.4cqw; }
+p { margin: 0; font-size: 2.5cqw; line-height: 1.35; }
+.big { font-size: 3cqw; }
+.eyebrow { font-size: 1.45cqw; font-weight: 800; letter-spacing: .2em; text-transform: uppercase; color: var(--teal-d); }
+.dark .eyebrow { color: var(--sun); }
+.soft { color: var(--ink-soft); }
+.dark .soft { color: #BFE0DA; }
+.chip { background: var(--mint); border-radius: 1.6cqw; padding: 1.4cqw 2cqw; }
+.chip.sun { background: var(--sun-l); }
+b { font-weight: 800; }
+.st { opacity: 0; transform: translateY(1cqw); transition: opacity .45s ease, transform .45s ease; }
+.st.show { opacity: 1; transform: none; }
+.figbox { background: var(--white); border: 2px solid var(--line); border-radius: 1.8cqw; padding: 1.2cqw; display: flex; justify-content: center; align-items: center; min-width: 0; }
+.figbox svg { width: 100%; height: auto; max-height: 72cqh; display: block; }
+.steps4 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.4cqw; }
+.card { background: var(--white); border: 2px solid var(--line); border-radius: 1.6cqw; padding: 1.4cqw 1.6cqw; display: flex; gap: 1.2cqw; align-items: flex-start; }
+.num { font-family: var(--display); font-weight: 600; font-size: 3.4cqw; line-height: 1; color: var(--teal); min-width: 2.4cqw; }
+.card p { font-size: 2.1cqw; }
+.check { display: flex; gap: 1.6cqw; align-items: center; }
+.check svg { width: 3.4cqw; height: 3.4cqw; flex: none; }
+.check p { font-size: 2.7cqw; }
+.vs { display: grid; grid-template-columns: 1fr 1fr; gap: 3cqw; }
+.vs .figbox { flex-direction: column; gap: 1cqw; }
+.vs p { font-size: 2.2cqw; text-align: center; }
+.cover-badge { display: inline-block; background: var(--sun); color: var(--ink); font-weight: 800; border-radius: 99px; padding: .6cqw 1.8cqw; font-size: 1.6cqw; }
+
+/* figuras */
+.g line.gl { stroke: var(--grid); stroke-width: 1.5; }
+.g .axis { stroke: var(--axis); stroke-width: 5; stroke-dasharray: 14 9; stroke-linecap: round; }
+.g .axis.pulse { animation: pulse 1s ease-in-out 3; }
+@keyframes pulse { 50% { stroke-width: 11; } }
+.g .half { fill: none; stroke: var(--ink); stroke-width: 8; stroke-linejoin: round; stroke-linecap: round; }
+.g .mir { transition: transform 1.3s cubic-bezier(.6,.05,.3,1), opacity .3s; opacity: 0; transform-box: view-box; }
+.g .mir path { fill: none; stroke: var(--blue); stroke-width: 8; stroke-linejoin: round; stroke-linecap: round; }
+.g.folded .mir { opacity: 1; }
+.g.folded.v .mir { transform: scaleX(-1); }
+.g.folded.h .mir { transform: scaleY(-1); }
+.g .lab { opacity: 0; transition: opacity .4s; }
+.g .lab circle { fill: var(--sun); }
+.g .lab text { font: 800 16px var(--body); fill: var(--ink); text-anchor: middle; dominant-baseline: central; }
+.g.labels .lab.l { opacity: 1; }
+.g.dots .lab.r, .g.folded .lab.r { opacity: 1; }
+.g .lab.r circle { fill: #9CC2F2; }
+.g .tom { fill: none; stroke: var(--blue); stroke-width: 8; stroke-linejoin: round; stroke-linecap: round; }
+.g .ghost { fill: none; stroke: var(--teal); stroke-width: 7; stroke-dasharray: 3 13; stroke-linecap: round; opacity: 0; transition: opacity .6s; }
+.g.ghostshow .ghost { opacity: 1; }
+.g.ghostshow .tom { stroke: var(--coral); }
+.px rect.c { transition: opacity .35s; }
+.px.hideR rect.r { opacity: 0; }
+@media (prefers-reduced-motion: reduce) { .g .mir, .st, .slide, .px rect.c { transition: none; } .g .axis.pulse { animation: none; } }
+
+/* barra */
+.bar { display: flex; align-items: center; gap: 12px; color: #CFE4DF; font: 700 14px var(--body); width: min(100%, calc((100vh - 84px) * 16 / 9)); }
+.bar button { background: #1F4A46; color: #F6FAF8; border: 0; border-radius: 10px; padding: 10px 16px; font: 800 15px var(--body); cursor: pointer; }
+.bar button:hover { background: #2A5E59; }
+.bar button:focus-visible { outline: 3px solid var(--sun); outline-offset: 2px; }
+.prog { flex: 1; height: 6px; background: #1F4A46; border-radius: 9px; overflow: hidden; min-width: 40px; }
+.prog i { display: block; height: 100%; width: 0; background: var(--sun); transition: width .3s; }
+.count { font-variant-numeric: tabular-nums; min-width: 64px; text-align: center; }
+:fullscreen .bar { position: fixed; bottom: 8px; left: 50%; transform: translateX(-50%); opacity: 0; transition: opacity .3s; width: auto; }
+:fullscreen .bar:hover { opacity: 1; }
+@media (max-width: 560px) { .bar .hint { display: none; } }
+</style>
+</head>
+<body>
+
+<div class="stage" id="stage" aria-live="polite">
+
+  <section class="slide dark two" data-steps="0">
+    <div class="col">
+      <span class="eyebrow">Matemática · 4.º básico</span>
+      <h1>Simetría</h1>
+      <p class="big soft">Objetivo: completar figuras simétricas respecto de un eje de simetría.</p>
+    </div>
+    <div class="figbox"><svg class="g v folded" data-fig="corazon" aria-label="Corazón simétrico con su eje rojo"></svg></div>
+  </section>
+
+  <section class="slide two" data-steps="3">
+    <div class="col">
+      <h2>¿Qué es un eje de simetría?</h2>
+      <p class="big st" data-s="1">Es la línea por donde <b>doblamos</b> la figura.</p>
+      <p class="big st" data-s="2">Si las dos mitades <b>calzan</b>, la figura es simétrica.</p>
+      <p class="chip st" data-s="3">Cada punto tiene una <b>pareja</b> al otro lado, a la <b>misma distancia</b> del eje. Como en un espejo.</p>
+    </div>
+    <div class="figbox"><svg class="g v" data-fig="corazon" data-pulse="1" data-fold="2" data-labels="3" aria-label="Corazón: se dobla por el eje"></svg></div>
+  </section>
+
+  <section class="slide two" data-steps="4">
+    <div class="col">
+      <h2>¿Qué hacer en la guía?</h2>
+      <div class="steps4">
+        <div class="card st" data-s="1"><span class="num">1</span><p>Mira dónde está el <b>eje rojo</b>.</p></div>
+        <div class="card st" data-s="2"><span class="num">2</span><p><b>Cuenta</b> los cuadraditos desde el eje hasta cada esquina.</p></div>
+        <div class="card st" data-s="3"><span class="num">3</span><p>Marca la <b>pareja</b> al otro lado, a la misma distancia.</p></div>
+        <div class="card st" data-s="4"><span class="num">4</span><p><b>Une</b> los puntos con regla.</p></div>
+      </div>
+      <p class="chip sun st" data-s="4">Primero las <b>4 figuras</b>, después <b>Tomás</b> y, si queda tiempo, el <b>futbolista</b>.</p>
+    </div>
+    <div class="figbox"><svg class="g v" data-fig="torta" data-pulse="1" data-labels="2" data-dots="3" data-fold="4" aria-label="La torta: ejemplo paso a paso"></svg></div>
+  </section>
+
+  <section class="slide mintbg" data-steps="4" style="align-content:start">
+    <h2>Antes de entregar, revisa</h2>
+    <div class="col" style="gap:2.4cqw">
+      <div class="check st" data-s="1"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="#2A9D8F"/><path d="M6.5 12.5l3.5 3.5 7.5-8" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg><p>¿Cada esquina tiene su <b>pareja</b> al otro lado?</p></div>
+      <div class="check st" data-s="2"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="#2A9D8F"/><path d="M6.5 12.5l3.5 3.5 7.5-8" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg><p>¿Contaste <b>desde el eje</b>, no desde el borde?</p></div>
+      <div class="check st" data-s="3"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="#2A9D8F"/><path d="M6.5 12.5l3.5 3.5 7.5-8" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg><p>Si doblas por el eje, ¿las mitades <b>calzan</b>?</p></div>
+      <div class="check st" data-s="4"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="#2A9D8F"/><path d="M6.5 12.5l3.5 3.5 7.5-8" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg><p>¿Quedó <b>dada vuelta</b> como en un espejo, y no copiada igual?</p></div>
+    </div>
+  </section>
+
+  <section class="slide two" data-steps="2">
+    <div class="col">
+      <span class="eyebrow">Corrección · figura 1</span>
+      <h2>La torta</h2>
+      <p class="big st" data-s="1">Doblamos por el eje… ¿así te quedó?</p>
+      <p class="chip st" data-s="2">Revisa: la vela queda de <b>2 cuadros</b>, justo al centro.</p>
+    </div>
+    <div class="figbox"><svg class="g v" data-fig="torta" data-labels="2" data-fold="1" aria-label="Corrección de la torta"></svg></div>
+  </section>
+
+  <section class="slide two" data-steps="2">
+    <div class="col">
+      <span class="eyebrow">Corrección · figura 2</span>
+      <h2>El árbol</h2>
+      <p class="big st" data-s="1">Doblamos por el eje… ¿así te quedó?</p>
+      <p class="chip st" data-s="2">Cuenta cada escalón: ¿quedó a la <b>misma distancia</b> del eje?</p>
+    </div>
+    <div class="figbox"><svg class="g v" data-fig="arbol" data-labels="2" data-fold="1" aria-label="Corrección del árbol"></svg></div>
+  </section>
+
+  <section class="slide two" data-steps="2">
+    <div class="col">
+      <span class="eyebrow">Corrección · figura 3</span>
+      <h2>El pez</h2>
+      <p class="big st" data-s="1">Aquí el eje está <b>acostado</b>: la mitad se refleja <b>hacia abajo</b>.</p>
+      <p class="chip st" data-s="2">Cuenta los cuadraditos <b>hacia arriba</b> y <b>hacia abajo</b> del eje.</p>
+    </div>
+    <div class="figbox"><svg class="g h" data-fig="pez" data-labels="2" data-fold="1" aria-label="Corrección del pez"></svg></div>
+  </section>
+
+  <section class="slide two" data-steps="2">
+    <div class="col">
+      <span class="eyebrow">Corrección · figura 4</span>
+      <h2>El corazón</h2>
+      <p class="big st" data-s="1">Doblamos por el eje… ¿así te quedó?</p>
+      <p class="chip st" data-s="2">Ojo: la diagonal se inclina <b>al revés</b> al otro lado.</p>
+    </div>
+    <div class="figbox"><svg class="g v" data-fig="corazon" data-labels="2" data-fold="1" aria-label="Corrección del corazón"></svg></div>
+  </section>
+
+  <section class="slide dark two" data-steps="3">
+    <div class="col">
+      <h2>¿Está bien lo que hizo Tomás?</h2>
+      <p class="big soft">La parte negra ya estaba. La azul la dibujó Tomás.</p>
+      <p class="big st" data-s="1" style="color:var(--sun)"><b>Sí o no. ¿Por qué?</b></p>
+      <p class="big st" data-s="2">Doblemos por el eje: lo correcto es la línea <span style="color:#7FD4C8"><b>punteada</b></span>.</p>
+      <p class="chip st" data-s="3" style="color:var(--ink)"><b>No.</b> Tomás <b>copió</b> la mitad, no la <b>reflejó</b>. Si doblamos, no calza.</p>
+    </div>
+    <div class="figbox"><svg class="g v" data-fig="tomas" data-ghost="2" aria-label="El dibujo de Tomás"></svg></div>
+  </section>
+
+  <section class="slide mintbg two" data-steps="2">
+    <div class="col">
+      <span class="eyebrow">Bonus</span>
+      <h2>El futbolista</h2>
+      <p class="big st" data-s="1">Cada cuadradito: <b>mismo color</b> y <b>misma distancia</b> del eje.</p>
+      <p class="chip st" data-s="2" style="background:var(--white)">Revisa las <b>orejas</b>, las <b>manos</b> y las <b>piernas</b>.</p>
+    </div>
+    <div class="figbox" style="padding:1.2cqw 4cqw"><svg class="px hideR" data-pixel="1" data-fill="1" aria-label="Futbolista en pixel art"></svg></div>
+  </section>
+
+  <section class="slide sunbg" data-steps="1" style="align-content:center">
+    <span class="eyebrow" style="color:#5C3D05">Cierre</span>
+    <h2 style="font-size:6cqw">¿Cómo sé si una línea es eje de simetría?</h2>
+    <p class="big st" data-s="1" style="background:#FFF6DF;border-radius:1.8cqw;padding:2cqw 2.6cqw;font-size:3.4cqw">Si doblo la figura por esa línea y las dos mitades <b>calzan</b>.</p>
+  </section>
+
+</div>
+
+<div class="bar">
+  <button id="prev" aria-label="Anterior">←</button>
+  <span class="count" id="count">1 / 11</span>
+  <div class="prog"><i id="prog"></i></div>
+  <span class="hint">Clic o → para avanzar</span>
+  <button id="next" aria-label="Siguiente">→</button>
+  <button id="fs">Pantalla completa</button>
+</div>
+
+<script>
+const FIGS = {
+  torta:   { cols: 12, rows: 10, axis: ['v', 6], pts: [[6,1],[2,1],[2,4],[3,4],[3,6],[5,6],[5,8],[6,8]] },
+  arbol:   { cols: 12, rows: 10, axis: ['v', 6], pts: [[6,1],[5,1],[5,2],[2,2],[2,4],[3,4],[3,6],[4,6],[4,8],[5,8],[5,9],[6,9]] },
+  pez:     { cols: 12, rows: 10, axis: ['h', 5], pts: [[1,5],[1,8],[2,8],[2,7],[3,7],[3,6],[4,6],[4,8],[8,8],[8,7],[10,7],[10,6],[11,6],[11,5]] },
+  corazon: { cols: 12, rows: 10, axis: ['v', 6], pts: [[6,1],[2,5],[2,7],[3,8],[5,8],[6,7]] },
+  tomas:   { cols: 12, rows: 8,  axis: ['v', 6], pts: [[6,1],[2,1],[2,3],[4,3],[4,6],[6,6]] },
+};
+const NS = 'http://www.w3.org/2000/svg';
+const CS = 40, PAD = 30;
+function el(tag, attrs, parent) { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; }
+
+function buildFig(svg) {
+  const f = FIGS[svg.dataset.fig];
+  const W = f.cols*CS + 2*PAD, H = f.rows*CS + 2*PAD;
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  const X = x => PAD + x*CS, Y = y => PAD + (f.rows - y)*CS;
+  for (let i = 0; i <= f.cols; i++) el('line', { class: 'gl', x1: X(i), y1: Y(0), x2: X(i), y2: Y(f.rows) }, svg);
+  for (let j = 0; j <= f.rows; j++) el('line', { class: 'gl', x1: X(0), y1: Y(j), x2: X(f.cols), y2: Y(j) }, svg);
+  const [k, a] = f.axis;
+  const d = pts => 'M' + pts.map(p => `${X(p[0])} ${Y(p[1])}`).join(' L');
+  if (svg.dataset.fig === 'tomas') {
+    const tom = f.pts.map(p => [p[0] + 4, p[1]]).concat([[10, 1]]);
+    el('path', { class: 'tom', d: d(tom) }, svg);
+    const ref = f.pts.map(p => [2*a - p[0], p[1]]);
+    el('path', { class: 'ghost', d: d(ref) }, svg);
+  } else {
+    const g = el('g', { class: 'mir' }, svg);
+    g.style.transformOrigin = k === 'v' ? `${X(a)}px 0px` : `0px ${Y(a)}px`;
+    el('path', { d: d(f.pts) }, g);
+  }
+  el('path', { class: 'half', d: d(f.pts) }, svg);
+  // distancias al eje en cada esquina (izquierda/arriba) y su pareja
+  const seen = new Set();
+  f.pts.forEach(p => {
+    const dist = k === 'v' ? Math.abs(p[0] - a) : Math.abs(p[1] - a);
+    const key = p.join(',');
+    if (!dist || seen.has(key)) return; seen.add(key);
+    const q = k === 'v' ? [2*a - p[0], p[1]] : [p[0], 2*a - p[1]];
+    [[p, 'l'], [q, 'r']].forEach(([pt, side]) => {
+      const gg = el('g', { class: 'lab ' + side }, svg);
+      el('circle', { cx: X(pt[0]), cy: Y(pt[1]), r: 12 }, gg);
+      el('text', { x: X(pt[0]), y: Y(pt[1]) }, gg).textContent = dist;
+    });
+  });
+  const ax = k === 'v'
+    ? el('line', { class: 'axis', x1: X(a), y1: Y(0) + 18, x2: X(a), y2: Y(f.rows) - 18 }, svg)
+    : el('line', { class: 'axis', x1: X(0) - 18, y1: Y(a), x2: X(f.cols) + 18, y2: Y(a) }, svg);
+}
+
+const PAL = { K:'#1E1E1E', S:'#F6C9A0', B:'#2B2B2B', R:'#D7263D', W:'#FFFFFF', N:'#1F4E9C', M:'#B5303A' };
+const HALF = [
+ "...KKKK","..KBBBB",".KBBBBB",".KBBBBB",".KBSSSS",".KSSSSS","KSKSSKS","KSKSSKS",".KSSSSS",".KSSSSM",
+ "..KSSSS","...KKSS","..KRRRW",".KRRRRR","KRRKRRR","KSSKRRR",".KKNNNN","..KNNNN","..KWWK.","..KWWK.",".KKKKK.",
+];
+function buildPixel(svg) {
+  const cs = 26, hw = HALF[0].length, R = HALF.length + 2, C = 2*hw + 2;
+  svg.setAttribute('viewBox', `0 0 ${C*cs} ${R*cs}`);
+  HALF.forEach((line, r) => {
+    const full = line + [...line].reverse().join('');
+    [...full].forEach((ch, i) => {
+      if (ch === '.') return;
+      const right = i >= hw;
+      const rect = el('rect', { class: 'c' + (right ? ' r' : ''), x: (i+1)*cs, y: (r+1)*cs, width: cs, height: cs, fill: PAL[ch] }, svg);
+      if (right) rect.style.transitionDelay = ((i - hw) * 0.22 + r * 0.012) + 's';
+    });
+  });
+  for (let i = 0; i <= C; i++) el('line', { x1: i*cs, y1: 0, x2: i*cs, y2: R*cs, stroke: '#9AA7AF', 'stroke-width': 1 }, svg);
+  for (let j = 0; j <= R; j++) el('line', { x1: 0, y1: j*cs, x2: C*cs, y2: j*cs, stroke: '#9AA7AF', 'stroke-width': 1 }, svg);
+  el('line', { x1: (hw+1)*cs, y1: 4, x2: (hw+1)*cs, y2: R*cs - 4, stroke: '#E63946', 'stroke-width': 5, 'stroke-dasharray': '12 8' }, svg);
+}
+
+document.querySelectorAll('svg[data-fig]').forEach(buildFig);
+document.querySelectorAll('svg[data-pixel]').forEach(buildPixel);
+
+const slides = [...document.querySelectorAll('.slide')];
+let si = 0, step = 0;
+function render(animate) {
+  slides.forEach((s, i) => s.classList.toggle('on', i === si));
+  const s = slides[si];
+  s.querySelectorAll('[data-s]').forEach(e => e.classList.toggle('show', +e.dataset.s <= step));
+  s.querySelectorAll('svg.g').forEach(g => {
+    const at = n => g.dataset[n] !== undefined && step >= +g.dataset[n];
+    if (g.dataset.fold !== undefined) g.classList.toggle('folded', at('fold'));
+    g.classList.toggle('labels', at('labels'));
+    g.classList.toggle('dots', at('dots'));
+    g.classList.toggle('ghostshow', at('ghost'));
+    const axis = g.querySelector('.axis');
+    if (axis) { axis.classList.remove('pulse'); if (animate && g.dataset.pulse && +g.dataset.pulse === step) { void axis.getBBox(); axis.classList.add('pulse'); } }
+  });
+  s.querySelectorAll('svg.px').forEach(p => p.classList.toggle('hideR', !(step >= +p.dataset.fill)));
+  document.getElementById('count').textContent = `${si + 1} / ${slides.length}`;
+  document.getElementById('prog').style.width = ((si + 1) / slides.length * 100) + '%';
+}
+function next() {
+  const max = +slides[si].dataset.steps;
+  if (step < max) step++;
+  else if (si < slides.length - 1) { si++; step = 0; }
+  render(true);
+}
+function prev() {
+  if (step > 0) step--;
+  else if (si > 0) { si--; step = +slides[si].dataset.steps; }
+  render(false);
+}
+document.getElementById('stage').addEventListener('click', next);
+document.getElementById('next').addEventListener('click', next);
+document.getElementById('prev').addEventListener('click', prev);
+document.addEventListener('keydown', e => {
+  if (['ArrowRight', 'PageDown', ' ', 'Enter'].includes(e.key)) { e.preventDefault(); next(); }
+  if (['ArrowLeft', 'PageUp', 'Backspace'].includes(e.key)) { e.preventDefault(); prev(); }
+});
+document.getElementById('fs').addEventListener('click', () => {
+  try {
+    if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(() => {});
+    else document.exitFullscreen();
+  } catch (_) {}
+});
+render(false);
+</script>
+</body>
+</html>

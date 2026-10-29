@@ -1,0 +1,18 @@
+{
+  "cursos": [
+    { "id": "4basico", "nombre": "4.º básico", "asignatura": "Matemática" }
+  ],
+  "clases": [
+    {
+      "curso": "4basico",
+      "fecha": "2026-10-30",
+      "titulo": "Simetría y ejes de simetría",
+      "descripcion": "Completar figuras simétricas respecto de un eje. Presentación dinámica con corrección paso a paso.",
+      "carpeta": "4basico/2026-10-30-simetria/",
+      "materiales": [
+        { "nombre": "Presentación", "archivo": "index.html" },
+        { "nombre": "Guía (PDF)", "archivo": "guia.pdf" }
+      ]
+    }
+  ]
+}
