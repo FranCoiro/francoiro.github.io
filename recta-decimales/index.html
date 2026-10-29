@@ -1,0 +1,449 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Decimales en la recta</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Nunito:wght@400;700;800;900&display=swap">
+<style>
+/* Una sola pantalla para proyectar en sala: fase arriba, escena animada al centro, navegación abajo. Look único claro, pensado para proyector. */
+:root{
+  --bg:#FBF7EE; --card:#FFFFFF; --ink:#1F2A44; --muted:#4F5B73; --rule:#D9DEE6;
+  --blue:#2F6FB0; --blue-soft:#E3EDF8; --orange:#D9622B; --orange-ink:#B9501F; --orange-soft:#FBE3D3; --good:#2E7D4F;
+  --display:'Fredoka','Trebuchet MS',Arial,sans-serif; --body:'Nunito','Segoe UI',Arial,sans-serif;
+  color-scheme:light;
+}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);margin:0;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+#app{min-height:100%;max-width:1440px;margin:0 auto;display:grid;grid-template-rows:auto 1fr auto;gap:clamp(8px,1.6vh,18px);padding-block:clamp(10px,2.4vh,26px);box-sizing:border-box;height:100%}
+.top{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+.phase{font-weight:900;text-transform:uppercase;letter-spacing:.14em;font-size:clamp(12px,1.1vw,16px);color:var(--bg);background:var(--blue);padding:.3em .8em;border-radius:999px}
+.phase.cierre{background:var(--orange-ink)} .phase.inicio{background:var(--ink)}
+.eyebrow{font-weight:800;color:var(--muted);font-size:clamp(14px,1.3vw,20px)}
+#stage{min-height:0;position:relative;cursor:pointer;display:flex}
+.scene{flex:1;display:flex;flex-direction:column;justify-content:center;gap:clamp(8px,1.6vh,20px);min-width:0}
+.title{font-family:var(--display);font-weight:600;font-size:clamp(28px,4.2vw,68px);line-height:1.08;margin:0;text-wrap:balance}
+.title.huge{font-size:clamp(40px,7vw,120px)}
+svg.nl{width:100%;height:auto;max-height:44vh;display:block;overflow:visible}
+svg.nl[hidden]{display:none}
+.cap{font-size:clamp(18px,2.3vw,36px);line-height:1.35;color:var(--muted);margin:0;min-height:1.4em;max-width:60ch}
+.cap b{color:var(--ink)} .cap .cnt{color:var(--orange-ink);font-variant-numeric:tabular-nums}
+.big{font-family:var(--display);font-weight:600;font-size:clamp(40px,6vw,104px);line-height:1;color:var(--orange-ink);display:flex;align-items:baseline;gap:.4em;flex-wrap:wrap}
+.big small{font-family:var(--body);font-weight:800;font-size:.32em;color:var(--muted)}
+.extra{display:flex;gap:clamp(10px,1.4vw,22px);flex-wrap:wrap;align-items:stretch}
+.extra:empty{display:none}
+/* recta */
+.axis{fill:none;stroke:var(--ink);stroke-width:4;stroke-linecap:round}
+.head{fill:var(--ink)}
+.tick{stroke:var(--ink);stroke-width:4;transform-box:fill-box;transform-origin:center}
+.tick.minor{stroke-width:2.5}
+.tick.flash{stroke:var(--orange)}
+.lab{fill:var(--ink);font-family:var(--body);font-weight:900;font-size:32px;text-anchor:middle;transform-box:fill-box;transform-origin:center}
+.lab.sm{font-size:22px;font-weight:800}
+.lab.hi{fill:var(--blue)} .lab.or{fill:var(--orange-ink)}
+.mark{font-family:var(--display);font-weight:600;font-size:34px;text-anchor:middle;fill:var(--orange-ink);transform-box:fill-box;transform-origin:center}
+.mark.num{font-family:var(--body);font-weight:900;font-size:22px;fill:var(--blue)}
+.mark.val{font-family:var(--body);font-weight:900;font-size:21px;fill:var(--blue)}
+.mark.bl{fill:var(--blue)} .mark.letter{fill:var(--ink);font-size:30px}
+.mark.rt{text-anchor:end}
+.mark.bad{fill:var(--muted)} .mark.strike{text-decoration:line-through;fill:var(--orange-ink)}
+.arc{fill:none;stroke:var(--blue);stroke-width:3.5;stroke-linecap:round}
+.pt{fill:var(--orange);transform-box:fill-box;transform-origin:center}
+.pt.b{fill:var(--blue)}
+.frog{fill:var(--blue);stroke:var(--card);stroke-width:3;transform-box:fill-box;transform-origin:center bottom}
+.band{fill:var(--orange-soft);transform-box:fill-box;transform-origin:left center}
+.qtext{font-family:var(--body);font-weight:800;font-size:28px;fill:var(--ink)}
+/* piezas */
+.bubble{flex:1 1 260px;background:var(--blue-soft);border-radius:22px;padding:18px 26px;display:flex;flex-direction:column;gap:2px}
+.bubble.alt{background:var(--orange-soft)}
+.bubble span{font-weight:800;color:var(--muted);font-size:clamp(14px,1.4vw,22px)}
+.bubble strong{font-family:var(--display);font-weight:600;font-size:clamp(28px,3.6vw,56px);color:var(--blue)}
+.bubble.alt strong{color:var(--orange-ink)}
+.formula{font-family:var(--display);font-weight:600;font-size:clamp(36px,5vw,84px);display:flex;gap:.35em;align-items:baseline;background:var(--card);border:3px solid var(--rule);border-radius:22px;padding:.15em .6em}
+.formula span:last-child{color:var(--orange-ink)}
+.cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:clamp(10px,1.4vw,20px);width:100%}
+.card{background:var(--card);border:2px solid var(--rule);border-radius:22px;padding:clamp(14px,1.6vw,26px);display:flex;flex-direction:column;gap:8px;min-width:0}
+.card .n{font-family:var(--display);font-weight:600;font-size:clamp(34px,4vw,64px);line-height:1;color:var(--blue)}
+.card p{margin:0;font-weight:800;font-size:clamp(16px,1.9vw,28px);line-height:1.25}
+.card.last{background:var(--orange-soft);border-color:transparent}.card.last .n{color:var(--orange-ink)}
+@media (max-width:760px){.cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.objective{font-family:var(--display);font-weight:600;font-size:clamp(28px,4vw,64px);line-height:1.2;max-width:24ch}
+.caret{display:inline-block;width:.08em;height:.9em;background:var(--orange);margin-left:.06em;vertical-align:-.1em;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.chips{display:flex;gap:10px;flex-wrap:wrap}
+.chip{font-weight:800;font-size:clamp(14px,1.5vw,22px);padding:.45em .9em;border-radius:999px;background:var(--blue-soft);color:var(--ink);animation:cyc 8s infinite}
+.chip:nth-child(2){animation-delay:2s}.chip:nth-child(3){animation-delay:4s}.chip:nth-child(4){animation-delay:6s}
+@keyframes cyc{0%,22%{background:var(--blue);color:var(--card)}25%,100%{background:var(--blue-soft);color:var(--ink)}}
+.cmp{display:flex;gap:clamp(10px,1.6vw,26px);flex-wrap:wrap}
+.cmpi{font-family:var(--display);font-weight:600;font-size:clamp(26px,3.4vw,54px);background:var(--card);border:2px solid var(--rule);border-radius:18px;padding:.1em .5em;display:flex;gap:.3em;align-items:center}
+.cmpi .sg{display:inline-grid;place-items:center;width:1.2em;height:1.2em;border:3px solid var(--ink);border-radius:10px;color:var(--orange-ink)}
+.cmpi.on{border-color:var(--blue)}
+.ord{font-family:var(--display);font-weight:600;font-size:clamp(26px,3.4vw,54px);display:flex;gap:.4em;align-items:center;flex-wrap:wrap}
+.ord .lt{color:var(--orange-ink)}
+.idea{flex:1 1 100%;font-family:var(--display);font-weight:600;font-size:clamp(22px,3vw,46px);background:var(--ink);color:var(--bg);border-radius:20px;padding:.35em .8em}
+.fing{flex:1 1 200px;background:var(--card);border:2px solid var(--rule);border-radius:20px;padding:14px 20px;display:flex;align-items:center;gap:14px;font-weight:800;font-size:clamp(16px,1.8vw,26px)}
+.fing b{font-family:var(--display);font-size:2em;color:var(--blue)}
+/* temporizador */
+.timer{display:flex;align-items:center;gap:clamp(14px,2vw,30px);background:var(--card);border:2px solid var(--rule);border-radius:26px;padding:clamp(12px,1.6vw,24px) clamp(16px,2vw,30px)}
+.ring{width:clamp(110px,14vw,210px);height:auto;transform:rotate(-90deg)}
+.ring-bg{fill:none;stroke:var(--blue-soft);stroke-width:12}
+.ring-fg{fill:none;stroke:var(--blue);stroke-width:12;stroke-linecap:round;transition:stroke-dashoffset .3s linear}
+.timer.done .ring-fg{stroke:var(--orange)}
+.timer.done{animation:pulse 1.2s ease-in-out infinite}
+@keyframes pulse{50%{box-shadow:0 0 0 10px var(--orange-soft)}}
+.tbody{display:flex;flex-direction:column;gap:12px}
+.tnum{font-family:var(--display);font-weight:600;font-size:clamp(44px,6vw,100px);line-height:1;font-variant-numeric:tabular-nums}
+.tbtns{display:flex;gap:8px;flex-wrap:wrap}
+.tb{font:inherit;font-weight:800;font-size:clamp(14px,1.3vw,18px);border-radius:999px;padding:.5em 1.1em;border:2px solid var(--blue);background:var(--blue);color:var(--card);cursor:pointer}
+.tb.ghost{background:transparent;color:var(--blue)}
+/* barra inferior */
+.bar{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.prog{display:flex;gap:16px;flex:1;flex-wrap:wrap;min-width:0}
+.grp{display:flex;align-items:center;gap:6px}
+.grp span{font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-right:4px}
+.dot{width:12px;height:12px;border-radius:50%;border:0;padding:0;background:var(--rule);cursor:pointer}
+.dot.done{background:#9DB7D6}.dot.cur{background:var(--orange);transform:scale(1.3)}
+.stepn{font-weight:800;color:var(--muted);font-size:14px;font-variant-numeric:tabular-nums}
+.nav{font:inherit;font-weight:900;border-radius:999px;padding:.55em 1.2em;cursor:pointer;border:2px solid var(--blue);background:transparent;color:var(--blue);font-size:15px}
+.nav.primary{background:var(--blue);color:var(--card)}
+.nav:disabled{opacity:.35;cursor:default}
+button:focus-visible{outline:3px solid var(--orange);outline-offset:3px}
+@media (prefers-reduced-motion:reduce){.chip,.caret,.timer.done{animation:none}}
+</style>
+</head>
+<body>
+
+<div id="app">
+  <div class="top"><span class="phase" id="phase">Inicio</span><span class="eyebrow" id="eyebrow"></span></div>
+  <main id="stage" aria-live="polite"></main>
+  <div class="bar">
+    <div class="prog" id="prog"></div>
+    <span class="stepn" id="stepn"></span>
+    <button class="nav" id="full" type="button">Pantalla completa</button>
+    <button class="nav" id="prev" type="button">Anterior</button>
+    <button class="nav primary" id="next" type="button">Siguiente</button>
+  </div>
+</div>
+
+<script>
+/* ---------- motor de animación ---------- */
+const NS='http://www.w3.org/2000/svg';
+const REDUCE=matchMedia('(prefers-reduced-motion: reduce)').matches;
+let FAST=false; const PEND=new Set();
+const fast=()=>FAST||REDUCE;
+function A(el,kf,o={}){ if(!el) return Promise.resolve();
+  const a=el.animate(kf,{duration:fast()?0:(o.d??550),delay:fast()?0:(o.delay??0),easing:o.e??'cubic-bezier(.2,.8,.2,1)',fill:'both'});
+  return a.finished.catch(()=>{}); }
+function wait(ms){ if(fast()) return Promise.resolve();
+  return new Promise(r=>{ const f=()=>{clearTimeout(t);PEND.delete(f);r();}; const t=setTimeout(f,ms); PEND.add(f); }); }
+const easeIO=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
+function tween(d,fn,ease=easeIO){ if(fast()){fn(1);return Promise.resolve();}
+  return new Promise(r=>{ const s=performance.now(); const f=now=>{ if(fast()){fn(1);r();return;} const t=Math.min(1,(now-s)/d); fn(ease(t)); t<1?requestAnimationFrame(f):r(); }; requestAnimationFrame(f); }); }
+function skip(){ FAST=true; document.getAnimations().forEach(a=>{ try{ if(a.effect && a.effect.getTiming().iterations!==Infinity) a.finish(); }catch(e){} }); [...PEND].forEach(f=>f()); }
+function mk(tag,attrs,parent){ const e=document.createElementNS(NS,tag); for(const k in attrs) e.setAttribute(k,attrs[k]); if(parent) parent.appendChild(e); return e; }
+const R=v=>Math.round(v*1e6)/1e6;
+function fmt(v){ const x=R(v); if(Number.isInteger(x)) return String(x); const d=Math.abs(x*10-Math.round(x*10))<1e-6?1:2; return x.toFixed(d).replace('.',','); }
+function vals(a,b,n){ return Array.from({length:n+1},(_,i)=>R(a+(b-a)*i/n)); }
+const pop=el=>A(el,[{opacity:0,transform:'scale(.3)'},{opacity:1,transform:'scale(1)'}],{d:420,e:'cubic-bezier(.34,1.56,.64,1)'});
+
+/* ---------- recta numérica ---------- */
+let UID=0;
+class NL{
+  constructor(svg,a,b,y=150){ this.svg=svg;this.a=a;this.b=b;this.y=y;this.x0=90;this.x1=910;this.items=[];this.frog=null;this.frogV=a;
+    const id='clip'+(++UID); const defs=mk('defs',{},svg); const cp=mk('clipPath',{id},defs); mk('rect',{x:16,y:y-150,width:968,height:260},cp);
+    this.g=mk('g',{'clip-path':`url(#${id})`},svg);
+    ['band','axis','arc','tick','lab','pt','mark','frog'].forEach(k=>this[k+'G']=mk('g',{},this.g)); }
+  X(v){ return this.x0+(v-this.a)/(this.b-this.a)*(this.x1-this.x0); }
+  reg(el,o){ const it=Object.assign({el,dx:0},o); this.items.push(it); this.place(it); return it; }
+  place(it){ const el=it.el; switch(it.k){
+    case 'tick':{const x=this.X(it.v);el.setAttribute('x1',x);el.setAttribute('x2',x);break;}
+    case 'lab': case 'mark': el.setAttribute('x',this.X(it.v)+it.dx); break;
+    case 'pt': el.setAttribute('cx',this.X(it.v)); break;
+    case 'band':{const x1=this.X(it.v1),x2=this.X(it.v2);el.setAttribute('x',x1);el.setAttribute('width',Math.max(0,x2-x1));break;}
+    case 'arc': el.setAttribute('d',this.arcD(it.v1,it.v2)); break; } }
+  placeAll(){ this.items.forEach(it=>this.place(it)); }
+  hgt(x1,x2){ return Math.min(70,Math.abs(x2-x1)*.5)+8; }
+  arcD(v1,v2){ const x1=this.X(v1),x2=this.X(v2),y=this.y-14,h=this.hgt(x1,x2); return `M${x1+4} ${y}Q${(x1+x2)/2} ${y-2*h} ${x2-4} ${y}`; }
+  async axis(d=650){ const y=this.y;
+    const p=mk('path',{class:'axis',d:`M${this.x0-55} ${y}H${this.x1+55}`,pathLength:1,'stroke-dasharray':1},this.axisG);
+    const h2=mk('path',{class:'head',d:`M${this.x0-72} ${y}l20 -12v24z`},this.axisG);
+    const h1=mk('path',{class:'head',d:`M${this.x1+72} ${y}l-20 -12v24z`},this.axisG);
+    A(h2,[{opacity:0},{opacity:1}],{d:200});
+    await A(p,[{strokeDashoffset:1},{strokeDashoffset:0}],{d,e:'ease-in-out'});
+    await A(h1,[{opacity:0},{opacity:1}],{d:200}); }
+  tick(v,minor){ return this.reg(mk('line',{class:'tick'+(minor?' minor':''),y1:this.y-(minor?11:18),y2:this.y+(minor?11:18)},this.tickG),{k:'tick',v}); }
+  async ticks(list,{stagger=50,minor=()=>false}={}){ const its=list.map((v,i)=>this.tick(v,minor(v,i)));
+    await Promise.all(its.map((it,i)=>A(it.el,[{transform:'scaleY(0)'},{transform:'scaleY(1)'}],{d:300,delay:i*stagger}))); return its; }
+  lab(v,txt,cls='',dy=58){ const t=mk('text',{class:'lab '+cls,y:this.y+dy},this.labG); t.textContent=txt; return this.reg(t,{k:'lab',v}); }
+  async labs(list,{stagger=60}={}){ const its=list.map(([v,txt,cls,dy])=>this.lab(v,txt,cls,dy));
+    await Promise.all(its.map((it,i)=>A(it.el,[{opacity:0,transform:'translateY(12px)'},{opacity:1,transform:'none'}],{d:350,delay:i*stagger}))); return its; }
+  mark(v,txt,cls='',dy=-70,dx=0){ const t=mk('text',{class:'mark '+cls,y:this.y+dy},this.markG); t.textContent=txt; const it=this.reg(t,{k:'mark',v,dx}); pop(t); return it; }
+  async point(v,cls=''){ const c=mk('circle',{class:'pt '+cls,cy:this.y,r:13},this.ptG); const it=this.reg(c,{k:'pt',v});
+    await A(c,[{transform:'translateY(-140px)',opacity:0},{transform:'translateY(0)',opacity:1,offset:.65},{transform:'translateY(-16px)',offset:.82},{transform:'translateY(0)',opacity:1}],{d:750,e:'ease-in'}); return it; }
+  async band(v1,v2){ const r=mk('rect',{class:'band',y:this.y-62,height:124,rx:12},this.bandG); const it=this.reg(r,{k:'band',v1,v2});
+    await A(r,[{transform:'scaleX(0)'},{transform:'scaleX(1)'}],{d:700}); return it; }
+  async arc(v1,v2,d=420){ const p=mk('path',{class:'arc',pathLength:1,'stroke-dasharray':1},this.arcG); const it=this.reg(p,{k:'arc',v1,v2});
+    await A(p,[{strokeDashoffset:1},{strokeDashoffset:0}],{d}); return it; }
+  async arcs(list,{stagger=70,d=260}={}){ const ps=[]; for(let i=0;i<list.length-1;i++){ ps.push(this.arc(list[i],list[i+1],d)); await wait(stagger);} await Promise.all(ps); }
+  frogAt(v){ if(!this.frog) this.frog=mk('circle',{class:'frog',r:12},this.frogG); this.frog.setAttribute('cx',this.X(v)); this.frog.setAttribute('cy',this.y); this.frogV=v; pop(this.frog); }
+  async hop(v2,{d=460,arc=true}={}){ if(!this.frog) this.frogAt(this.a); const v1=this.frogV,x1=this.X(v1),x2=this.X(v2),y=this.y,h=this.hgt(x1,x2);
+    if(arc) this.arc(v1,v2,d);
+    const f=this.frog;
+    await tween(d,t=>{ const u=1-t; f.setAttribute('cx',u*u*x1+2*u*t*(x1+x2)/2+t*t*x2); f.setAttribute('cy',u*u*y+2*u*t*(y-14-2*h)+t*t*y); },t=>t);
+    this.frogV=v2; A(f,[{transform:'scale(1.35,.65)'},{transform:'scale(1)'}],{d:240}); }
+  async hopTo(target,step,o={}){ let v=this.frogV; while(R(v)<R(target)-1e-9){ v=R(v+step); await this.hop(v,o); if(o.each) o.each(v); } }
+  async clear(kinds){ const rm=this.items.filter(it=>kinds.includes(it.k));
+    await Promise.all(rm.map(it=>A(it.el,[{opacity:1},{opacity:0}],{d:250}))); rm.forEach(it=>it.el.remove()); this.items=this.items.filter(it=>!rm.includes(it));
+    if(kinds.includes('frog')&&this.frog){ this.frog.remove(); this.frog=null; } }
+  async zoomTo(a2,b2,d=1800){ const a1=this.a,b1=this.b; await tween(d,t=>{ this.a=a1+(a2-a1)*t; this.b=b1+(b2-b1)*t; this.placeAll(); }); }
+}
+
+/* ---------- ayudas de escena ---------- */
+async function line(c,a,b,n,o={}){ const nl=new NL(c.svg,a,b,o.y??c.ly); if(!o.keep) c.nl=nl;
+  await nl.axis(o.d??600);
+  const vs=vals(a,b,n);
+  const minorEvery=o.minorEvery||0;
+  const isMinor=(v,i)=>minorEvery?(i%minorEvery!==0):false;
+  await nl.ticks(vs,{stagger:o.stagger??(n>20?12:45),minor:isMinor});
+  let L=[];
+  if(o.labels==='all') L=vs; else if(o.labels==='majors') L=vs.filter((v,i)=>i%minorEvery===0); else if(Array.isArray(o.labels)) L=o.labels; else if(o.labels!=='none') L=[a,b];
+  await nl.labs(L.map(v=>[v,fmt(v),o.labCls||'']));
+  return nl; }
+function clearSvg(c){ c.svg.innerHTML=''; c.nl=null; }
+async function swap(el,html){ if(el.innerHTML.trim()) await A(el,[{opacity:1},{opacity:0}],{d:160}); el.innerHTML=html;
+  await A(el,[{opacity:0,transform:'translateY(10px)'},{opacity:1,transform:'none'}],{d:360}); }
+const say=(c,html)=>swap(c.cap,html);
+const setTitle=(c,t)=>swap(c.title,t);
+async function big(c,html){ c.big.hidden=false; c.big.innerHTML=html; await A(c.big,[{opacity:0,transform:'scale(.6)'},{opacity:1,transform:'scale(1)'}],{d:500,e:'cubic-bezier(.34,1.56,.64,1)'}); }
+async function add(c,html,how='rise'){ const t=document.createElement('template'); t.innerHTML=html.trim(); const el=t.content.firstElementChild; c.extra.appendChild(el);
+  const kf=how==='pop'?[{opacity:0,transform:'scale(.6)'},{opacity:1,transform:'scale(1)'}]:how==='left'?[{opacity:0,transform:'translateX(-40px)'},{opacity:1,transform:'none'}]:[{opacity:0,transform:'translateY(24px)'},{opacity:1,transform:'none'}];
+  await A(el,kf,{d:480}); return el; }
+async function formula(c,parts){ const el=await add(c,`<div class="formula">${parts.map(p=>`<span style="opacity:0">${p}</span>`).join('')}</div>`,'pop');
+  for(const s of el.children){ await A(s,[{opacity:0,transform:'translateY(14px)'},{opacity:1,transform:'none'}],{d:380}); await wait(220); } return el; }
+async function typeText(el,txt){ if(fast()){ el.textContent=txt; return; } for(let i=1;i<=txt.length;i++){ el.textContent=txt.slice(0,i); await wait(32); } }
+const bubble=(who,what,alt)=>`<div class="bubble ${alt?'alt':''}"><span>${who}</span><strong>${what}</strong></div>`;
+function onlyLabs(nl,pred){ return nl.items.filter(it=>it.k==='lab'&&pred(it)); }
+
+/* ---------- temporizador ---------- */
+const TIMERS={};
+function timer(c,id,min){ const T=TIMERS[id]??(TIMERS[id]={total:min*60,left:min*60,run:false,last:Date.now()});
+  const t=document.createElement('template');
+  t.innerHTML=`<div class="timer" data-id="${id}"><svg viewBox="0 0 120 120" class="ring" aria-hidden="true"><circle cx="60" cy="60" r="52" class="ring-bg"/><circle cx="60" cy="60" r="52" class="ring-fg" pathLength="1" stroke-dasharray="1"/></svg><div class="tbody"><div class="tnum" role="timer"></div><div class="tbtns"><button type="button" class="tb" id="t-${id}-go" data-a="toggle">Iniciar</button><button type="button" class="tb ghost" id="t-${id}-m" data-a="minus">−1 min</button><button type="button" class="tb ghost" id="t-${id}-p" data-a="plus">+1 min</button><button type="button" class="tb ghost" id="t-${id}-r" data-a="reset">Reiniciar</button></div></div></div>`;
+  const el=t.content.firstElementChild; c.extra.appendChild(el);
+  el.addEventListener('click',e=>{ e.stopPropagation(); const b=e.target.closest('button'); if(!b) return; const a=b.dataset.a;
+    if(a==='toggle'){ T.run=!T.run; T.last=Date.now(); if(T.left<=0){ T.left=T.total; T.run=true; } }
+    if(a==='minus'){ T.total=Math.max(60,T.total-60); T.left=Math.max(0,T.left-60); }
+    if(a==='plus'){ T.total+=60; T.left+=60; }
+    if(a==='reset'){ T.left=T.total; T.run=false; }
+    paintTimers(); });
+  paintTimers(); A(el,[{opacity:0,transform:'translateY(24px)'},{opacity:1,transform:'none'}],{d:480}); return el; }
+function paintTimers(){ document.querySelectorAll('.timer').forEach(el=>{ const T=TIMERS[el.dataset.id]; const s=Math.ceil(T.left);
+  el.querySelector('.tnum').textContent=`${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;
+  el.querySelector('.ring-fg').style.strokeDashoffset=String(1-T.left/T.total);
+  el.querySelector('[data-a=toggle]').textContent=T.run?'Pausar':(T.left<=0?'Otra vez':(T.left<T.total?'Seguir':'Iniciar'));
+  el.classList.toggle('done',T.left<=0); }); }
+setInterval(()=>{ const now=Date.now(); Object.values(TIMERS).forEach(T=>{ if(T.run){ T.left=Math.max(0,T.left-(now-T.last)/1000); if(T.left<=0) T.run=false; } T.last=now; }); paintTimers(); },250);
+
+/* ---------- escenas ---------- */
+const S=(phase,eyebrow,title,steps,opt={})=>({phase,eyebrow,title,steps,opt});
+
+function corr(k,a,b,n,salto,pre,solve,extra={}){
+  return S('Desarrollo','Corrección',`Ítem ${k}`,[
+    async c=>{ const nl=await line(c,a,b,n,extra); if(pre) await pre(c,nl); await say(c,'Primero: ¿cuánto vale cada salto?'); },
+    async c=>{ const v=vals(a,b,n); await c.nl.arc(v[0],v[1]); c.nl.mark((v[0]+v[1])/2,salto,'val',-74); await say(c,`Cada salto vale <b>${salto}</b>.`); },
+    async c=>{ await solve(c,c.nl); }
+  ]);
+}
+
+const SCENES=[
+  S('Inicio','Matemática · 4.º básico','La recta numérica',[
+    async c=>{ c.title.classList.add('huge'); await say(c,'Hoy: <b>números decimales</b>, décimos y centésimos.');
+      const nl=await line(c,0,1,10); nl.frogAt(0); for(const v of [0.1,0.2,0.3]) await nl.hop(v,{d:380}); }
+  ]),
+  S('Inicio','Objetivo','Escribe el objetivo en tu cuaderno',[
+    async c=>{ const el=await add(c,'<div class="objective"><span class="typed"></span><span class="caret"></span></div>','left');
+      await typeText(el.querySelector('.typed'),'Ubicar e identificar números decimales (décimos y centésimos) en la recta numérica.'); }
+  ],{noSvg:true}),
+  S('Desarrollo','Explicación','¿Qué número es el punto?',[
+    async c=>{ const nl=await line(c,0,1,10); await nl.point(0.7); nl.mark(0.7,'?','',-56); },
+    async c=>{ await add(c,bubble('Tomás dice','“Es el 7”'),'left'); },
+    async c=>{ await add(c,bubble('Sofía dice','“Es el 0,7”',true),'left'); await say(c,'¿Quién tiene razón? Llamemos al <b>Detective de la escala</b>.'); }
+  ]),
+  S('Desarrollo','Explicación · Paso 1','Miro los números que conozco',[
+    async c=>{ const nl=await line(c,0,1,10,{d:350,stagger:20}); await nl.point(0.7); },
+    async c=>{ for(const it of onlyLabs(c.nl,()=>true)){ it.el.classList.add('hi'); await A(it.el,[{transform:'scale(1)'},{transform:'scale(1.7)'},{transform:'scale(1.3)'}],{d:650}); }
+      await say(c,'La recta va de <b>0</b> a <b>1</b>.'); },
+    async c=>{ await c.nl.band(0,1); await say(c,'El punto está entre el 0 y el 1. Entonces <b>no puede ser el 7</b>.'); }
+  ]),
+  S('Desarrollo','Explicación · Paso 2','Cuento los saltos, no las rayitas',[
+    async c=>{ const nl=await line(c,0,1,10,{d:350,stagger:20}); await nl.point(0.7); },
+    async c=>{ await say(c,'Rayitas: <b class="cnt">0</b>'); const cnt=c.cap.querySelector('.cnt'); const ts=c.nl.items.filter(i=>i.k==='tick');
+      for(let i=0;i<ts.length;i++){ ts[i].el.classList.add('flash'); A(ts[i].el,[{transform:'scaleY(1.7)'},{transform:'scaleY(1)'}],{d:300}); cnt.textContent=i+1; await wait(190); }
+      await wait(300); ts.forEach(t=>t.el.classList.remove('flash')); await say(c,'Hay <b>11 rayitas</b>…'); },
+    async c=>{ await say(c,'Saltos: <b class="cnt">0</b>'); const cnt=c.cap.querySelector('.cnt'); const v=vals(0,1,10);
+      for(let i=0;i<10;i++){ await c.nl.arc(v[i],v[i+1],230); c.nl.mark((v[i]+v[i+1])/2,String(i+1),'num',-76); cnt.textContent=i+1; }
+      await wait(300); await say(c,'…pero entre el 0 y el 1 hay <b>10 saltos</b>.'); }
+  ]),
+  S('Desarrollo','Explicación · Paso 3','¿Cuánto vale cada salto?',[
+    async c=>{ const nl=await line(c,0,1,10,{d:350,stagger:20}); await nl.point(0.7); await nl.arcs(vals(0,1,10),{stagger:40}); },
+    async c=>{ await say(c,'Del 0 al 1 hay <b>10 saltos iguales</b>. Cada salto es <b>un décimo</b>.'); await formula(c,['1 salto','=','0,1']); },
+    async c=>{ const v=vals(0,1,10); for(let i=0;i<10;i++){ c.nl.mark((v[i]+v[i+1])/2,'0,1','val',-76); await wait(110); }
+      await say(c,'Todos los saltos valen lo mismo: <b>0,1</b>.'); }
+  ]),
+  S('Desarrollo','Explicación · Paso 4','Avanzo de salto en salto',[
+    async c=>{ const nl=await line(c,0,1,10,{d:350,stagger:20}); await nl.point(0.7); nl.frogAt(0); await say(c,'Partimos en el 0.'); },
+    async c=>{ const nl=c.nl; const v=vals(0,1,10);
+      for(let i=1;i<=7;i++){ await nl.hop(v[i],{d:440}); const it=nl.lab(v[i],fmt(v[i]),i===7?'or':''); pop(it.el); c.cap.innerHTML=`${i} ${i===1?'salto':'saltos'}: <b class="cnt">${fmt(v[i])}</b>`; await wait(120); } },
+    async c=>{ await big(c,'0,7 <small>siete décimos</small>'); await say(c,'<b>Sofía tiene razón.</b>'); }
+  ]),
+  S('Desarrollo','Explicación · Centésimos','¿Qué hay entre 0,7 y 0,8?',[
+    async c=>{ await line(c,0,1,10,{labels:'all',labCls:'sm'}); },
+    async c=>{ await c.nl.band(0.7,0.8); await say(c,'Miremos con lupa el tramo entre <b>0,7</b> y <b>0,8</b>.'); },
+    async c=>{ await say(c,'Hacemos zoom…'); await c.nl.zoomTo(0.7,0.8,2000); await setTitle(c,'Entre dos décimos hay centésimos'); },
+    async c=>{ const nl=c.nl; const v=vals(0.7,0.8,10).slice(1,-1); await nl.ticks(v,{stagger:70,minor:()=>true}); await nl.labs(v.map(x=>[x,fmt(x),'sm']),{stagger:50});
+      await say(c,'Aparecen <b>10 saltos más</b>. Cada uno vale <b>0,01</b>: un centésimo.'); },
+    async c=>{ const nl=c.nl; await nl.point(0.72); nl.frogAt(0.7); await nl.hop(0.71,{d:380}); await nl.hop(0.72,{d:380});
+      await big(c,'0,72 <small>setenta y dos centésimos</small>'); }
+  ]),
+  S('Desarrollo','Explicación · Comparar','¿Cuál es mayor: 0,89 o 0,9?',[
+    async c=>{ await line(c,0.8,0.9,10); await say(c,'Piensa antes de mirar: ¿cuál queda más a la derecha?'); },
+    async c=>{ await c.nl.point(0.89,'b'); c.nl.mark(0.89,'0,89','bl',-58); },
+    async c=>{ await c.nl.point(0.9); c.nl.mark(0.9,'0,9 = 0,90','rt',-104,22); await say(c,'0,9 es lo mismo que <b>0,90</b>.'); },
+    async c=>{ await c.nl.band(0.8,0.9); await big(c,'0,89 &lt; 0,9 <small>más a la derecha, mayor</small>'); }
+  ]),
+  S('Desarrollo','Explicación · Resumen','Detective de la escala',[
+    async c=>{ const el=await add(c,`<div class="cards"><div class="card"><span class="n">1</span><p>Miro los números que ya conozco.</p></div><div class="card"><span class="n">2</span><p>Cuento los saltos, no las rayitas.</p></div><div class="card"><span class="n">3</span><p>Me fijo cuánto vale cada salto: un décimo o un centésimo.</p></div><div class="card last"><span class="n">4</span><p>Avanzo de salto en salto.</p></div></div>`,'rise');
+      const cards=[...el.children]; cards.forEach(k=>k.style.opacity=0);
+      for(const k of cards){ await A(k,[{opacity:0,transform:'translateY(30px) rotate(-2deg)'},{opacity:1,transform:'none'}],{d:420}); }
+      await say(c,'Usa estos 4 pasos en la guía.'); }
+  ],{noSvg:true}),
+  S('Desarrollo','Ejercitación','Guía · ítems 1 a 5',[
+    async c=>{ await say(c,'Individual y en silencio. Antes de ubicar, escribe <b>cuánto vale cada salto</b>.');
+      await add(c,'<div class="chips"><span class="chip">1 · Miro</span><span class="chip">2 · Cuento saltos</span><span class="chip">3 · ¿Cuánto vale?</span><span class="chip">4 · Avanzo</span></div>','rise');
+      timer(c,'g1',15); }
+  ],{noSvg:true}),
+  corr(1,0,1,10,'0,1',
+    async (c,nl)=>{ await nl.point(0.3); nl.mark(0.3,'A','letter',-50); await nl.point(0.8); nl.mark(0.8,'B','letter',-50); },
+    async (c,nl)=>{ await nl.clear(['mark']); nl.frogAt(0);
+      await nl.hopTo(0.3,0.1); pop(nl.lab(0.3,'0,3','or').el); nl.mark(0.3,'A','letter',-50);
+      await nl.hopTo(0.8,0.1); pop(nl.lab(0.8,'0,8','or').el); nl.mark(0.8,'B','letter',-50);
+      await say(c,'<b>A = 0,3</b> · <b>B = 0,8</b>'); }),
+  corr(2,1,2,10,'0,1',null,
+    async (c,nl)=>{ nl.frogAt(1); await nl.hopTo(1.4,0.1); await nl.point(1.4); pop(nl.lab(1.4,'1,4','or').el);
+      await nl.hopTo(1.9,0.1); await nl.point(1.9); pop(nl.lab(1.9,'1,9','or').el);
+      await say(c,'<b>1,4</b> en la 4.ª marca · <b>1,9</b> en la 9.ª marca'); }),
+  corr(3,0.5,0.6,10,'0,01',
+    async (c,nl)=>{ await nl.point(0.58); nl.mark(0.58,'C','letter',-50); },
+    async (c,nl)=>{ await nl.clear(['mark']); nl.frogAt(0.5); await nl.hopTo(0.53,0.01); await nl.point(0.53,'b'); pop(nl.lab(0.53,'0,53','or sm').el);
+      await nl.hopTo(0.58,0.01); pop(nl.lab(0.58,'0,58','or sm').el); nl.mark(0.58,'C','letter',-50);
+      await say(c,'<b>0,53</b> en la 3.ª marca · <b>C = 0,58</b>'); }),
+  corr(4,3,4,10,'0,1',
+    async (c,nl)=>{ await nl.point(3.2); nl.mark(3.2,'D','letter',-50); },
+    async (c,nl)=>{ await nl.clear(['mark']); nl.frogAt(3); await nl.hopTo(3.2,0.1); pop(nl.lab(3.2,'3,2','or').el); nl.mark(3.2,'D','letter',-50);
+      await nl.hopTo(3.8,0.1,{d:340}); await nl.point(3.8,'b'); pop(nl.lab(3.8,'3,8','or').el);
+      await say(c,'<b>D = 3,2</b> · <b>3,8</b> en la 8.ª marca'); }),
+  corr(5,0,2,20,'0,1',null,
+    async (c,nl)=>{ nl.frogAt(0); await nl.hopTo(0.5,0.1,{d:300}); await nl.point(0.5); pop(nl.lab(0.5,'0,5','or sm').el);
+      await nl.hopTo(1.3,0.1,{d:240}); await nl.point(1.3); pop(nl.lab(1.3,'1,3','or sm').el);
+      await say(c,'Aunque la recta llega al 2, cada salto sigue valiendo 0,1: <b>0,5</b> y <b>1,3</b>.'); }),
+  S('Desarrollo','Pausa activa','La recta en el cuerpo',[
+    async c=>{ const s=c.svg; s.setAttribute('viewBox','0 0 1000 340'); const X=420,Y=v=>310-280*v;
+      const p=mk('path',{class:'axis',d:`M${X} 320V20`,pathLength:1,'stroke-dasharray':1},s);
+      await A(p,[{strokeDashoffset:1},{strokeDashoffset:0}],{d:700});
+      for(const [v,t] of [[0,'0 · abajo'],[0.5,'0,5 · al frente'],[1,'1 · arriba']]){ mk('line',{class:'tick',x1:X-18,x2:X+18,y1:Y(v),y2:Y(v)},s); const tx=mk('text',{class:'qtext',x:X-36,y:Y(v)+10,'text-anchor':'end'},s); tx.textContent=t; pop(tx); await wait(150); }
+      c.pv={X,Y,dot:mk('circle',{class:'pt',cx:X,cy:Y(0),r:16},s),num:mk('text',{class:'mark',x:640,y:200,style:'font-size:120px'},s),v:0};
+      await say(c,'De pie en tu puesto. <b>Tu brazo es la recta</b>: muévelo al número que aparece.'); },
+    ...[0.5,1,0,0.9,0.1,0.25,0.75].map(v=>async c=>{ const P=c.pv; const y0=+P.dot.getAttribute('cy'),y1=P.Y(v);
+      P.num.textContent=fmt(v); pop(P.num);
+      await tween(700,t=>P.dot.setAttribute('cy',y0+(y1-y0)*t)); })
+  ],{h:340}),
+  S('Desarrollo','Retomamos','Guía · ítems 6 a 8',[
+    async c=>{ await say(c,'Compara, ordena y resuelve. <b>Justifica con la recta.</b>'); timer(c,'g2',10); }
+  ],{noSvg:true}),
+  S('Desarrollo','Corrección','Ítem 6 · Compara',[
+    async c=>{ await add(c,'<div class="cmp"><div class="cmpi">0,4 <span class="sg"></span> 0,40</div><div class="cmpi">0,7 <span class="sg"></span> 0,65</div><div class="cmpi">1,2 <span class="sg"></span> 1,09</div></div>','rise'); },
+    ...[[0,1,10,0.4,0.4,'0,4','0,40','=','majorsAll'],[0.6,0.8,20,0.7,0.65,'0,7','0,65','>',''],[1,1.3,30,1.2,1.09,'1,2','1,09','>','']].map(([a,b,n,p1,p2,t1,t2,sg],k)=>async c=>{
+      clearSvg(c); const cards=c.extra.querySelectorAll('.cmpi'); cards.forEach(x=>x.classList.remove('on')); cards[k].classList.add('on');
+      const nl=await line(c,a,b,n,{labels:'majors',minorEvery:10,labCls:'sm'});
+      await nl.point(p1,'b'); nl.mark(p1,t1,'bl',-58); await nl.point(p2); nl.mark(p2,t2,'',-104);
+      const s=cards[k].querySelector('.sg'); s.textContent=sg; await pop(s); })
+  ]),
+  S('Desarrollo','Corrección','Ítem 7 · Ordena',[
+    async c=>{ await line(c,0,0.4,40,{labels:'majors',minorEvery:10,labCls:'sm'}); await say(c,'0,3 · 0,03 · 0,33 · 0,13'); },
+    async c=>{ const nl=c.nl; let h=-58; for(const v of [0.03,0.13,0.3,0.33]){ await nl.point(v,'b'); nl.mark(v,fmt(v),'bl',h); h=h===-58?-104:-58; } },
+    async c=>{ await add(c,'<div class="ord"><span>0,03</span><span class="lt">&lt;</span><span>0,13</span><span class="lt">&lt;</span><span>0,3</span><span class="lt">&lt;</span><span>0,33</span></div>','left'); await say(c,'0,3 es lo mismo que <b>0,30</b>.'); }
+  ]),
+  S('Desarrollo','Corrección','Ítem 8 · Salto largo',[
+    async c=>{ await line(c,1,2,10); await say(c,'Camila saltó <b>1,45 m</b> y Diego <b>1,5 m</b>.'); },
+    async c=>{ await c.nl.point(1.45,'b'); c.nl.mark(1.45,'Camila 1,45','bl',-58); },
+    async c=>{ await c.nl.point(1.5); c.nl.mark(1.5,'Diego 1,5','',-104); },
+    async c=>{ await big(c,'Diego saltó más <small>1,5 = 1,50 y queda más a la derecha</small>'); }
+  ]),
+  S('Cierre','Cierre','Volvamos a la pregunta: ¿7 o 0,7?',[
+    async c=>{ const nl=await line(c,0,1,10,{d:350,stagger:20}); await nl.point(0.7); nl.frogAt(0); await nl.hopTo(0.7,0.1,{d:260}); pop(nl.lab(0.7,'0,7','or').el); },
+    async c=>{ await add(c,'<div class="idea">Primero descubro la escala, después ubico.</div>','left'); },
+    async c=>{ await add(c,'<div class="idea">Entre dos décimos hay centésimos.</div>','left'); },
+    async c=>{ await add(c,'<div class="idea">Más a la derecha, mayor es el número.</div>','left'); },
+    async c=>{ c.extra.innerHTML=''; clearSvg(c); c.svg.hidden=true; await setTitle(c,'¿Cómo me fue hoy?');
+      for(const [n,t] of [['1','Necesito ayuda'],['2','Casi lo logro'],['3','Puedo explicarlo a otro']]) await add(c,`<div class="fing"><b>${n}</b>${t}</div>`,'pop'); }
+  ]),
+  S('Cierre','Cierre · Desafío','¿Dónde empieza mi recta?',[
+    async c=>{ const nl=await line(c,0.4,1.4,10,{labels:'none'}); c.q=nl.lab(0.4,'?','or'); pop(c.q.el); await nl.point(0.8); nl.mark(0.8,'0,8','',-56);
+      await say(c,'Cada salto vale <b>0,1</b>. El <b>0,8</b> está a 4 saltos del comienzo. ¿En qué número empieza la recta?'); },
+    async c=>{ await add(c,'<div class="chips"><span class="chip">Parte en el 0,8</span><span class="chip">Salta hacia atrás</span><span class="chip">Cuenta 4 saltos</span></div>','rise'); },
+    async c=>{ const nl=c.nl; nl.frogAt(0.8);
+      for(const v of [0.7,0.6,0.5]){ await nl.hop(v,{d:500}); pop(nl.lab(v,fmt(v),'sm').el); }
+      await nl.hop(0.4,{d:500}); c.q.el.textContent='0,4'; pop(c.q.el);
+      await big(c,'Empieza en 0,4 <small>4 saltos hacia atrás desde 0,8</small>'); }
+  ]),
+  S('Cierre','Ticket de salida','Responde en tu ticket',[
+    async c=>{ const q=mk('text',{class:'qtext',x:40,y:40},c.svg); q.textContent='1. ¿Qué número es el punto? ¿Cuánto vale cada salto?'; pop(q);
+      const nl=await line(c,0,1,10,{y:130,keep:true}); await nl.point(0.6); },
+    async c=>{ const q=mk('text',{class:'qtext',x:40,y:250},c.svg); q.textContent='2. Ubica el 0,24. ¿Cuánto vale cada salto?'; pop(q);
+      await line(c,0.2,0.3,10,{y:340,keep:true}); },
+    async c=>{ await say(c,'3. ¿Por qué no basta con contar las rayitas?'); }
+  ],{h:420})
+];
+
+/* ---------- navegación ---------- */
+const stage=document.getElementById('stage');
+let cur=0, step=0, busy=false, gen=0;
+function build(si){ const sc=SCENES[si]; const h=sc.opt.h||260;
+  stage.innerHTML=`<div class="scene"><h1 class="title"></h1><svg class="nl" viewBox="0 0 1000 ${h}" role="img" aria-label="Recta numérica" ${sc.opt.noSvg?'hidden':''}></svg><div class="big" hidden></div><p class="cap"></p><div class="extra"></div></div>`;
+  const r=stage.firstElementChild;
+  const c={root:r,title:r.querySelector('.title'),svg:r.querySelector('svg'),big:r.querySelector('.big'),cap:r.querySelector('.cap'),extra:r.querySelector('.extra'),ly:Math.min(150,h-110),nl:null};
+  c.title.textContent=sc.title;
+  const ph=document.getElementById('phase'); ph.textContent=sc.phase; ph.className='phase '+sc.phase.toLowerCase();
+  document.getElementById('eyebrow').textContent=sc.eyebrow;
+  return c; }
+async function show(si,upto,animateLast=true){ const g=++gen; cur=si; step=upto; const sc=SCENES[si]; const c=build(si); SCENES.ctx=c; paintNav();
+  FAST=true; for(let k=0;k<upto;k++){ await sc.steps[k](c); if(g!==gen) return; } FAST=false;
+  busy=true; if(!animateLast) FAST=true;
+  if(animateLast) await A(c.title,[{opacity:0,transform:'translateY(16px)'},{opacity:1,transform:'none'}],{d:420});
+  await sc.steps[upto](c); if(g!==gen) return; FAST=false; busy=false; paintNav(); }
+async function runStep(k){ const g=gen; step=k; paintNav(); busy=true; await SCENES[cur].steps[k](SCENES.ctx); if(g!==gen) return; FAST=false; busy=false; paintNav(); }
+function next(){ if(busy){ skip(); return; } if(step<SCENES[cur].steps.length-1) runStep(step+1); else if(cur<SCENES.length-1) show(cur+1,0); }
+function prev(){ if(busy) skip(); if(step>0) show(cur,step-1,false); else if(cur>0) show(cur-1,SCENES[cur-1].steps.length-1,false); }
+const prog=document.getElementById('prog');
+['Inicio','Desarrollo','Cierre'].forEach(p=>{ const g=document.createElement('div'); g.className='grp'; g.innerHTML=`<span>${p}</span>`;
+  SCENES.forEach((s,i)=>{ if(s.phase!==p) return; const b=document.createElement('button'); b.type='button'; b.className='dot'; b.id='dot-'+i; b.setAttribute('aria-label',`${s.eyebrow}: ${s.title}`); b.title=`${s.eyebrow} · ${s.title}`;
+    b.addEventListener('click',e=>{ e.stopPropagation(); if(busy) skip(); show(i,0); }); g.appendChild(b); }); prog.appendChild(g); });
+function paintNav(){ SCENES.forEach((_,i)=>{ const d=document.getElementById('dot-'+i); d.classList.toggle('cur',i===cur); d.classList.toggle('done',i<cur); });
+  const n=SCENES[cur].steps.length; document.getElementById('stepn').textContent=n>1?`Paso ${step+1} de ${n}`:'';
+  document.getElementById('prev').disabled=cur===0&&step===0;
+  document.getElementById('next').disabled=cur===SCENES.length-1&&step===n-1&&!busy; }
+document.getElementById('next').addEventListener('click',e=>{e.stopPropagation();next();});
+document.getElementById('prev').addEventListener('click',e=>{e.stopPropagation();prev();});
+document.getElementById('full').addEventListener('click',e=>{ e.stopPropagation(); const el=document.documentElement;
+  if(document.fullscreenElement) document.exitFullscreen?.().catch(()=>{}); else el.requestFullscreen?.().catch(()=>{}); });
+stage.addEventListener('click',e=>{ if(e.target.closest('button')) return; next(); });
+document.addEventListener('keydown',e=>{ const onBtn=e.target.closest&&e.target.closest('button');
+  if(['ArrowRight','PageDown','ArrowDown'].includes(e.key)||(e.key===' '&&!onBtn)){ e.preventDefault(); next(); }
+  if(['ArrowLeft','PageUp','ArrowUp'].includes(e.key)){ e.preventDefault(); prev(); } });
+show(0,0);
+</script>
+
+</body>
+</html>
