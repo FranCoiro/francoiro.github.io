@@ -193,6 +193,11 @@ h2{font-family:var(--f-display);font-weight:400;font-size:clamp(2rem,4.4vw,3rem)
 @media (max-width:560px){
   .nav ul a{padding:6px 9px;font-size:.84rem}
   .nav .me{display:none}
+  .nav ul{gap:0}
+}
+@media (max-width:400px){
+  .nav ul a{padding:6px 6px;font-size:.78rem;white-space:nowrap}
+  .nav ul{overflow-x:auto;min-width:0;scrollbar-width:none}
   .timeline li{grid-template-columns:minmax(0,1fr);gap:4px}
   .next{grid-template-columns:minmax(0,1fr)}
   .panel{padding:22px}
@@ -210,6 +215,7 @@ h2{font-family:var(--f-display);font-weight:400;font-size:clamp(2rem,4.4vw,3rem)
     <a class="me" href="#top">Francisca Coiro Díaz</a>
     <ul>
       <li><a href="#herramientas">Herramientas</a></li>
+      <li><a href="clases/">Clases</a></li>
       <li><a href="#investigacion">Investigación</a></li>
       <li><a href="#produccion">Producción</a></li>
     </ul>
@@ -245,6 +251,7 @@ h2{font-family:var(--f-display);font-weight:400;font-size:clamp(2rem,4.4vw,3rem)
       <span class="num">01</span>
       <h2 id="h-tools">Herramientas que programo</h2>
       <p class="intro">Desde 2024 diseño y programo los recursos que uso en clases. Hoy son 27 aplicaciones abiertas que cualquier docente puede usar sin crear cuentas, escritas en JavaScript, con Node.js y Supabase cuando el problema necesita servidor o base de datos.</p>
+      <p class="intro">Las presentaciones y guías de mis clases están ordenadas por curso y fecha en <a href="clases/">Clases →</a></p>
     </div>
 
     <div class="cards">
