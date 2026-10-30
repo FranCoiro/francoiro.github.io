@@ -1,6 +1,15 @@
 {
   "cursos": [
-    { "id": "4basico", "nombre": "4.º básico", "asignatura": "Matemática" }
+    {
+      "id": "2basico",
+      "nombre": "2.º básico B",
+      "asignatura": "Matemática"
+    },
+    {
+      "id": "4basico",
+      "nombre": "4.º básico",
+      "asignatura": "Matemática"
+    }
   ],
   "clases": [
     {
@@ -10,8 +19,35 @@
       "descripcion": "Completar figuras simétricas respecto de un eje. Presentación dinámica con corrección paso a paso.",
       "carpeta": "4basico/2026-10-30-simetria/",
       "materiales": [
-        { "nombre": "Presentación", "archivo": "index.html" },
-        { "nombre": "Guía (PDF)", "archivo": "guia.pdf" }
+        {
+          "nombre": "Presentación",
+          "archivo": "index.html"
+        },
+        {
+          "nombre": "Guía (PDF)",
+          "archivo": "guia.pdf"
+        }
+      ]
+    },
+    {
+      "curso": "2basico",
+      "fecha": "2026-10-30",
+      "titulo": "Construir e interpretar pictogramas",
+      "descripcion": "Cuatro situaciones en cómic animado: conteo con tabla, construcción del pictograma y preguntas con revisión paso a paso.",
+      "carpeta": "2basico/2026-10-30-pictogramas/",
+      "materiales": [
+        {
+          "nombre": "Presentación",
+          "archivo": "index.html"
+        },
+        {
+          "nombre": "Cómics y tablas de conteo (PDF)",
+          "archivo": "comics-tablas-de-conteo.pdf"
+        },
+        {
+          "nombre": "Hoja de trabajo (PDF)",
+          "archivo": "hoja-de-trabajo.pdf"
+        }
       ]
     }
   ]

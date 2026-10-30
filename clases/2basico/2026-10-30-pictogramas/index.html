@@ -1,0 +1,466 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}[hidden]{display:none!important}</style>
+<title>Pictogramas paso a paso</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Patrick+Hand&family=Nunito:wght@500;700;800&display=swap">
+<style>
+/* Proyector de aula: barra de situaciones arriba, escenario 16:9 al centro, controles grandes abajo. Un solo tema claro, pensado para proyectar. */
+:root{
+  --paper:#eef2f7; --stage:#ffffff; --ink:#1e2833; --muted:#5b6878; --line:#c9d3df;
+  --accent:#2f62d6; --accent-soft:#e3ebfb; --more:#2e9a5a; --more-soft:#dcf2e4; --less:#d9711c; --less-soft:#fbe8d6;
+  --display:"Baloo 2", "Arial Rounded MT Bold", "Trebuchet MS", sans-serif;
+  --body:"Nunito", "Segoe UI", Arial, sans-serif;
+  color-scheme: light;
+}
+html,body{height:100%}
+body{background:var(--paper);color:var(--ink);font-family:var(--body);}
+.app{height:100%;display:flex;flex-direction:column;gap:10px;padding-block:10px;padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));box-sizing:border-box}
+.top{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px}
+.brand{font-family:var(--display);font-weight:800;font-size:1.35rem;margin-right:auto}
+.tabs{display:flex;flex-wrap:wrap;gap:6px}
+.tabs button,.ctrl button{font:inherit;font-weight:800;border:2px solid var(--line);background:var(--stage);color:var(--ink);border-radius:999px;padding:.45em 1em;cursor:pointer}
+.tabs button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.stagewrap{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;position:relative}
+.nav{position:absolute;top:50%;transform:translateY(-50%);z-index:2;width:clamp(44px,5vw,72px);height:clamp(44px,5vw,72px);border-radius:50%;border:3px solid var(--accent);background:var(--stage);color:var(--accent);font-size:clamp(30px,3.6vw,52px);font-weight:800;line-height:1;cursor:pointer;opacity:.85;box-shadow:0 4px 14px rgba(30,40,51,.18);display:flex;align-items:center;justify-content:center;padding:0 0 .12em}
+.nav:hover{opacity:1;background:var(--accent);color:#fff}
+.nav:disabled{opacity:.25;cursor:default}
+.navL{left:6px}.navR{right:6px}
+#stage{width:100%;height:100%;max-width:100%;display:block;cursor:pointer}
+.ctrl{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:10px}
+.ctrl .main{background:var(--accent);border-color:var(--accent);color:#fff;font-size:1.1rem;padding:.55em 1.4em}
+.ctrl button:disabled{opacity:.4;cursor:default}
+.where{min-width:12em;text-align:center;font-weight:700;color:var(--muted);font-variant-numeric:tabular-nums}
+.where b{color:var(--ink)}
+.hint{font-size:.85rem;color:var(--muted);text-align:center}
+svg text{font-family:var(--body);fill:var(--ink)}
+svg .disp{font-family:var(--display);font-weight:800}
+.pop{animation:pop .45s cubic-bezier(.3,1.5,.6,1) both;transform-box:fill-box;transform-origin:center}
+.fade{animation:fade .5s ease both}
+.rise{animation:rise .5s ease both}
+@keyframes pop{from{opacity:0;transform:scale(.2)}to{opacity:1;transform:scale(1)}}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+@keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+.dim{opacity:.16;transition:opacity .4s}
+@keyframes walkL{0%{transform:translate(-420px,0)}15%{transform:translate(-350px,-14px)}30%{transform:translate(-280px,0)}45%{transform:translate(-210px,-14px)}60%{transform:translate(-140px,0)}75%{transform:translate(-70px,-14px)}100%{transform:none}}
+@keyframes walkR{0%{transform:translate(420px,0)}15%{transform:translate(350px,-14px)}30%{transform:translate(280px,0)}45%{transform:translate(210px,-14px)}60%{transform:translate(140px,0)}75%{transform:translate(70px,-14px)}100%{transform:none}}
+.walkL{animation:walkL 1.4s ease-out both}.walkR{animation:walkR 1.4s ease-out both}
+.emote{animation:pop .5s cubic-bezier(.3,1.6,.6,1) both;transform-box:fill-box;transform-origin:center}
+.floaty{animation:floaty 1.8s .5s ease-in-out infinite}
+@keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
+.drop{animation:drop .8s cubic-bezier(.3,1.4,.5,1) both}
+@keyframes drop{0%{opacity:0;transform:translateY(-320px)}60%{opacity:1}100%{opacity:1;transform:none}}
+.wig{animation:wig .7s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+@keyframes wig{0%,100%{transform:rotate(-9deg) scale(1.08)}50%{transform:rotate(9deg) scale(1.08)}}
+.conf{animation:fall linear infinite;transform-box:fill-box;transform-origin:center}
+@keyframes fall{from{transform:translateY(-80px) rotate(0)}to{transform:translateY(820px) rotate(540deg)}}
+@media (prefers-reduced-motion: reduce){.pop,.fade,.rise,.walkL,.walkR,.emote,.floaty,.drop,.wig,.conf{animation:none}}
+@media (max-width:600px){.brand{font-size:1.1rem}.hint{display:none}}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <div class="top">
+    <div class="brand">Pictogramas paso a paso</div>
+    <div class="tabs" id="tabs"></div>
+    <button id="fs" class="tabs-btn" style="font:inherit;font-weight:800;border:2px solid var(--line);background:var(--stage);color:var(--ink);border-radius:999px;padding:.45em 1em;cursor:pointer">Pantalla completa</button>
+  </div>
+  <div class="stagewrap"><button class="nav navL" id="navL" aria-label="Paso anterior">‹</button><button class="nav navR" id="navR" aria-label="Paso siguiente">›</button><svg id="stage" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Escena de la situación"></svg></div>
+  <div class="ctrl">
+    <button id="prev">◀ Anterior</button>
+    <div class="where" id="where"></div>
+    <button id="next" class="main">Siguiente ▶</button>
+  </div>
+  <div class="hint">Avanza con clic en la escena, la barra espaciadora o las flechas. Teclas 1 a 4 para cambiar de situación.</div>
+</div>
+
+<script>
+/* ---------- dibujos ---------- */
+const sc=(f,cx,cy,s)=>`<g transform="translate(${cx} ${cy}) scale(${s}) translate(${-cx} ${-cy})">${f(cx,cy)}</g>`;
+const I={
+manzana:(cx,cy)=>`<circle cx="${cx}" cy="${cy+4}" r="27" fill="#e53935" stroke="#8e1b18" stroke-width="3"/><path d="M${cx} ${cy-22} q2 -12 6 -16" stroke="#5d4037" stroke-width="4" fill="none"/><ellipse cx="${cx+13}" cy="${cy-25}" rx="10" ry="5" fill="#43a047" transform="rotate(-25 ${cx+13} ${cy-25})"/>`,
+naranja:(cx,cy)=>`<circle cx="${cx}" cy="${cy+2}" r="28" fill="#fb8c00" stroke="#a65500" stroke-width="3"/><circle cx="${cx-8}" cy="${cy-6}" r="5" fill="#ffb74d"/><ellipse cx="${cx+4}" cy="${cy-26}" rx="9" ry="4" fill="#43a047"/>`,
+platano:(cx,cy)=>sc((cx,cy)=>`<path d="M${cx-30} ${cy-12} Q${cx-20} ${cy+32} ${cx+30} ${cy+16} Q${cx-5} ${cy+12} ${cx-22} ${cy-18} Z" fill="#fdd835" stroke="#9e8600" stroke-width="3" stroke-linejoin="round"/><rect x="${cx-30}" y="${cy-22}" width="8" height="10" fill="#5d4037"/>`,cx,cy,1.3),
+uva:(cx,cy)=>{let s=`<path d="M${cx} ${cy-20} l4 -10" stroke="#5d4037" stroke-width="4"/>`;for(const[dx,dy]of[[-14,-12],[0,-12],[14,-12],[-7,0],[7,0],[0,12]])s+=`<circle cx="${cx+dx}" cy="${cy+dy}" r="9" fill="#8e24aa" stroke="#4a148c" stroke-width="2.5"/>`;return s},
+pez:(cx,cy)=>`<path d="M${cx+18} ${cy} L${cx+36} ${cy-16} L${cx+36} ${cy+16} Z" fill="#1e88e5" stroke="#0d47a1" stroke-width="3" stroke-linejoin="round"/><ellipse cx="${cx-4}" cy="${cy}" rx="28" ry="18" fill="#42a5f5" stroke="#0d47a1" stroke-width="3"/><circle cx="${cx-16}" cy="${cy-4}" r="4" fill="#222"/>`,
+pollito:(cx,cy)=>`<circle cx="${cx}" cy="${cy+8}" r="22" fill="#ffeb3b" stroke="#c9a800" stroke-width="3"/><circle cx="${cx+4}" cy="${cy-16}" r="15" fill="#ffeb3b" stroke="#c9a800" stroke-width="3"/><circle cx="${cx+8}" cy="${cy-19}" r="3" fill="#222"/><path d="M${cx+18} ${cy-16} l10 3 l-10 4 Z" fill="#fb8c00"/>`,
+tortuga:(cx,cy)=>`<circle cx="${cx+30}" cy="${cy+4}" r="9" fill="#81c784" stroke="#2e7d32" stroke-width="3"/><ellipse cx="${cx-14}" cy="${cy+18}" rx="7" ry="6" fill="#81c784" stroke="#2e7d32" stroke-width="2.5"/><ellipse cx="${cx+14}" cy="${cy+18}" rx="7" ry="6" fill="#81c784" stroke="#2e7d32" stroke-width="2.5"/><path d="M${cx-28} ${cy+12} A28 26 0 0 1 ${cx+24} ${cy+12} Z" fill="#43a047" stroke="#1b5e20" stroke-width="3"/><circle cx="${cx-2}" cy="${cy-2}" r="7" fill="#2e7d32"/>`,
+caracol:(cx,cy)=>`<path d="M${cx-30} ${cy+20} L${cx+30} ${cy+20} Q${cx+34} ${cy+8} ${cx+24} ${cy+4} L${cx+24} ${cy-14}" fill="#d7b98e" stroke="#7a5c33" stroke-width="3" stroke-linejoin="round"/><circle cx="${cx-4}" cy="${cy}" r="20" fill="#a1887f" stroke="#5d4037" stroke-width="3"/><path d="M${cx-4} ${cy} m-8 0 a8 8 0 1 1 8 8" fill="none" stroke="#5d4037" stroke-width="3"/>`,
+lapiz:(cx,cy)=>`<g transform="rotate(-35 ${cx} ${cy})"><rect x="${cx-26}" y="${cy-8}" width="44" height="16" fill="#fdd835" stroke="#9e8600" stroke-width="3"/><path d="M${cx+18} ${cy-8} L${cx+34} ${cy} L${cx+18} ${cy+8} Z" fill="#ffe0b2" stroke="#9e8600" stroke-width="3" stroke-linejoin="round"/><rect x="${cx-36}" y="${cy-8}" width="10" height="16" fill="#f48fb1" stroke="#9e8600" stroke-width="3"/></g>`,
+goma:(cx,cy)=>`<rect x="${cx-26}" y="${cy-14}" width="52" height="28" rx="6" fill="#ffffff" stroke="#555" stroke-width="3"/><rect x="${cx-4}" y="${cy-14}" width="30" height="28" rx="2" fill="#29b6f6" stroke="#555" stroke-width="3"/>`,
+libro:(cx,cy)=>`<rect x="${cx-22}" y="${cy-26}" width="44" height="52" rx="3" fill="#e53935" stroke="#8e1b18" stroke-width="3"/><rect x="${cx-22}" y="${cy-26}" width="8" height="52" fill="#b71c1c"/><rect x="${cx-6}" y="${cy-12}" width="22" height="8" fill="#fff"/>`,
+regla:(cx,cy)=>{let s=`<rect x="${cx-34}" y="${cy-11}" width="68" height="22" rx="3" fill="#a5d6a7" stroke="#2e7d32" stroke-width="3"/>`;for(let t=-26;t<30;t+=10)s+=`<line x1="${cx+t}" y1="${cy-11}" x2="${cx+t}" y2="${cy-2}" stroke="#2e7d32" stroke-width="2"/>`;return s},
+galleta:(cx,cy)=>{let s=`<circle cx="${cx}" cy="${cy}" r="26" fill="#d9a35b" stroke="#8d5a1f" stroke-width="3"/>`;for(const[dx,dy]of[[-10,-10],[8,-12],[12,6],[-12,8],[0,0],[2,14]])s+=`<circle cx="${cx+dx}" cy="${cy+dy}" r="3.5" fill="#4e2a12"/>`;return s},
+torta:(cx,cy)=>`<path d="M${cx-30} ${cy-4} L${cx+30} ${cy-18} L${cx+30} ${cy+20} L${cx-30} ${cy+20} Z" fill="#fff3e0" stroke="#8d5a1f" stroke-width="3" stroke-linejoin="round"/><path d="M${cx-30} ${cy-4} L${cx+30} ${cy-18} L${cx+30} ${cy-8} L${cx-30} ${cy+6} Z" fill="#f48fb1" stroke="#8d5a1f" stroke-width="3" stroke-linejoin="round"/><rect x="${cx-30}" y="${cy+9}" width="60" height="4" fill="#795548"/><circle cx="${cx+16}" cy="${cy-24}" r="7" fill="#e53935" stroke="#8e1b18" stroke-width="2"/>`,
+alfajor:(cx,cy)=>`<ellipse cx="${cx}" cy="${cy+10}" rx="30" ry="9" fill="#5d4037" stroke="#3e2723" stroke-width="3"/><rect x="${cx-26}" y="${cy-3}" width="52" height="8" fill="#c68642"/><ellipse cx="${cx}" cy="${cy-6}" rx="30" ry="9" fill="#6d4c41" stroke="#3e2723" stroke-width="3"/>`,
+dona:(cx,cy)=>{let s=`<circle cx="${cx}" cy="${cy}" r="27" fill="#d9a35b" stroke="#8d5a1f" stroke-width="3"/><path d="M${cx-23} ${cy-4} Q${cx-24} ${cy-24} ${cx} ${cy-23} Q${cx+24} ${cy-24} ${cx+23} ${cy-2} Q${cx+16} ${cy+4} ${cx+20} ${cy+12} Q${cx+6} ${cy+22} ${cx-8} ${cy+18} Q${cx-12} ${cy+10} ${cx-22} ${cy+10} Z" fill="#f06292" stroke="#ad1457" stroke-width="2.5"/><circle cx="${cx}" cy="${cy}" r="8" fill="#fafafa" stroke="#8d5a1f" stroke-width="3"/>`;for(const[dx,dy,c]of[[-12,-12,"#fff176"],[10,-14,"#4fc3f7"],[14,4,"#aed581"],[-14,4,"#ffffff"],[0,-18,"#ffffff"],[2,13,"#fff176"]])s+=`<rect x="${cx+dx-3}" y="${cy+dy-1.5}" width="6" height="3" rx="1.5" fill="${c}" transform="rotate(${dx*4} ${cx+dx} ${cy+dy})"/>`;return s},
+};
+const headTop=(by,p,s)=>by-(p[5]?240:212)*s*(p[4]?1.15:1);
+function wrap(t,n){const o=[];let c='';for(const w of t.split(' ')){if(c&&(c+' '+w).length>n){o.push(c);c=w}else c=(c?c+' ':'')+w}o.push(c);return o}
+function lines(x,y,arr,size,attrs=''){const y0=y-(arr.length-1)*size*0.62;return arr.map((l,i)=>`<text x="${x}" y="${y0+i*size*1.25+size*0.35}" text-anchor="middle" font-size="${size}" ${attrs}>${l}</text>`).join('')}
+function bubble(x,y,w,h,text,tx,ty,size,cls){
+  const bx=Math.min(Math.max(tx,x+45),x+w-45);
+  let s=`<g class="${cls||''}"><path d="M${bx-18} ${y+h-4} L${tx} ${ty} L${bx+18} ${y+h-4}" fill="#fff" stroke="#333" stroke-width="4" stroke-linejoin="round"/>`;
+  s+=`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="30" fill="#fff" stroke="#333" stroke-width="4"/><rect x="${bx-14}" y="${y+h-7}" width="28" height="10" fill="#fff"/>`;
+  return s+lines(x+w/2,y+h/2,wrap(text,Math.floor(w/(size*0.56))),size)+`</g>`;
+}
+
+/* ---------- datos ---------- */
+const MAMA=["#f1c27d","#a1887f","#26a69a",false,true,false], SOFIA=["#f1c27d","#4e342e","#7e57c2",true,false,false],
+PEPE=["#d9a066","#9e9e9e","#5d4037",false,true,true], MATIAS=["#8d5524","#212121","#ffca28",false,false,false],
+PROFE=["#f1c27d","#5d4037","#5c6bc0",true,true,false], BENJA=["#e0ac69","#ff8f00","#66bb6a",false,false,false],
+ROSA=["#c68642","#212121","#8d6e63",false,true,true], AMANDA=["#f1c27d","#3e2723","#ec407a",true,false,false];
+const SITS=[
+ {t:"Frutas de la canasta",bg:"#fff8e1",scene:"#ffe9c7",who:[MAMA,SOFIA],unit:"frutas",one:"fruta",
+  talk:[[0,"Mañana es la once del curso y debo llevar fruta para todos."],[1,"¡Hagamos brochetas con una fruta de cada tipo!"],[0,"Pero no sé qué fruta alcanza y cuál falta comprar."],[1,"¡Contemos la canasta! La que tenga menos, la compramos."]],
+  cap:"Esta es la canasta. ¿Qué fruta falta comprar?",
+  cols:[["Manzanas",6,"manzana","f"],["Plátanos",3,"platano","m"],["Uvas",8,"uva","f"],["Naranjas",5,"naranja","f"]],
+  end:[[1,"¡Hay que comprar plátanos! Tenemos solo 3."],[0,"Y ya tenemos 22 frutas en total. ¡Vamos a la feria!"]]},
+ {t:"Animales de la mascotería",bg:"#e3f2fd",scene:"#d4ecd5",who:[PEPE,MATIAS],unit:"animales",one:"animal",
+  talk:[[0,"¡Ay, no! Se me acabó la comida de los animales."],[1,"¡Pobrecitos! ¿Y cuánta comida tiene que pedir?"],[0,"Debo saber cuántos hay de cada uno para no equivocarme."],[1,"¡Yo lo ayudo a contar! Así ninguno se queda sin comer."]],
+  cap:"Estos son los animales de don Pepe.",
+  cols:[["Peces",4,"pez","m"],["Pollitos",7,"pollito","m"],["Tortugas",2,"tortuga","f"],["Caracoles",5,"caracol","m"]],
+  end:[[0,"¡Son 18 animales! Ya puedo hacer el pedido."],[1,"Pida más comida para pollitos: ¡son los que más hay!"]]},
+ {t:"Útiles de la sala",bg:"#f3e5f5",scene:"#e6dcd6",who:[PROFE,BENJA],unit:"útiles",one:"útil",
+  talk:[[0,"¡El director nos va a regalar útiles nuevos!"],[1,"¡Bacán! ¿Nos va a regalar de todo?"],[0,"Solo del útil que tengamos menos. Hay que avisarle hoy."],[1,"¡Entonces contemos lo que hay sobre la mesa!"]],
+  cap:"Estos son los útiles de la mesa. ¿De cuál tenemos menos?",
+  cols:[["Lápices",7,"lapiz","m"],["Gomas",4,"goma","f"],["Libros",6,"libro","m"],["Reglas",2,"regla","f"]],
+  end:[[1,"¡Hay que pedir reglas! Solo tenemos 2."],[0,"¡Muy bien! Le aviso al director ahora mismo."]]},
+ {t:"Pasteles más vendidos",bg:"#fce4ec",scene:"#fff8dc",who:[ROSA,AMANDA],unit:"pasteles",one:"pastel",
+  talk:[[0,"Mañana es la fiesta del barrio y vendrá muchísima gente."],[1,"¿Qué pastel vas a hornear, tía Rosa?"],[0,"¡El que más se vendió hoy! Pero perdí la cuenta..."],[1,"¡Dibujaste cada venta en tu cuaderno! Contémoslas."]],
+  cap:"El cuaderno de tía Rosa. ¿Qué pastel se vendió más?",
+  cols:[["Galletas",5,"galleta","f"],["Tortas",3,"torta","f"],["Alfajores",4,"alfajor","m"],["Donas",7,"dona","f"]],
+  end:[[1,"¡Las donas! Se vendieron 7, más que todos los otros."],[0,"¡Mañana horneo muchas donas para la fiesta!"]]},
+];
+const STORYQ=[["¿Qué fruta falta comprar?", "Plátanos", "Es la fruta que tiene menos: solo hay 3."], ["¿Para cuántos animales debe pedir comida don Pepe?", "Para 18 animales", "4 peces, 7 pollitos, 2 tortugas y 5 caracoles."], ["¿De qué útil tenemos menos?", "Reglas", "Solo hay 2. Hay que pedirle reglas al director."], ["¿Qué pastel se vendió más?", "Donas", "Se vendieron 7. Tía Rosa debe hornear donas."]];
+const art=(g)=>g==="f"?"Las":"Los", cuantos=(g)=>g==="f"?"¿Cuántas":"¿Cuántos";
+
+/* posiciones mezcladas (fijas por situación) */
+function rng(a){return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+SITS.forEach((S,k)=>{
+  const r=rng(101+k*13); const slots=[];
+  for(let row=0;row<4;row++)for(let c=0;c<8;c++)slots.push([c,row]);
+  for(let i=slots.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[slots[i],slots[j]]=[slots[j],slots[i]]}
+  const items=[];S.cols.forEach((c,ci)=>{for(let n=0;n<c[1];n++)items.push(ci)});
+  for(let i=items.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[items[i],items[j]]=[items[j],items[i]]}
+  S.items=items.map((ci,i)=>({ci,x:100+slots[i][0]*117+Math.round((r()-.5)*20),y:300+slots[i][1]*148+Math.round((r()-.5)*20)}));
+  S.cols.forEach((c,ci)=>{S.items.filter(it=>it.ci===ci).sort((a,b)=>a.y-b.y||a.x-b.x).forEach((it,o)=>it.ord=o)});
+  const n=S.cols.map(c=>c[1]); S.total=n.reduce((a,b)=>a+b,0);
+  S.max=n.indexOf(Math.max(...n)); S.min=n.indexOf(Math.min(...n));
+  S.steps=buildSteps(S);
+});
+SITS[0].steps.unshift({scr:"obj"});
+function buildSteps(S){
+  const st=[];
+  for(let pi=0;pi<2;pi++)for(let n=0;n<=2;n++)st.push({scr:"comic",pi,n});
+  st.push({scr:"count",f:-1});
+  S.cols.forEach((c,i)=>{st.push({scr:"count",f:i,ph:"ask"});st.push({scr:"count",f:i,ph:"rev"})});
+  st.push({scr:"task"});
+  st.push({scr:"picto",q:0});
+  for(let q=1;q<=3;q++){st.push({scr:"picto",q,ans:false});st.push({scr:"picto",q,ans:true})}
+  st.push({scr:"story",ans:false});st.push({scr:"story",ans:true});
+  for(let b=0;b<=2;b++)st.push({scr:"end",b});
+  return st;
+}
+const LABEL={obj:"Objetivo",task:"Trabajo en la hoja",story:"Pregunta de la historia",comic:"Historia",count:"Tabla de conteo",picto:"Pictograma y preguntas",end:"Final"};
+
+/* ---------- pantallas ---------- */
+const title=(k,S)=>`<text x="800" y="64" text-anchor="middle" font-size="46" class="disp">Situación ${k+1}: ${S.t}</text>`;
+const panel=(x,y,w,h,bg)=>`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="18" fill="${bg}" stroke="#1e2833" stroke-width="6"/>`;
+const badge=(x,y,n)=>`<circle cx="${x}" cy="${y}" r="22" fill="#1e2833"/><text x="${x}" y="${y+9}" text-anchor="middle" font-size="26" font-weight="800" style="fill:#fff">${n}</text>`;
+
+function tally(x,cy,n,delay,stepT){
+  let o='';
+  for(let k=0;k<n;k++){
+    const g=Math.floor(k/5),p=k%5,gx=x+g*100;
+    const a=delay!=null?` class="pop" style="animation-delay:${(delay+k*stepT).toFixed(2)}s"`:'';
+    o+= p<4?`<line x1="${gx+p*18}" y1="${cy-34}" x2="${gx+p*18}" y2="${cy+34}" stroke="#1e2833" stroke-width="7" stroke-linecap="round"${a}/>`
+           :`<line x1="${gx-12}" y1="${cy+28}" x2="${gx+66}" y2="${cy-28}" stroke="#d93a2b" stroke-width="7" stroke-linecap="round"${a}/>`;
+  }
+  return o;
+}
+function count(S,st,fresh){
+  const T=0.65; let o='';
+  const f=st.f, rev=st.ph==="rev", done=f<0?0:(rev?f+1:f);
+  o+=`<g class="${fresh?'fade':''}">${panel(30,100,960,770,S.scene)}${panel(1020,100,550,770,"#ffffff")}</g>`;
+  let cap=S.cap;
+  if(f>=0){const c=S.cols[f]; cap=rev?"¡Revisemos! Contamos juntos de uno en uno.":`${cuantos(c[3])} ${c[0].toLowerCase()} hay? Cuenta con tu dedo.`;}
+  o+=`<rect x="55" y="120" width="910" height="96" rx="14" fill="#fff59d" stroke="#1e2833" stroke-width="4"/>`;
+  o+=lines(510,168,wrap(cap,48),36,`font-weight="800" class="${f>=0?'fade':''}"`);
+  // elementos
+  S.items.forEach((it,i)=>{
+    const foc=f>=0&&it.ci===f;
+    let cls=f>=0&&!foc?'dim':'';
+    let g=`<g class="${cls}">`;
+    if(foc) g+=`<circle cx="${it.x}" cy="${it.y}" r="52" fill="var(--accent)" fill-opacity=".14" stroke="var(--accent)" stroke-width="4" ${st.ph==="ask"?'class="pop"':''}/>`;
+    const anim=f<0&&fresh?` class="drop" style="animation-delay:${(0.3+i*0.09).toFixed(2)}s"`:'';
+    const wig=foc&&st.ph==="ask"?` class="wig" style="animation-delay:${(it.ord*0.12).toFixed(2)}s"`:'';
+    g+=`<g${anim}><g${wig}>${sc(I[S.cols[it.ci][2]],it.x,it.y,1.35)}</g></g>`;
+    if(foc&&rev) g+=`<g class="pop" style="animation-delay:${(0.4+it.ord*T).toFixed(2)}s"><circle cx="${it.x+38}" cy="${it.y-38}" r="22" fill="var(--accent)" stroke="#fff" stroke-width="3"/><text x="${it.x+38}" y="${it.y-29}" text-anchor="middle" font-size="26" font-weight="800" style="fill:#fff">${it.ord+1}</text></g>`;
+    o+=g+`</g>`;
+  });
+  // tabla
+  o+=`<text x="1295" y="150" text-anchor="middle" font-size="36" class="disp">Tabla de conteo</text>`;
+  const X=[1040,1225,1455,1550], top=172;
+  o+=`<rect x="${X[0]}" y="${top}" width="${X[3]-X[0]}" height="58" fill="#e7ecf3" stroke="#1e2833" stroke-width="3"/>`;
+  [["Elemento",0],["Conteo",1],["Total",2]].forEach(([l,i])=>o+=`<text x="${(X[i]+X[i+1])/2}" y="${top+39}" text-anchor="middle" font-size="27" font-weight="800">${l}</text>`);
+  S.cols.forEach((c,i)=>{
+    const ry=top+58+i*155, cy=ry+77;
+    o+=`<rect x="${X[0]}" y="${ry}" width="${X[3]-X[0]}" height="155" fill="${i===f?'var(--accent-soft)':'#fff'}" stroke="#1e2833" stroke-width="3"/>`;
+    o+=sc(I[c[2]],(X[0]+X[1])/2,ry+58,1.05)+`<text x="${(X[0]+X[1])/2}" y="${ry+130}" text-anchor="middle" font-size="27" font-weight="700">${c[0]}</text>`;
+    if(i<done){
+      const anim=i===f&&rev;
+      o+=tally(X[1]+30,cy,c[1],anim?0.4:null,T);
+      o+=`<text x="${(X[2]+X[3])/2}" y="${cy+22}" text-anchor="middle" font-size="64" class="disp${anim?' pop':''}" style="fill:var(--accent);${anim?`animation-delay:${(0.5+c[1]*T).toFixed(2)}s`:''}">${c[1]}</text>`;
+    }
+  });
+  [1,2].forEach(i=>o+=`<line x1="${X[i]}" y1="${top}" x2="${X[i]}" y2="${top+58+4*155}" stroke="#1e2833" stroke-width="3"/>`);
+  return o;
+}
+function task(S,st,fresh){
+  let o=`<g class="${fresh?'fade':''}">${panel(30,100,960,770,"#eaf1fd")}${panel(1020,100,550,770,"#ffffff")}</g>`;
+  o+=`<g class="pop"><rect x="80" y="140" width="860" height="200" rx="26" fill="var(--accent)"/>`+lines(510,240,["Crea el pictograma","y responde las preguntas"],56,`class="disp" style="fill:#fff"`)+`</g>`;
+  // hoja de trabajo en miniatura
+  o+=`<g class="rise" style="animation-delay:.5s"><rect x="250" y="390" width="400" height="440" rx="12" fill="#fff" stroke="#1e2833" stroke-width="4"/>`;
+  const xs=[320,400,480,560];
+  S.cols.forEach((c,i)=>{o+=`<text x="${xs[i]}" y="700" text-anchor="middle" font-size="20" style="fill:#9aa7b6">____</text>`;
+    o+=`<line x1="${xs[i]-30}" y1="${670}" x2="${xs[i]+30}" y2="670" stroke="#1e2833" stroke-width="3"/>`});
+  for(let q=0;q<3;q++)o+=`<line x1="285" y1="${720+q*35}" x2="615" y2="${720+q*35}" stroke="#9aa7b6" stroke-width="3"/>`;
+  o+=`</g><g><animateTransform attributeName="transform" type="translate" values="0 0;50 -40;100 0;150 -40;200 0;0 0" dur="3s" repeatCount="indefinite"/>${sc(I.lapiz,340,600,1.6)}</g>`;
+  o+=`<text x="790" y="560" text-anchor="middle" font-size="30" font-weight="800">Usa tu</text><text x="790" y="600" text-anchor="middle" font-size="30" font-weight="800">tabla de conteo</text><path d="M870 580 L960 580" stroke="var(--accent)" stroke-width="8" stroke-linecap="round"/><path d="M945 562 L968 580 L945 598" fill="none" stroke="var(--accent)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>`;
+  // tabla completa para consultar
+  o+=`<text x="1295" y="150" text-anchor="middle" font-size="36" class="disp">Tabla de conteo</text>`;
+  const X=[1040,1225,1455,1550], top=172;
+  o+=`<rect x="${X[0]}" y="${top}" width="${X[3]-X[0]}" height="58" fill="#e7ecf3" stroke="#1e2833" stroke-width="3"/>`;
+  [["Elemento",0],["Conteo",1],["Total",2]].forEach(([l,i])=>o+=`<text x="${(X[i]+X[i+1])/2}" y="${top+39}" text-anchor="middle" font-size="27" font-weight="800">${l}</text>`);
+  S.cols.forEach((c,i)=>{const ry=top+58+i*155,cy=ry+77;
+    o+=`<rect x="${X[0]}" y="${ry}" width="${X[3]-X[0]}" height="155" fill="#fff" stroke="#1e2833" stroke-width="3"/>`;
+    o+=sc(I[c[2]],(X[0]+X[1])/2,ry+58,1.05)+`<text x="${(X[0]+X[1])/2}" y="${ry+130}" text-anchor="middle" font-size="27" font-weight="700">${c[0]}</text>`;
+    o+=tally(X[1]+30,cy,c[1],null,0)+`<text x="${(X[2]+X[3])/2}" y="${cy+22}" text-anchor="middle" font-size="64" class="disp" style="fill:var(--accent)">${c[1]}</text>`;});
+  [1,2].forEach(i=>o+=`<line x1="${X[i]}" y1="${top}" x2="${X[i]}" y2="${top+58+4*155}" stroke="#1e2833" stroke-width="3"/>`);
+  return o;
+}
+function picto(S,st,fresh){
+  let o='';const xs=[150,390,630,870],base=770,q=st.q;
+  const answered=k=>k<q||(k===q&&st.ans);
+  o+=`<g class="${fresh?'fade':''}">${panel(30,100,960,770,"#ffffff")}</g>`;
+  o+=`<text x="510" y="160" text-anchor="middle" font-size="32" font-weight="800">Cada dibujo representa 1 ${S.one}</text>`;
+  const hl=(i,color,soft,isNew)=>{const n=S.cols[i][1];const ty=base-40-(n-1)*60-85;return `<rect x="${xs[i]-100}" y="${ty}" width="200" height="${base+75-ty}" rx="20" fill="${soft}" stroke="${color}" stroke-width="5" class="${isNew?'fade':''}"/>`};
+  if(answered(2))o+=hl(S.max,"var(--more)","var(--more-soft)",q===2&&st.ans);
+  if(answered(3))o+=hl(S.min,"var(--less)","var(--less-soft)",q===3&&st.ans);
+  S.cols.forEach((c,i)=>{
+    for(let j=0;j<c[1];j++){
+      const a=q===0?` class="pop" style="animation-delay:${(0.3+i*1.0+j*0.13).toFixed(2)}s"`:'';
+      o+=`<g${a}>${sc(I[c[2]],xs[i],base-40-j*60,1.0)}</g>`;
+    }
+    o+=`<line x1="${xs[i]-95}" y1="${base}" x2="${xs[i]+95}" y2="${base}" stroke="#1e2833" stroke-width="5"/>`;
+    o+=`<text x="${xs[i]}" y="${base+50}" text-anchor="middle" font-size="31" font-weight="800">${c[0]}</text>`;
+    if(answered(1)){const ny=base-40-(c[1]-1)*60-52;o+=`<text x="${xs[i]}" y="${ny}" text-anchor="middle" font-size="40" class="disp${q===1&&st.ans?' pop':''}" style="fill:var(--accent);${q===1&&st.ans?`animation-delay:${(i*0.5).toFixed(1)}s`:''}">${c[1]}</text>`}
+  });
+  const Q=["1. ¿Cuántos elementos hay en total?","2. ¿Cuál tiene más?","3. ¿Cuál tiene menos?"];
+  for(let k=1;k<=q;k++){
+    const y=100+(k-1)*262, isQ=k===q&&!st.ans;
+    o+=`<g class="${isQ?'rise':''}"><rect x="1020" y="${y}" width="550" height="244" rx="18" fill="#fff" stroke="${k===2&&answered(2)?'var(--more)':k===3&&answered(3)?'var(--less)':'#1e2833'}" stroke-width="5"/>`;
+    o+=lines(1295,y+62,wrap(Q[k-1],26),33,`font-weight="800"`)+`</g>`;
+    if(answered(k)){
+      const nw=k===q&&st.ans, d=k===1?2.2:0.2;
+      const A=`class="${nw?'pop':''}" style="animation-delay:${nw?d:0}s"`;
+      if(k===1){
+        o+=`<g ${A}><text x="1295" y="${y+160}" text-anchor="middle" font-size="40" class="disp" style="fill:var(--accent)">${S.cols.map(c=>c[1]).join(" + ")} = ${S.total}</text><text x="1295" y="${y+212}" text-anchor="middle" font-size="31" font-weight="700">Hay ${S.total} ${S.unit} en total.</text></g>`;
+      }else{
+        const i=k===2?S.max:S.min,c=S.cols[i];
+        o+=`<g ${A}><text x="1295" y="${y+185}" text-anchor="middle" font-size="46" class="disp" style="fill:${k===2?'var(--more)':'var(--less)'}">${art(c[3])} ${c[0].toLowerCase()}: ${c[1]}</text></g>`;
+      }
+    }
+  }
+  return o;
+}
+function person(cx,by,p,s,mode,side,seed){
+  mode=mode||'idle'; side=side||1; seed=seed||0;
+  const [skin,hair,shirt,girl,adult,apron]=p; const k=s*(adult?1.15:1); const hy=by-175;
+  const sx=cx+34*side, sy=by-130, ex=cx+52*side, ey=by-80;
+  let g=`<g transform="translate(${cx} ${by}) scale(${k}) translate(${-cx} ${-by})"><g>`;
+  if(mode==='jump') g+=`<animateTransform attributeName="transform" type="translate" values="0 0;0 -55;0 0" keyTimes="0;.45;1" dur=".75s" begin="${(seed*.2).toFixed(2)}s" repeatCount="indefinite"/>`;
+  else if(mode==='talk') g+=`<animateTransform attributeName="transform" type="translate" values="0 0;0 -9;0 0" dur=".42s" repeatCount="5"/>`;
+  else g+=`<animateTransform attributeName="transform" type="translate" values="0 0;0 -3;0 0" dur="2.6s" begin="${(seed*.7).toFixed(2)}s" repeatCount="indefinite"/>`;
+  g+=`<rect x="${cx-22}" y="${by-65}" width="18" height="65" rx="6" fill="#455a64"/><rect x="${cx+4}" y="${by-65}" width="18" height="65" rx="6" fill="#455a64"/>`;
+  const arm=(sgn,anim)=>`<line x1="${cx+34*sgn}" y1="${by-130}" x2="${cx+52*sgn}" y2="${by-80}" stroke="${skin}" stroke-width="12" stroke-linecap="round">${anim||''}</line>`;
+  const wave=(sgn,rep)=>`<animateTransform attributeName="transform" type="rotate" values="0 ${cx+34*sgn} ${sy};${-120*sgn} ${cx+34*sgn} ${sy};${-90*sgn} ${cx+34*sgn} ${sy};${-120*sgn} ${cx+34*sgn} ${sy};${-90*sgn} ${cx+34*sgn} ${sy};0 ${cx+34*sgn} ${sy}" dur="1.8s" repeatCount="${rep}"/>`;
+  if(mode==='jump'){g+=arm(-1,`<animateTransform attributeName="transform" type="rotate" values="${120} ${cx-34} ${sy};${150} ${cx-34} ${sy};${120} ${cx-34} ${sy}" dur=".75s" repeatCount="indefinite"/>`)+arm(1,`<animateTransform attributeName="transform" type="rotate" values="-120 ${cx+34} ${sy};-150 ${cx+34} ${sy};-120 ${cx+34} ${sy}" dur=".75s" repeatCount="indefinite"/>`)}
+  else if(mode==='talk'){g+=arm(-side)+arm(side,wave(side,1))}
+  else g+=arm(-1)+arm(1);
+  g+=`<rect x="${cx-36}" y="${by-145}" width="72" height="90" rx="18" fill="${shirt}" stroke="#333" stroke-width="2"/>`;
+  if(apron) g+=`<rect x="${cx-24}" y="${by-120}" width="48" height="62" rx="6" fill="#fff" stroke="#999" stroke-width="2"/>`;
+  if(girl) g+=`<circle cx="${cx-36}" cy="${hy+5}" r="13" fill="${hair}"/><circle cx="${cx+36}" cy="${hy+5}" r="13" fill="${hair}"/>`;
+  g+=`<circle cx="${cx}" cy="${hy}" r="32" fill="${skin}" stroke="#333" stroke-width="2"/>`;
+  g+=`<path d="M${cx-32} ${hy-2} Q${cx-30} ${hy-40} ${cx} ${hy-36} Q${cx+30} ${hy-40} ${cx+32} ${hy-2} Q${cx+18} ${hy-22} ${cx-32} ${hy-2} Z" fill="${hair}"/>`;
+  if(apron) g+=`<rect x="${cx-26}" y="${hy-58}" width="52" height="24" rx="8" fill="#fff" stroke="#999" stroke-width="2"/>`;
+  const blink=`<animate attributeName="ry" values="4.5;4.5;0.5;4.5" keyTimes="0;.93;.96;1" dur="${(3.2+seed*.6).toFixed(1)}s" repeatCount="indefinite"/>`;
+  g+=`<ellipse cx="${cx-11}" cy="${hy+2}" rx="4" ry="4.5" fill="#222">${blink}</ellipse><ellipse cx="${cx+11}" cy="${hy+2}" rx="4" ry="4.5" fill="#222">${blink}</ellipse>`;
+  if(mode==='talk') g+=`<ellipse cx="${cx}" cy="${hy+17}" rx="9" ry="4" fill="#7b2d2d"><animate attributeName="ry" values="3;9;3" dur=".28s" repeatCount="12"/></ellipse>`;
+  else if(mode==='jump') g+=`<path d="M${cx-13} ${hy+12} Q${cx} ${hy+32} ${cx+13} ${hy+12} Z" fill="#7b2d2d"/>`;
+  else g+=`<path d="M${cx-12} ${hy+14} Q${cx} ${hy+25} ${cx+12} ${hy+14}" stroke="#222" stroke-width="3" fill="none" stroke-linecap="round"/>`;
+  return g+`</g></g>`;
+}
+function emote(type,x,y){
+  let s='';
+  if(type==='q') s=`<circle cx="${x}" cy="${y}" r="30" fill="#fff" stroke="#7e57c2" stroke-width="5"/><text x="${x}" y="${y+16}" text-anchor="middle" font-size="46" font-weight="800" style="fill:#7e57c2">?</text>`;
+  if(type==='ex') s=`<circle cx="${x}" cy="${y}" r="30" fill="#fff" stroke="#e53935" stroke-width="5"/><text x="${x}" y="${y+16}" text-anchor="middle" font-size="46" font-weight="800" style="fill:#e53935">!</text>`;
+  if(type==='idea'){s=`<g stroke="#f9a825" stroke-width="5" stroke-linecap="round">`;for(let a=0;a<8;a++){const r=a*Math.PI/4;s+=`<line x1="${x+Math.cos(r)*40}" y1="${y-8+Math.sin(r)*40}" x2="${x+Math.cos(r)*52}" y2="${y-8+Math.sin(r)*52}"/>`}s+=`</g><circle cx="${x}" cy="${y-8}" r="26" fill="#ffee58" stroke="#f9a825" stroke-width="4"/><rect x="${x-12}" y="${y+16}" width="24" height="16" rx="4" fill="#90a4ae"/>`}
+  if(type==='heart') s=`<path d="M${x} ${y+26} C${x-46} ${y-4} ${x-26} ${y-40} ${x} ${y-16} C${x+26} ${y-40} ${x+46} ${y-4} ${x} ${y+26} Z" fill="#ec407a" stroke="#ad1457" stroke-width="4"/>`;
+  if(type==='sad') s=`<path d="M${x} ${y-30} Q${x+22} ${y} ${x+18} ${y+12} A18 18 0 1 1 ${x-18} ${y+12} Q${x-22} ${y} ${x} ${y-30} Z" fill="#64b5f6" stroke="#1e88e5" stroke-width="4"/>`;
+  if(type==='star'){const p=[];for(let i=0;i<10;i++){const r=i%2?14:32,a=-Math.PI/2+i*Math.PI/5;p.push(`${(x+r*Math.cos(a)).toFixed(1)},${(y+r*Math.sin(a)).toFixed(1)}`)}s=`<polygon points="${p.join(' ')}" fill="#ffca28" stroke="#ef6c00" stroke-width="4" stroke-linejoin="round"/>`}
+  return `<g class="emote"><g class="floaty">${s}</g></g>`;
+}
+function scenery(k,x,y,w,h,pi){
+  const cx=x+w/2, fy=y+h-130; let s='';
+  if(k===0){ // cocina: ventana con nubes, mesa y canasta
+    s+=`<rect x="${cx-95}" y="${y+315}" width="190" height="150" rx="8" fill="#bfe3ff" stroke="#8d6e63" stroke-width="8"/><circle cx="${cx+50}" cy="${y+355}" r="22" fill="#ffd54f"><animate attributeName="r" values="20;25;20" dur="3s" repeatCount="indefinite"/></circle>`;
+    s+=`<g><animateTransform attributeName="transform" type="translate" values="-60 0;60 0;-60 0" dur="9s" repeatCount="indefinite"/><ellipse cx="${cx-20}" cy="${y+400}" rx="34" ry="14" fill="#fff"/><ellipse cx="${cx-5}" cy="${y+390}" rx="20" ry="14" fill="#fff"/></g>`;
+    s+=`<line x1="${cx}" y1="${y+315}" x2="${cx}" y2="${y+465}" stroke="#8d6e63" stroke-width="6"/>`;
+    s+=`<rect x="${cx-105}" y="${fy-20}" width="210" height="18" rx="6" fill="#a1887f"/><rect x="${cx-90}" y="${fy-2}" width="14" height="110" fill="#8d6e63"/><rect x="${cx+76}" y="${fy-2}" width="14" height="110" fill="#8d6e63"/>`;
+    s+=`<g>${pi===1?`<animateTransform attributeName="transform" type="rotate" values="-4 ${cx} ${fy-20};4 ${cx} ${fy-20};-4 ${cx} ${fy-20}" dur=".9s" repeatCount="indefinite"/>`:''}${I.manzana(cx-35,fy-62)}${I.naranja(cx+5,fy-70)}${sc(I.uva,cx+40,fy-62,.9)}<path d="M${cx-70} ${fy-60} L${cx+70} ${fy-60} L${cx+52} ${fy-20} L${cx-52} ${fy-20} Z" fill="#d7a35a" stroke="#8d5a1f" stroke-width="4"/><path d="M${cx-60} ${fy-46} L${cx+60} ${fy-46} M${cx-56} ${fy-33} L${cx+56} ${fy-33}" stroke="#8d5a1f" stroke-width="3"/></g>`;
+  }
+  if(k===1){ // mascotería: acuario con pez y burbujas, pollito saltando
+    s+=`<rect x="${cx-100}" y="${y+330}" width="200" height="150" rx="10" fill="#b3e5fc" stroke="#546e7a" stroke-width="6"/><rect x="${cx-100}" y="${y+455}" width="200" height="25" fill="#d7ccc8"/>`;
+    s+=`<g><animateTransform attributeName="transform" type="translate" values="-50 0;50 8;-50 0" dur="5s" repeatCount="indefinite"/>${I.pez(cx,y+395)}</g>`;
+    for(let i=0;i<3;i++) s+=`<circle cx="${cx-60+i*30}" cy="${y+450}" r="5" fill="none" stroke="#fff" stroke-width="2"><animate attributeName="cy" values="${y+450};${y+340}" dur="${2+i*.6}s" begin="${i*.5}s" repeatCount="indefinite"/><animate attributeName="opacity" values="1;0" dur="${2+i*.6}s" begin="${i*.5}s" repeatCount="indefinite"/></circle>`;
+    s+=`<rect x="${cx-80}" y="${y+480}" width="160" height="${fy-y-480+40}" fill="#8d6e63"/>`;
+    s+=`<g><animateTransform attributeName="transform" type="translate" values="0 0;0 -26;0 0;0 0" keyTimes="0;.25;.5;1" dur="1.2s" repeatCount="indefinite"/>${I.pollito(cx,fy+75)}</g>`;
+  }
+  if(k===2){ // sala: pizarra y mesa con útiles revueltos
+    s+=`<rect x="${cx-110}" y="${y+310}" width="220" height="150" rx="6" fill="#2e5e4e" stroke="#8d6e63" stroke-width="8"/><text x="${cx}" y="${y+375}" text-anchor="middle" font-size="30" font-weight="800" style="fill:#e8f5e9">Útiles</text><path d="M${cx-60} ${y+410} q30 -20 60 0 t60 0" fill="none" stroke="#e8f5e9" stroke-width="3"/>`;
+    s+=`<rect x="${cx-110}" y="${fy-10}" width="220" height="18" rx="6" fill="#a1887f"/><rect x="${cx-95}" y="${fy+8}" width="14" height="100" fill="#8d6e63"/><rect x="${cx+81}" y="${fy+8}" width="14" height="100" fill="#8d6e63"/>`;
+    s+=`${sc(I.libro,cx-60,fy-36,.8)}${sc(I.goma,cx+55,fy-22,.8)}<g><animateTransform attributeName="transform" type="translate" values="-20 0;20 0;-20 0" dur="2.4s" repeatCount="indefinite"/>${sc(I.lapiz,cx,fy-24,.9)}</g>`;
+  }
+  if(k===3){ // pastelería: banderines y vitrina
+    s+=`<g><animateTransform attributeName="transform" type="rotate" values="-2 ${cx} ${y+310};2 ${cx} ${y+310};-2 ${cx} ${y+310}" dur="2.2s" repeatCount="indefinite"/><path d="M${cx-140} ${y+310} Q${cx} ${y+350} ${cx+140} ${y+310}" stroke="#795548" stroke-width="3" fill="none"/>`;
+    ["#ef5350","#ffca28","#42a5f5","#66bb6a","#ab47bc"].forEach((c,i)=>{const fx=cx-110+i*55,fyy=y+322+Math.sin((i+.5)/5*Math.PI)*16;s+=`<path d="M${fx-18} ${fyy} L${fx+18} ${fyy} L${fx} ${fyy+34} Z" fill="${c}"/>`});
+    s+=`</g><rect x="${cx-115}" y="${fy-120}" width="230" height="${h-(fy-y)+90}" rx="10" fill="#e1f5fe" fill-opacity=".85" stroke="#8d6e63" stroke-width="6"/><line x1="${cx-115}" y1="${fy-30}" x2="${cx+115}" y2="${fy-30}" stroke="#8d6e63" stroke-width="5"/>`;
+    s+=`${sc(I.torta,cx-60,fy-60,.9)}${sc(I.dona,cx+5,fy-60,.8)}${sc(I.galleta,cx+65,fy-60,.8)}${sc(I.alfajor,cx-50,fy+15,.8)}${sc(I.dona,cx+20,fy+15,.8)}${sc(I.galleta,cx+80,fy+15,.7)}`;
+    for(let i=0;i<3;i++) s+=`<path d="M${cx-70+i*10} ${fy-100} q-8 -12 0 -24 q8 -12 0 -24" stroke="#bbb" stroke-width="3" fill="none"><animate attributeName="opacity" values="0;1;0" dur="2s" begin="${i*.6}s" repeatCount="indefinite"/></path>`;
+  }
+  return s;
+}
+const EMO=[["ex","idea","q","idea"],["ex","sad","q","heart"],["ex","star","q","idea"],["heart","q","q","idea"]];
+function comic(S,st,fresh){
+  const k=sit, pi=st.pi, x=30,y=100,w=1540,h=770,by=835;
+  const shown=st.n; // diálogos visibles en esta viñeta
+  const last=shown>0?pi*2+shown-1:-1, speaking=last>=0?S.talk[last][0]:-1;
+  fresh=fresh&&pi===0;
+  let o=`<g class="${fresh?'fade':''}">${panel(x,y,w,h,S.bg)}<rect x="${x+3}" y="${y+h-130}" width="${w-6}" height="127" fill="#000" fill-opacity="0.07"/>${scenery(k,x+390,y,760,h,pi)}`;
+  [0,1].forEach(wi=>{
+    const px=wi===0?450:1150;
+    const walk=fresh?` class="walk${wi===0?'L':'R'}"`:'';
+    o+=`<g${walk}>${person(px,by,S.who[wi],1.5,speaking===wi?'talk':'idle',wi===0?1:-1,wi+pi*2)}</g>`;
+  });
+  o+=badge(x+40,y+40,pi+1)+`</g>`;
+  for(let j=0;j<shown;j++){
+    const idx=pi*2+j, [w0,txt]=S.talk[idx], px=w0===0?450:1150, bx=w0===0?130:890;
+    o+=bubble(bx,130,580,230,txt,px,headTop(by,S.who[w0],1.5)-18,38,idx===last?'pop':'');
+    if(idx===last) o+=emote(EMO[k][idx],px+(w0===0?-150:150),headTop(by,S.who[w0],1.5)+40);
+  }
+  return o;
+}
+function story(S,st,fresh){
+  const [q,a,why]=STORYQ[sit];
+  let o=`<g class="${fresh?'fade':''}">${panel(30,100,1540,770,S.bg)}<rect x="33" y="740" width="1534" height="127" fill="#000" fill-opacity="0.07"/>`;
+  o+=person(220,835,S.who[0],1.4,'idle',1,0)+person(1380,835,S.who[1],1.4,'idle',-1,1);
+  o+=`<text x="800" y="175" text-anchor="middle" font-size="34" font-weight="800" style="fill:var(--muted)">Volvamos a la pregunta de la historia</text>`;
+  o+=`<rect x="370" y="205" width="860" height="200" rx="26" fill="#fff59d" stroke="#1e2833" stroke-width="5"/>`+lines(800,305,wrap(q,30),52,`class="disp"`)+`</g>`;
+  if(st.ans){
+    o+=`<g class="pop"><rect x="420" y="450" width="760" height="250" rx="26" fill="var(--more-soft)" stroke="var(--more)" stroke-width="6"/>`;
+    o+=`<text x="800" y="560" text-anchor="middle" font-size="76" class="disp" style="fill:var(--more)">${a}</text>`+lines(800,640,wrap(why,48),32,`font-weight="700"`)+`</g>`;
+    o+=emote("idea",S.talk[3][0]===0?220:1380,500);
+  }
+  return o;
+}
+function ending(S,st,fresh){
+  let o=`<g class="${fresh?'fade':''}">${panel(30,100,1540,770,S.bg)}<rect x="33" y="740" width="1534" height="127" fill="#000" fill-opacity="0.07"/>`;
+  if(st.b>=2){
+    const r=rng(7+sit), cols=["#ef5350","#ffca28","#42a5f5","#66bb6a","#ab47bc","#ff7043"];
+    o+=`<g clip-path="url(#endclip)">`;
+    for(let i=0;i<70;i++){const cx=50+r()*1500;o+=`<rect class="conf" x="${cx}" y="60" width="${10+r()*8}" height="${16+r()*10}" rx="2" fill="${cols[i%6]}" style="animation-duration:${(2.2+r()*2).toFixed(2)}s;animation-delay:${(-r()*4).toFixed(2)}s"/>`}
+    o+=`</g>`;
+  }
+  const last=st.b-1, speaking=last>=0?S.end[last][0]:-1;
+  [0,1].forEach(wi=>{
+    const px=wi===0?450:1150;
+    const mode=st.b>=2?'jump':(speaking===wi?'talk':'idle');
+    o+=person(px,835,S.who[wi],1.5,mode,wi===0?1:-1,wi);
+  });
+  o+=`</g>`;
+  S.end.forEach(([w0,txt],i)=>{
+    if(i>=st.b)return;
+    const px=w0===0?450:1150, bx=w0===0?160:860;
+    o+=bubble(bx,130,580,220,txt,px,headTop(835,S.who[w0],1.5)-18,36,i===last?'pop':'');
+  });
+  if(st.b===1) o+=emote("idea",S.end[0][0]===0?300:1300,520);
+  if(st.b>=2) o+=emote("star",S.end[1][0]===0?300:1300,520);
+  return o;
+}
+
+function objective(){
+  const x=250,y=200,w=1100,h=560;
+  let o=`<g class="fade"><text x="800" y="120" text-anchor="middle" font-size="60" class="disp">Objetivo de la clase</text>`;
+  o+=`<rect x="${x+8}" y="${y+10}" width="${w}" height="${h}" rx="14" fill="#cfd8e3"/><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="14" fill="#fff" stroke="#1e2833" stroke-width="5"/>`;
+  for(let l=y+120;l<y+h-20;l+=70) o+=`<line x1="${x+10}" y1="${l}" x2="${x+w-10}" y2="${l}" stroke="#b9d3f0" stroke-width="3"/>`;
+  o+=`<line x1="${x+110}" y1="${y+5}" x2="${x+110}" y2="${y+h-5}" stroke="#ef9a9a" stroke-width="4"/>`;
+  for(let i=0;i<8;i++) o+=`<ellipse cx="${x}" cy="${y+50+i*66}" rx="22" ry="9" fill="none" stroke="#78909c" stroke-width="6"/>`;
+  o+=`<text x="${x+140}" y="${y+100}" font-size="40" style="font-family:'Patrick Hand',cursive;fill:#5b6878">Objetivo:</text></g>`;
+  o+=`<defs><clipPath id="write"><rect x="${x+130}" y="${y+150}" width="0" height="200"><animate attributeName="width" from="0" to="920" begin=".9s" dur="3.4s" fill="freeze"/></rect></clipPath></defs>`;
+  o+=`<g clip-path="url(#write)"><text x="${x+140}" y="${y+238}" font-size="68" style="font-family:'Patrick Hand',cursive;fill:#1d4fb8">Construir e interpretar</text><text x="${x+140}" y="${y+238}" font-size="68" style="font-family:'Patrick Hand',cursive;fill:#1d4fb8;opacity:0">.</text></g>`;
+  o+=`<defs><clipPath id="write2"><rect x="${x+130}" y="${y+290}" width="0" height="120"><animate attributeName="width" from="0" to="920" begin="4.3s" dur="2.4s" fill="freeze"/></rect></clipPath></defs>`;
+  o+=`<g clip-path="url(#write2)"><text x="${x+140}" y="${y+378}" font-size="68" style="font-family:'Patrick Hand',cursive;fill:#1d4fb8">pictogramas.</text></g>`;
+  o+=`<g><animateTransform attributeName="transform" type="translate" values="0 0;640 0;640 140;0 140;380 140;380 140" keyTimes="0;.47;.5;.53;.95;1" begin=".9s" dur="5.8s" fill="freeze"/>${sc(I.lapiz,x+180,y+200,2.2)}</g>`;
+  o+=`<g class="rise" style="animation-delay:6.6s"><rect x="560" y="800" width="480" height="70" rx="35" fill="var(--accent)"/><text x="800" y="846" text-anchor="middle" font-size="34" font-weight="800" style="fill:#fff">Escríbelo en tu cuaderno</text></g>`;
+  return o;
+}
+/* ---------- control ---------- */
+let sit=0, step=0, lastScr=null;
+const stage=document.getElementById('stage'), where=document.getElementById('where');
+const tabs=document.getElementById('tabs');
+{const b=document.createElement('button');b.textContent='Objetivo';b.onclick=()=>go(0,0);tabs.appendChild(b)}
+SITS.forEach((S,k)=>{const b=document.createElement('button');b.textContent=`Situación ${k+1}`;b.title=S.t;b.onclick=()=>go(k,k===0?1:0);tabs.appendChild(b)});
+function render(){
+  const S=SITS[sit], st=S.steps[step], key=st.scr+(st.pi??''), fresh=key!==lastScr; lastScr=key;
+  const body=st.scr==='obj'?objective():{comic,count,task,picto,story,end:ending}[st.scr](S,st,fresh);
+  stage.innerHTML=`<defs><clipPath id="endclip"><rect x="36" y="106" width="1528" height="758" rx="14"/></clipPath></defs><rect width="1600" height="900" fill="var(--stage)"/>${st.scr==='obj'?'':title(sit,S)}${body}`;
+  try{stage.setCurrentTime(0)}catch(e){}
+  where.innerHTML=`<b>${LABEL[st.scr]}</b> · paso ${step+1} de ${S.steps.length}`;
+  const cur=st.scr==='obj'?0:sit+1;[...tabs.children].forEach((b,k)=>b.setAttribute('aria-pressed',k===cur));
+  document.getElementById('prev').disabled=document.getElementById('navL').disabled=sit===0&&step===0;
+  document.getElementById('navR').disabled=sit===3&&step===S.steps.length-1;
+  document.getElementById('next').textContent=step===S.steps.length-1?(sit<3?'Siguiente situación ▶':'Fin'):'Siguiente ▶';
+  document.getElementById('next').disabled=sit===3&&step===S.steps.length-1;
+}
+function go(s,p){if(s!==sit)lastScr=null;sit=s;step=p;render()}
+function next(){const n=SITS[sit].steps.length;if(step<n-1)go(sit,step+1);else if(sit<3)go(sit+1,0)}
+const kk=t=>t.scr+(t.pi??'');
+function prev(){if(step>0){lastScr=kk(SITS[sit].steps[step-1])===kk(SITS[sit].steps[step])?lastScr:null;step--;render()}else if(sit>0)go(sit-1,SITS[sit-1].steps.length-1)}
+document.getElementById('next').onclick=next;
+document.getElementById('prev').onclick=prev;
+document.getElementById('navL').onclick=e=>{e.stopPropagation();prev()};
+document.getElementById('navR').onclick=e=>{e.stopPropagation();next()};
+stage.addEventListener('click',next);
+window.addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight'||e.key==='ArrowDown'){e.preventDefault();next()}
+  else if(['ArrowLeft','ArrowUp'].includes(e.key)){e.preventDefault();prev()}
+  else if([' ','PageDown','Enter'].includes(e.key)&&e.target.tagName!=='BUTTON'){e.preventDefault();next()}
+  else if(['ArrowLeft','PageUp'].includes(e.key)){e.preventDefault();prev()}
+  else if(['1','2','3','4'].includes(e.key))go(+e.key-1,e.key==='1'?1:0);
+});
+document.getElementById('fs').onclick=()=>{try{const el=document.documentElement;(document.fullscreenElement?document.exitFullscreen():el.requestFullscreen()).catch(()=>{})}catch(e){}};
+render();
+try{document.body.tabIndex=-1;window.focus();document.body.focus({preventScroll:true})}catch(e){}
+stage.addEventListener('pointerdown',()=>{try{document.body.focus({preventScroll:true})}catch(e){}});
+</script>
+
+</body>
+</html>
