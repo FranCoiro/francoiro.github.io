@@ -6,6 +6,11 @@
       "asignatura": "Matemática"
     },
     {
+      "id": "3basico",
+      "nombre": "3.º básico",
+      "asignatura": "Matemática"
+    },
+    {
       "id": "4basico",
       "nombre": "4.º básico",
       "asignatura": "Matemática"
@@ -47,6 +52,23 @@
         {
           "nombre": "Hoja de trabajo (PDF)",
           "archivo": "hoja-de-trabajo.pdf"
+        }
+      ]
+    },
+    {
+      "curso": "3basico",
+      "fecha": "2026-10-30",
+      "titulo": "Prismas y pirámides",
+      "descripcion": "Distinguir prismas y pirámides e identificar bases, caras, vértices y aristas. Presentación con corrección paso a paso y rondas para descifrar en parejas.",
+      "carpeta": "3basico/2026-10-30-prismas-y-piramides/",
+      "materiales": [
+        {
+          "nombre": "Presentación",
+          "archivo": "index.html"
+        },
+        {
+          "nombre": "La fábrica de cuerpos: material para imprimir (PDF)",
+          "archivo": "fabrica-de-cuerpos-para-imprimir.pdf"
         }
       ]
     }
