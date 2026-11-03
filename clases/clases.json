@@ -18,6 +18,19 @@
   ],
   "clases": [
     {
+      "curso": "3basico",
+      "fecha": "2026-11-03",
+      "titulo": "Guía evaluada: prismas y pirámides",
+      "descripcion": "Guía evaluada (32 pts, 60–70 min): partes de un cuerpo, clasificar y nombrar prismas y pirámides, contar caras, aristas y vértices, adivinanzas y argumentar si el cubo es una pirámide cuadrada.",
+      "carpeta": "3basico/2026-11-03-guia-evaluada-prismas-y-piramides/",
+      "materiales": [
+        {
+          "nombre": "Guía evaluada (PDF)",
+          "archivo": "guia-evaluada.pdf"
+        }
+      ]
+    },
+    {
       "curso": "4basico",
       "fecha": "2026-11-03",
       "titulo": "Traslación de figuras",
