@@ -1,0 +1,374 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Traslación 4.º básico</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Atkinson+Hyperlegible:wght@400;700&display=swap">
+<style>
+/* Layout: una lámina a pantalla completa, como hoja de cuaderno de cuadros; barra de navegación abajo */
+:root {
+  --bg: #e9eff6;
+  --paper: #ffffff;
+  --ink: #1c2840;
+  --muted: #5a6780;
+  --grid: #cddbeb;
+  --margin: #e5838a;
+  --fig: #2563c9;
+  --fig-fill: rgba(37, 99, 201, 0.28);
+  --ghost: #8c98ad;
+  --path: #d4530f;
+  --hl: #fff1a8;
+  --btn: #1c2840;
+  --btn-ink: #ffffff;
+  --display: "Baloo 2", "Trebuchet MS", system-ui, sans-serif;
+  --body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #10161f; --paper: #18202d; --ink: #e9eef6; --muted: #9aa6ba;
+    --grid: #2b3a50; --margin: #a8545b; --fig: #6fa6ff; --fig-fill: rgba(111, 166, 255, 0.26);
+    --ghost: #6c7a90; --path: #ff8d52; --hl: #4a4115; --btn: #e9eef6; --btn-ink: #10161f;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #10161f; --paper: #18202d; --ink: #e9eef6; --muted: #9aa6ba;
+  --grid: #2b3a50; --margin: #a8545b; --fig: #6fa6ff; --fig-fill: rgba(111, 166, 255, 0.26);
+  --ghost: #6c7a90; --path: #ff8d52; --hl: #4a4115; --btn: #e9eef6; --btn-ink: #10161f;
+  color-scheme: dark;
+}
+
+html, body { height: 100%; }
+body {
+  background: var(--bg); color: var(--ink);
+  font-family: var(--body); font-size: 16px;
+  display: flex; flex-direction: column;
+  overflow: hidden;
+}
+.deck {
+  flex: 1; min-height: 0; position: relative;
+  padding-block: 16px 8px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.slide {
+  position: absolute; inset: 16px max(16px, env(safe-area-inset-right, 0px)) 8px max(16px, env(safe-area-inset-left, 0px));
+  background: var(--paper);
+  border-radius: 14px;
+  box-shadow: 0 2px 0 var(--grid), 0 12px 30px rgba(20, 30, 50, 0.08);
+  padding: clamp(18px, 3.5vw, 48px);
+  padding-left: clamp(30px, 6vw, 84px);
+  display: flex; flex-direction: column; gap: clamp(12px, 2vh, 24px);
+  overflow: auto;
+  background-image:
+    linear-gradient(to right, transparent calc(clamp(18px, 4vw, 56px) - 1px), var(--margin) calc(clamp(18px, 4vw, 56px) - 1px), var(--margin) calc(clamp(18px, 4vw, 56px) + 1px), transparent calc(clamp(18px, 4vw, 56px) + 1px));
+}
+.slide[hidden] { display: none !important; }
+
+h1, h2 { font-family: var(--display); font-weight: 800; line-height: 1.05; margin: 0; text-wrap: balance; }
+h1 { font-size: clamp(3.2rem, 11vw, 8rem); color: var(--fig); }
+h2 { font-size: clamp(1.8rem, 4.6vw, 3.4rem); }
+.eyebrow {
+  font-family: var(--display); font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.08em; color: var(--muted); font-size: clamp(0.9rem, 1.6vw, 1.2rem);
+}
+.label {
+  display: inline-block; font-family: var(--display); font-weight: 800; text-transform: uppercase;
+  letter-spacing: 0.06em; font-size: clamp(0.85rem, 1.4vw, 1.05rem); color: var(--muted);
+}
+
+/* Portada */
+.cover { justify-content: center; }
+.objective {
+  background: var(--hl); border-radius: 6px;
+  padding: clamp(14px, 2.4vw, 28px) clamp(16px, 3vw, 36px);
+  max-width: 34ch; display: flex; flex-direction: column; gap: 6px;
+}
+.objective p { margin: 0; font-size: clamp(1.6rem, 4.2vw, 3rem); font-weight: 700; line-height: 1.15; }
+.copy-tip { color: var(--muted); font-size: clamp(1rem, 1.8vw, 1.3rem); margin: 0; }
+
+/* Definición */
+.def-wrap { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: clamp(16px, 3vw, 40px); align-items: center; flex: 1; }
+.def-lines { display: flex; flex-direction: column; gap: clamp(10px, 2vh, 22px); margin: 0; padding: 0; list-style: none; }
+.def-lines li {
+  font-size: clamp(1.5rem, 3.6vw, 2.7rem); font-weight: 700; line-height: 1.2;
+  opacity: 0; transform: translateY(8px); transition: opacity .35s, transform .35s;
+}
+.def-lines li.show { opacity: 1; transform: none; }
+.def-lines li:first-child { background: var(--hl); padding: 6px 12px; border-radius: 6px; margin-left: -12px; }
+.demo { width: 100%; max-width: 100%; height: auto; }
+.demo .g line { stroke: var(--grid); stroke-width: 1; }
+.demo .ghost { fill: none; stroke: var(--ghost); stroke-width: 2.5; stroke-dasharray: 6 5; }
+.demo .mover { fill: var(--fig-fill); stroke: var(--fig); stroke-width: 3; animation: slide 4s ease-in-out infinite; }
+@keyframes slide {
+  0%, 15% { transform: translate(0, 0); }
+  45%, 70% { transform: translate(160px, 0); }
+  100% { transform: translate(0, 0); }
+}
+
+/* Ejemplos */
+.ex-body { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: clamp(14px, 3vw, 40px); align-items: center; }
+.board svg { width: 100%; height: auto; max-height: 62vh; display: block; }
+.board .gl { stroke: var(--grid); stroke-width: 1.2; }
+.board .ghost { fill: none; stroke: var(--ghost); stroke-width: 3; stroke-dasharray: 8 6; opacity: 0; transition: opacity .3s; }
+.board .ghost.show { opacity: 1; }
+.board .fig { transition: transform .45s cubic-bezier(.4, .1, .2, 1); }
+.board .fig polygon { fill: var(--fig-fill); stroke: var(--fig); stroke-width: 4; stroke-linejoin: round; }
+.board .fig circle { fill: var(--fig); }
+.board .paths { opacity: 0; transition: opacity .35s; }
+.board .paths.show { opacity: 1; }
+.board .paths polyline { fill: none; stroke: var(--path); stroke-width: 3; stroke-dasharray: 2 6; stroke-linecap: round; }
+.board marker path { fill: var(--path); }
+
+.side { display: flex; flex-direction: column; gap: clamp(12px, 2.4vh, 24px); min-width: 0; }
+.counter { display: flex; flex-wrap: wrap; gap: 12px; }
+.count {
+  display: flex; align-items: baseline; gap: 10px;
+  border: 3px solid var(--grid); border-radius: 12px; padding: 8px 16px;
+}
+.count b { font-family: var(--display); font-size: clamp(2.4rem, 6vw, 4.4rem); color: var(--fig); line-height: 1; font-variant-numeric: tabular-nums; }
+.count span { font-size: clamp(1rem, 1.9vw, 1.4rem); font-weight: 700; }
+.count .of { color: var(--muted); font-weight: 400; }
+.hint { margin: 0; color: var(--muted); font-size: clamp(1rem, 1.7vw, 1.25rem); min-height: 1.4em; }
+.note {
+  background: var(--hl); border-radius: 6px; padding: clamp(12px, 2vw, 22px);
+  opacity: 0; transform: translateY(8px); transition: opacity .35s, transform .35s;
+  display: flex; flex-direction: column; gap: 6px;
+}
+.note.show { opacity: 1; transform: none; }
+.note p { margin: 0; font-size: clamp(1.3rem, 2.9vw, 2.1rem); font-weight: 700; line-height: 1.2; }
+
+/* Navegación */
+.nav {
+  display: flex; align-items: center; justify-content: center; gap: 12px;
+  padding-block: 6px calc(10px + env(safe-area-inset-bottom, 0px));
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.nav button {
+  font: 700 1rem var(--body); border: 0; border-radius: 999px; cursor: pointer;
+  background: var(--btn); color: var(--btn-ink); padding: 10px 20px; min-width: 48px;
+}
+.nav button.ghostbtn { background: transparent; color: var(--muted); border: 2px solid var(--grid); }
+.nav button:focus-visible { outline: 3px solid var(--fig); outline-offset: 2px; }
+.nav button:disabled { opacity: .35; cursor: default; }
+.dots { display: flex; gap: 8px; }
+.dots i { width: 10px; height: 10px; border-radius: 50%; background: var(--grid); }
+.dots i.on { background: var(--fig); }
+
+@media (max-width: 760px) {
+  .def-wrap, .ex-body { grid-template-columns: minmax(0, 1fr); }
+  .board svg { max-height: 44vh; }
+  .nav .ghostbtn { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .demo .mover { animation: none; transform: translate(160px, 0); }
+  .board .fig, .def-lines li, .note, .board .ghost, .board .paths { transition: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="deck" id="deck">
+  <section class="slide cover" data-steps="0">
+    <span class="eyebrow">Matemática · 4.º básico</span>
+    <h1>Traslación</h1>
+    <div class="objective">
+      <span class="label">Objetivo</span>
+      <p>Trasladar figuras en una cuadrícula.</p>
+    </div>
+    <p class="copy-tip">Anota el objetivo en tu cuaderno.</p>
+  </section>
+
+  <section class="slide" data-steps="3" data-kind="def" hidden>
+    <span class="eyebrow">Definición · para el cuaderno</span>
+    <h2>¿Qué es trasladar?</h2>
+    <div class="def-wrap">
+      <ul class="def-lines">
+        <li>La traslación es un movimiento de una figura en el plano que la desplaza de un lugar a otro sin cambiar su forma ni su tamaño.</li>
+        <li>La figura cambia de lugar.</li>
+        <li>Su forma y su tamaño no cambian.</li>
+      </ul>
+      <svg class="demo" viewBox="0 0 320 160" role="img" aria-label="Un cuadrado se desliza 4 cuadros a la derecha y vuelve">
+        <g class="g"></g>
+        <rect class="ghost" x="40" y="40" width="80" height="80"></rect>
+        <rect class="mover" x="40" y="40" width="80" height="80"></rect>
+      </svg>
+    </div>
+  </section>
+</div>
+
+<nav class="nav" aria-label="Navegación de la presentación">
+  <button id="prev" type="button" aria-label="Anterior">←</button>
+  <div class="dots" id="dots"></div>
+  <button id="next" type="button" aria-label="Siguiente">→</button>
+  <button id="full" class="ghostbtn" type="button">Pantalla completa</button>
+</nav>
+
+<script>
+(function () {
+  const C = 40; // tamaño de un cuadro en la cuadrícula
+  const DIRS = {
+    R: { sym: "→", label: "a la derecha", val: (dx, dy) => dx },
+    L: { sym: "←", label: "a la izquierda", val: (dx, dy) => -dx },
+    U: { sym: "↑", label: "hacia arriba", val: (dx, dy) => -dy },
+    D: { sym: "↓", label: "hacia abajo", val: (dx, dy) => dy }
+  };
+  const VEC = { R: [1, 0], L: [-1, 0], U: [0, -1], D: [0, 1] };
+
+  const examples = [
+    {
+      title: "Trasladar 4 cuadros a la derecha",
+      aria: "Triángulo en una cuadrícula",
+      cols: 12, rows: 10,
+      pts: [[2, 7], [5, 7], [2, 3]],
+      plan: [["R", 4]],
+      note: "El triángulo se trasladó 4 cuadros a la derecha."
+    },
+    {
+      title: "Trasladar 3 cuadros hacia abajo",
+      aria: "Triángulo en una cuadrícula",
+      cols: 12, rows: 10,
+      pts: [[5, 4], [9, 4], [7, 1]],
+      plan: [["D", 3]],
+      note: "El triángulo se trasladó 3 cuadros hacia abajo."
+    },
+    {
+      title: "Trasladar 3 cuadros a la derecha y 2 hacia arriba",
+      aria: "Flecha en una cuadrícula",
+      cols: 12, rows: 10,
+      pts: [[1, 6], [4, 6], [4, 5], [6, 7], [4, 9], [4, 8], [1, 8]],
+      plan: [["R", 3], ["U", 2]],
+      note: "La flecha se trasladó 3 cuadros a la derecha y 2 cuadros hacia arriba."
+    }
+  ];
+
+  // Cuadrícula de la mini demo
+  const dg = document.querySelector(".demo .g");
+  let dl = "";
+  for (let x = 0; x <= 320; x += 40) dl += `<line x1="${x}" y1="0" x2="${x}" y2="160"/>`;
+  for (let y = 0; y <= 160; y += 40) dl += `<line x1="0" y1="${y}" x2="320" y2="${y}"/>`;
+  dg.innerHTML = dl;
+
+  // Construir láminas de ejemplos
+  const deck = document.getElementById("deck");
+  examples.forEach((ex, i) => {
+    ex.moves = [];
+    ex.plan.forEach(([d, n]) => { for (let k = 0; k < n; k++) ex.moves.push(VEC[d]); });
+    const W = ex.cols * C, H = ex.rows * C;
+    let g = "";
+    for (let x = 0; x <= ex.cols; x++) g += `<line class="gl" x1="${x * C}" y1="0" x2="${x * C}" y2="${H}"/>`;
+    for (let y = 0; y <= ex.rows; y++) g += `<line class="gl" x1="0" y1="${y * C}" x2="${W}" y2="${y * C}"/>`;
+    const poly = ex.pts.map(p => `${p[0] * C},${p[1] * C}`).join(" ");
+    // Caminos de cada vértice
+    let paths = "";
+    ex.pts.forEach(p => {
+      const seq = [[p[0], p[1]]];
+      let x = p[0], y = p[1];
+      ex.plan.forEach(([d, n]) => { x += VEC[d][0] * n; y += VEC[d][1] * n; seq.push([x, y]); });
+      paths += `<polyline points="${seq.map(q => `${q[0] * C},${q[1] * C}`).join(" ")}" marker-end="url(#arr${i})"/>`;
+    });
+    const dots = ex.pts.map(p => `<circle cx="${p[0] * C}" cy="${p[1] * C}" r="6"/>`).join("");
+    const counters = ex.plan.map(([d, n]) =>
+      `<div class="count" data-dir="${d}"><b>0</b><span>${DIRS[d].sym} ${DIRS[d].label} <span class="of">de ${n}</span></span></div>`
+    ).join("");
+
+    const s = document.createElement("section");
+    s.className = "slide";
+    s.hidden = true;
+    s.dataset.kind = "ex";
+    s.dataset.index = i;
+    s.dataset.steps = ex.moves.length + 2;
+    s.innerHTML = `
+      <span class="eyebrow">Ejemplo ${i + 1}</span>
+      <h2>${ex.title}</h2>
+      <div class="ex-body">
+        <div class="board">
+          <svg viewBox="-10 -10 ${W + 20} ${H + 20}" role="img" aria-label="${ex.aria}">
+            <defs><marker id="arr${i}" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z"/></marker></defs>
+            ${g}
+            <polygon class="ghost" points="${poly}"/>
+            <g class="paths">${paths}</g>
+            <g class="fig"><polygon points="${poly}"/>${dots}</g>
+          </svg>
+        </div>
+        <aside class="side">
+          <div class="counter">${counters}</div>
+          <p class="hint"></p>
+          <div class="note"><span class="label">Para el cuaderno</span><p>${ex.note}</p></div>
+        </aside>
+      </div>`;
+    deck.appendChild(s);
+  });
+
+  const slides = [...deck.querySelectorAll(".slide")];
+  const state = slides.map(() => 0);
+  let cur = 0;
+
+  const dotsEl = document.getElementById("dots");
+  dotsEl.innerHTML = slides.map(() => "<i></i>").join("");
+
+  function render() {
+    slides.forEach((s, i) => { s.hidden = i !== cur; });
+    [...dotsEl.children].forEach((d, i) => d.classList.toggle("on", i === cur));
+    const sl = slides[cur], st = state[cur];
+    if (sl.dataset.kind === "def") {
+      sl.querySelectorAll(".def-lines li").forEach((li, i) => li.classList.toggle("show", i < st));
+    }
+    if (sl.dataset.kind === "ex") {
+      const ex = examples[+sl.dataset.index];
+      const n = ex.moves.length;
+      const k = Math.min(st, n);
+      let dx = 0, dy = 0;
+      for (let i = 0; i < k; i++) { dx += ex.moves[i][0]; dy += ex.moves[i][1]; }
+      sl.querySelector(".fig").style.transform = `translate(${dx * C}px, ${dy * C}px)`;
+      sl.querySelector(".ghost").classList.toggle("show", st > 0);
+      sl.querySelector(".paths").classList.toggle("show", st > n);
+      sl.querySelector(".note").classList.toggle("show", st > n + 1);
+      sl.querySelectorAll(".count").forEach(c => {
+        c.querySelector("b").textContent = DIRS[c.dataset.dir].val(dx, dy);
+      });
+      sl.querySelector(".hint").textContent =
+        st === 0 ? "Aprieta → para mover la figura un cuadro." :
+        st < n ? "Aprieta → para mover otro cuadro." :
+        st === n ? "Aprieta → para ver el camino de cada punta." :
+        st === n + 1 ? "Todas las puntas se movieron lo mismo." : "";
+    }
+    document.getElementById("prev").disabled = cur === 0 && state[0] === 0;
+    document.getElementById("next").disabled = cur === slides.length - 1 && state[cur] >= +slides[cur].dataset.steps;
+  }
+
+  function next() {
+    const max = +slides[cur].dataset.steps;
+    if (state[cur] < max) state[cur]++;
+    else if (cur < slides.length - 1) { cur++; }
+    render();
+  }
+  function prev() {
+    if (state[cur] > 0) state[cur]--;
+    else if (cur > 0) { cur--; }
+    render();
+  }
+
+  document.getElementById("next").addEventListener("click", next);
+  document.getElementById("prev").addEventListener("click", prev);
+  document.addEventListener("keydown", e => {
+    if (["ArrowRight", "PageDown", " ", "Enter"].includes(e.key)) { e.preventDefault(); next(); }
+    if (["ArrowLeft", "PageUp", "Backspace"].includes(e.key)) { e.preventDefault(); prev(); }
+  });
+  document.getElementById("full").addEventListener("click", () => {
+    try {
+      if (document.fullscreenElement) document.exitFullscreen();
+      else document.documentElement.requestFullscreen().catch(() => {});
+    } catch (err) {}
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>

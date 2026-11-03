@@ -20,6 +20,19 @@
     {
       "curso": "4basico",
       "fecha": "2026-11-03",
+      "titulo": "Traslación de figuras",
+      "descripcion": "Objetivo, definición y tres ejemplos animados en cuadrícula: la figura avanza cuadro a cuadro y se ve el camino de cada punta. Para copiar en el cuaderno.",
+      "carpeta": "4basico/2026-11-03-traslacion/",
+      "materiales": [
+        {
+          "nombre": "Presentación",
+          "archivo": "index.html"
+        }
+      ]
+    },
+    {
+      "curso": "4basico",
+      "fecha": "2026-11-03",
       "titulo": "Números decimales: grilla, recta, suma y resta",
       "descripcion": "Guía de repaso: pintar décimos y centésimos en la grilla de 100, ubicar decimales en rectas ya divididas, y sumar y restar decimales.",
       "carpeta": "4basico/2026-11-03-decimales/",
