@@ -19,6 +19,19 @@
   "clases": [
     {
       "curso": "4basico",
+      "fecha": "2026-11-03",
+      "titulo": "Números decimales: grilla, recta, suma y resta",
+      "descripcion": "Guía de repaso: pintar décimos y centésimos en la grilla de 100, ubicar decimales en rectas ya divididas, y sumar y restar decimales.",
+      "carpeta": "4basico/2026-11-03-decimales/",
+      "materiales": [
+        {
+          "nombre": "Guía (PDF)",
+          "archivo": "guia.pdf"
+        }
+      ]
+    },
+    {
+      "curso": "4basico",
       "fecha": "2026-10-30",
       "titulo": "Simetría y ejes de simetría",
       "descripcion": "Completar figuras simétricas respecto de un eje. Presentación dinámica con corrección paso a paso.",
