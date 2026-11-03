@@ -47,6 +47,12 @@ h1{font-family:var(--f-display);font-weight:500;font-size:clamp(2rem,5vw,2.8rem)
 .mats{display:flex;flex-wrap:wrap;gap:8px}
 .mats a{font-size:.88rem;font-weight:500;text-decoration:none;padding:5px 12px;border-radius:999px;background:var(--accent-soft);color:var(--accent)}
 .mats a:hover{text-decoration:underline}
+.subtabs{display:flex;flex-wrap:wrap;gap:6px;margin:-12px 0 22px}
+.subtabs button{font:500 .85rem var(--f-body);color:var(--soft);background:transparent;border:1px solid var(--line);border-radius:999px;padding:4px 12px;cursor:pointer}
+.subtabs button[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px}
+.tag{font:500 .72rem var(--f-mono);letter-spacing:.04em;text-transform:uppercase;padding:2px 8px;border-radius:6px;border:1px solid var(--line);color:var(--soft)}
+.tag.ev{border-color:#c2662d;color:#c2662d}
 .empty{color:var(--soft);padding:24px;text-align:center;border:1px dashed var(--line);border-radius:16px}
 @media (max-width:520px){.item{grid-template-columns:1fr;gap:6px}.date b{display:inline;font-size:1.2rem;margin-right:6px}}
 </style>
@@ -57,12 +63,13 @@ h1{font-family:var(--f-display);font-weight:500;font-size:clamp(2rem,5vw,2.8rem)
   <h1>Clases</h1>
   <p class="lead">Presentaciones y guías organizadas por curso y fecha.</p>
   <div class="tabs" role="tablist" id="tabs"></div>
+  <div class="subtabs" id="subtabs" aria-label="Asignatura"></div>
   <div class="list" id="list"><p class="empty">Cargando clases…</p></div>
 </main>
 <script>
 const MESES = ['ene','feb','mar','abr','may','jun','jul','ago','sept','oct','nov','dic'];
-const tabs = document.getElementById('tabs'), list = document.getElementById('list');
-let data = { cursos: [], clases: [] }, actual = null;
+const tabs = document.getElementById('tabs'), list = document.getElementById('list'), subtabs = document.getElementById('subtabs');
+let data = { cursos: [], clases: [] }, actual = null, asig = 'Todas';
 
 function esc(s){ return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 
@@ -71,11 +78,23 @@ function pintar(){
   data.cursos.forEach(c => {
     const b = document.createElement('button');
     b.setAttribute('role','tab'); b.setAttribute('aria-selected', c.id === actual);
-    b.textContent = c.nombre + (c.asignatura ? ' · ' + c.asignatura : '');
-    b.onclick = () => { actual = c.id; location.hash = c.id; pintar(); };
+    b.textContent = c.nombre;
+    b.onclick = () => { actual = c.id; asig = 'Todas'; location.hash = c.id; pintar(); };
     tabs.appendChild(b);
   });
-  const clases = data.clases.filter(x => x.curso === actual).sort((a,b) => b.fecha.localeCompare(a.fecha));
+  const delCurso = data.clases.filter(x => x.curso === actual);
+  const asigs = [...new Set(delCurso.map(x => x.asignatura || 'Matemática'))].sort();
+  subtabs.innerHTML = '';
+  if (asigs.length > 1){
+    ['Todas', ...asigs].forEach(a => {
+      const b = document.createElement('button');
+      b.textContent = a; b.setAttribute('aria-pressed', a === asig);
+      b.onclick = () => { asig = a; pintar(); };
+      subtabs.appendChild(b);
+    });
+  } else asig = 'Todas';
+  const clases = delCurso.filter(x => asig === 'Todas' || (x.asignatura || 'Matemática') === asig)
+    .sort((a,b) => b.fecha.localeCompare(a.fecha));
   if (!clases.length){ list.innerHTML = '<p class="empty">Todavía no hay clases en este curso.</p>'; return; }
   list.innerHTML = clases.map(x => {
     const [y,m,d] = x.fecha.split('-');
@@ -83,7 +102,7 @@ function pintar(){
       `<a href="${esc(x.carpeta + mt.archivo)}">${esc(mt.nombre)}</a>`).join('');
     return `<article class="item">
       <div class="date"><b>${+d}</b>${MESES[+m-1]} ${y}</div>
-      <div><h2>${esc(x.titulo)}</h2>${x.descripcion ? `<p>${esc(x.descripcion)}</p>` : ''}<div class="mats">${mats}</div></div>
+      <div><div class="tags"><span class="tag">${esc(x.asignatura || 'Matemática')}</span>${x.evaluada ? '<span class="tag ev">Evaluada</span>' : ''}</div><h2>${esc(x.titulo)}</h2>${x.descripcion ? `<p>${esc(x.descripcion)}</p>` : ''}<div class="mats">${mats}</div></div>
     </article>`;
   }).join('');
 }
