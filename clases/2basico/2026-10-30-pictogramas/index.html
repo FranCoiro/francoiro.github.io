@@ -77,7 +77,7 @@ svg .disp{font-family:var(--display);font-weight:800}
     <div class="where" id="where"></div>
     <button id="next" class="main">Siguiente ▶</button>
   </div>
-  <div class="hint">Avanza con clic en la escena, la barra espaciadora o las flechas. Teclas 1 a 4 para cambiar de situación.</div>
+  <div class="hint">Avanza con clic en la escena, la barra espaciadora o las flechas. Toca un punto para saltar a ese paso; tecla I para el índice. Teclas 1 a 4 para cambiar de situación.</div>
 </div>
 
 <script>
@@ -430,10 +430,14 @@ const stage=document.getElementById('stage'), where=document.getElementById('whe
 const tabs=document.getElementById('tabs');
 {const b=document.createElement('button');b.textContent='Objetivo';b.onclick=()=>go(0,0);tabs.appendChild(b)}
 SITS.forEach((S,k)=>{const b=document.createElement('button');b.textContent=`Situación ${k+1}`;b.title=S.t;b.onclick=()=>go(k,k===0?1:0);tabs.appendChild(b)});
+function scene(s,p,fresh){
+  const S=SITS[s], st=S.steps[p];
+  const body=st.scr==='obj'?objective():{comic,count,task,picto,story,end:ending}[st.scr](S,st,fresh);
+  return `<defs><clipPath id="endclip"><rect x="36" y="106" width="1528" height="758" rx="14"/></clipPath></defs><rect width="1600" height="900" fill="var(--stage)"/>${st.scr==='obj'?'':title(s,S)}${body}`;
+}
 function render(){
   const S=SITS[sit], st=S.steps[step], key=st.scr+(st.pi??''), fresh=key!==lastScr; lastScr=key;
-  const body=st.scr==='obj'?objective():{comic,count,task,picto,story,end:ending}[st.scr](S,st,fresh);
-  stage.innerHTML=`<defs><clipPath id="endclip"><rect x="36" y="106" width="1528" height="758" rx="14"/></clipPath></defs><rect width="1600" height="900" fill="var(--stage)"/>${st.scr==='obj'?'':title(sit,S)}${body}`;
+  stage.innerHTML=scene(sit,step,fresh);
   try{stage.setCurrentTime(0)}catch(e){}
   where.innerHTML=`<b>${LABEL[st.scr]}</b> · paso ${step+1} de ${S.steps.length}`;
   const cur=st.scr==='obj'?0:sit+1;[...tabs.children].forEach((b,k)=>b.setAttribute('aria-pressed',k===cur));
@@ -459,6 +463,92 @@ window.addEventListener('keydown',e=>{
   else if(['1','2','3','4'].includes(e.key))go(+e.key-1,e.key==='1'?1:0);
 });
 document.getElementById('fs').onclick=()=>{try{const el=document.documentElement;(document.fullscreenElement?document.exitFullscreen():el.requestFullscreen()).catch(()=>{})}catch(e){}};
+const GROUP={obj:{n:0,c:"#5b6878"},comic:{n:1,c:"#7e57c2"},count:{n:2,c:"#2f62d6"},task:{n:3,c:"#26a69a"},picto:{n:4,c:"#2e9a5a"},story:{n:5,c:"#d9711c"},end:{n:6,c:"#ec407a"}};
+function stepName(S,st){
+  switch(st.scr){
+    case 'obj':return 'Objetivo';
+    case 'comic':return `Historia, viñeta ${st.pi*3+st.n+1}`;
+    case 'count':return st.f<0?'Tabla de conteo':`Conteo: ${S.cols[st.f][0].toLowerCase()}${st.ph==='rev'?' (revisión)':''}`;
+    case 'task':return 'Trabajo en la hoja';
+    case 'picto':return st.q===0?'Pictograma':`Pregunta ${st.q}${st.ans?' (respuesta)':''}`;
+    case 'story':return `Pregunta de la historia${st.ans?' (respuesta)':''}`;
+    default:return 'Final';
+  }
+}
+const secName=s=>`Situación ${s+1}: ${SITS[s].t}`;
+/* ---------- navegación: barra de pasos e índice ---------- */
+(function(){
+  document.head.insertAdjacentHTML('beforeend',`<style>
+.stepbar{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:7px;min-height:26px;padding:0 60px}
+.stepbar .dot{width:16px;height:16px;border-radius:50%;border:2.5px solid var(--c);background:#fff;padding:0;cursor:pointer;opacity:.8;transition:transform .15s}
+.stepbar .dot.done{background:var(--c);opacity:.5}
+.stepbar .dot.cur{background:var(--c);opacity:1;transform:scale(1.4);box-shadow:0 0 0 3px var(--paper),0 0 0 5px var(--c)}
+.stepbar .dot:hover{opacity:1;transform:scale(1.3)}
+.stepbar .sep{width:12px}
+.idx{position:fixed;inset:0;z-index:50;background:var(--paper);overflow:auto;padding:0 max(16px,env(safe-area-inset-right,0px)) 24px max(16px,env(safe-area-inset-left,0px))}
+.idxhead{position:sticky;top:0;z-index:1;display:flex;justify-content:space-between;align-items:center;gap:12px;background:var(--paper);padding:12px 0;border-bottom:2px solid var(--line)}
+.idxhead b{font-family:var(--display);font-size:1.5rem}
+.idxhead button{font:inherit;font-weight:800;border:2px solid var(--accent);background:var(--accent);color:#fff;border-radius:999px;padding:.45em 1.1em;cursor:pointer}
+.idx h3{font-family:var(--display);font-size:1.25rem;margin:20px 0 10px}
+.idxgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+.th{display:flex;flex-direction:column;gap:6px;border:3px solid var(--line);border-top:7px solid var(--c);background:var(--stage);border-radius:12px;padding:6px;cursor:pointer;font:inherit;font-size:.9rem;font-weight:700;text-align:left;color:var(--ink)}
+.th:hover{border-color:var(--c)}
+.th.cur{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.th svg{width:100%;aspect-ratio:16/9;display:block;border-radius:6px}
+.idx svg *{animation:none!important}
+</style>`);
+  const bar=document.createElement('div');bar.className='stepbar';
+  const ctrl=document.querySelector('.ctrl');ctrl.parentNode.insertBefore(bar,ctrl);
+  const fs=document.getElementById('fs');
+  const ib=document.createElement('button');ib.textContent='Índice';ib.style.cssText=fs.style.cssText;ib.title='Ver todos los pasos (tecla I)';
+  fs.before(ib);
+  const ov=document.createElement('div');ov.className='idx';ov.hidden=true;ov.setAttribute('role','dialog');ov.setAttribute('aria-label','Índice de pasos');
+  document.body.appendChild(ov);
+
+  function drawBar(){
+    const S=SITS[sit];let h='',pg=null;
+    S.steps.forEach((st,i)=>{const g=GROUP[st.scr];
+      if(pg!==null&&g.n!==pg)h+='<span class="sep"></span>';pg=g.n;
+      const nm=`${i+1}. ${stepName(S,st)}`;
+      h+=`<button class="dot${i===step?' cur':''}${i<step?' done':''}" style="--c:${g.c}" data-i="${i}" title="${nm}" aria-label="Ir al paso ${nm}"></button>`});
+    bar.innerHTML=h;
+  }
+  bar.addEventListener('click',e=>{const b=e.target.closest('.dot');if(b){e.stopPropagation();go(sit,+b.dataset.i)}});
+  const baseRender=render;
+  render=function(){baseRender();drawBar()};
+
+  let uid=0;
+  function thumb(s,p){
+    const keep=sit;sit=s;let h;try{h=scene(s,p,false)}finally{sit=keep}
+    const u='_t'+(uid++);
+    h=h.replace(/<rect([^>]*?)width="0"([^>]*)><animate attributeName="width" from="0" to="(\d+)"[^>]*\/><\/rect>/g,'<rect$1width="$3"$2/>')
+       .replace(/<animate(Transform)?\b[^>]*\/>/g,'')
+       .replace(/id="([^"]+)"/g,`id="$1${u}"`).replace(/url\(#([^)]+)\)/g,`url(#$1${u})`);
+    return `<svg viewBox="0 0 1600 900" aria-hidden="true">${h}</svg>`;
+  }
+  function openIdx(){
+    let h=`<div class="idxhead"><b>Índice</b><button type="button" data-close>✕ Cerrar</button></div>`;
+    SITS.forEach((S,s)=>{
+      h+=`<h3>${secName(s)}</h3><div class="idxgrid">`;
+      S.steps.forEach((st,p)=>{h+=`<button type="button" class="th${s===sit&&p===step?' cur':''}" data-s="${s}" data-p="${p}" style="--c:${GROUP[st.scr].c}">${thumb(s,p)}<span>${p+1}. ${stepName(S,st)}</span></button>`});
+      h+=`</div>`;
+    });
+    ov.innerHTML=h;ov.hidden=false;
+    const c=ov.querySelector('.th.cur');if(c)c.scrollIntoView({block:'center'});
+    ov.querySelector('[data-close]').focus({preventScroll:true});
+  }
+  function closeIdx(){ov.hidden=true;ov.innerHTML='';try{document.body.focus({preventScroll:true})}catch(e){}}
+  ib.onclick=openIdx;
+  ov.addEventListener('click',e=>{
+    if(e.target.closest('[data-close]')){closeIdx();return}
+    const t=e.target.closest('.th');if(t){closeIdx();go(+t.dataset.s,+t.dataset.p)}
+  });
+  window.addEventListener('keydown',e=>{
+    if(!ov.hidden){if(e.key==='Escape'||e.key==='i'||e.key==='I')closeIdx();if(e.key!=='Tab')e.stopImmediatePropagation();return}
+    if(e.key==='i'||e.key==='I'){e.stopImmediatePropagation();openIdx()}
+  },true);
+})();
+
 render();
 try{document.body.tabIndex=-1;window.focus();document.body.focus({preventScroll:true})}catch(e){}
 stage.addEventListener('pointerdown',()=>{try{document.body.focus({preventScroll:true})}catch(e){}});
