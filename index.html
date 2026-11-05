@@ -325,6 +325,12 @@ h2{font-family:var(--f-display);font-weight:400;font-size:clamp(2rem,4.4vw,3rem)
       </div>
     </div>
 
+    <p class="sub" id="ponencias">ponencias</p>
+    <ul class="timeline reveal">
+      <li><span class="y">2026</span><div><div class="t">«¡Muy bien! pero argumenta tu respuesta». El desafío de la retroalimentación matemática en segundo ciclo básico</div><div class="d">Con Luis Zapata y Rafael Pontigo. 4.º Encuentro de Estudiantes en Pedagogía Básica, UMCE, Santiago. <a href="https://francoiro.github.io/ponencias/umce-2026/?proyectar" target="_blank" rel="noopener">Ver presentación</a></div></div><span class="st pr">ponencia</span></li>
+      <li><span class="y">2025</span><div><div class="t">Percepciones de futuros docentes sobre tecnología en la enseñanza de la matemática</div><div class="d">RELME 38, Colombia. <a href="https://francoiro.github.io/relme38/" target="_blank" rel="noopener">Ver presentación</a></div></div><span class="st pr">ponencia</span></li>
+    </ul>
+
   </section>
 
   <section id="produccion" aria-labelledby="h-prod">
@@ -334,8 +340,9 @@ h2{font-family:var(--f-display);font-weight:400;font-size:clamp(2rem,4.4vw,3rem)
     </div>
     <ul class="timeline reveal">
       <li><span class="y">2026</span><div><div class="t">Mi Laboratorio Remoto: A Resource-Efficient Remote Laboratory with Flexible Deployment for Contextualized K–12 STEM Education</div><div class="d">Con M. A. Solis et al. <em>IEEE RITA</em>.</div></div><span class="st rev">en revisión</span></li>
-      <li><span class="y">2026</span><div><div class="t">Noticing como razonamiento en un Lesson Study sobre equiprobabilidad</div><div class="d"><em>The International Journal of Science, Mathematics and Technology Learning</em>.</div></div><span class="st rev">en revisión</span></li>
+      <li><span class="y">2026</span><div><div class="t">Noticing como razonamiento en un Lesson Study sobre equiprobabilidad</div><div class="d"><em>The International Journal of Science, Mathematics and Technology Learning</em>.</div></div><span class="st ok">aceptado</span></li>
       <li><span class="y">2026</span><div><div class="t">«¡Muy bien! pero argumenta tu respuesta». El desafío de la retroalimentación matemática en segundo ciclo básico</div><div class="d">Seminario de título, PUCV.</div></div><span class="st ok">defendido</span></li>
+      <li><span class="y">2026</span><div><div class="t">«¡Muy bien! pero argumenta tu respuesta». El desafío de la retroalimentación matemática en segundo ciclo básico</div><div class="d">Con L. Zapata y R. Pontigo. 4.º Encuentro de Estudiantes en Pedagogía Básica, UMCE.</div></div><span class="st pr">ponencia</span></li>
       <li><span class="y">2025</span><div><div class="t">Percepciones de futuros docentes sobre tecnología en la enseñanza de la matemática</div><div class="d">RELME 38, Colombia.</div></div><span class="st pr">ponencia</span></li>
       <li><span class="y">2025</span><div><div class="t">Jornadas Nacionales de Educación Matemática · Jornada Nacional de Educación Estadística · Jornada de Modelación y Tecnología</div></div><span class="st pr">ponencias</span></li>
     </ul>
@@ -436,7 +443,7 @@ drawAll();requestAnimationFrame(loopPrism);requestAnimationFrame(loopArts);
 /* ---------- Pestañas de investigación ---------- */
 const STUDIES=[
   {big:60.7,fmt:v=>v.toFixed(1).replace('.',',')+' %',cap:'de las retroalimentaciones escritas no moviliza lenguaje matemático, aunque casi todas muestran mediación didáctica.',meth:['análisis mixto','56 producciones · 14 docentes','MTSK'],src:'Seminario de título, PUCV, 2026.'},
-  {big:4,fmt:v=>Math.round(v)+'',cap:'trayectorias en que futuros docentes reorganizan lo que notan en la actividad de sus estudiantes: de la persistencia subestimada a la reinterpretación del logro.',meth:['Lesson Study','noticing como razonamiento','Bakker et al., 2022'],src:'Artículo en revisión, 2026.'},
+  {big:4,fmt:v=>Math.round(v)+'',cap:'trayectorias en que futuros docentes reorganizan lo que notan en la actividad de sus estudiantes: de la persistencia subestimada a la reinterpretación del logro.',meth:['Lesson Study','noticing como razonamiento','Bakker et al., 2022'],src:'Artículo aceptado, 2026.'},
   {big:12,fmt:v=>Math.round(v)+'',cap:'futuros docentes con alta disposición tecnológica: valoran la robótica educativa, pero no logran transferirla al aula de matemática.',meth:['estudio exploratorio','grupo focal','muestra de mejor escenario'],src:'Ponencia en RELME 38, Colombia, 2025.'}
 ];
 const tabs=[...document.querySelectorAll('.tab')],panel=document.getElementById('panel');
