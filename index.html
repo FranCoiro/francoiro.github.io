@@ -217,6 +217,7 @@ h2{font-family:var(--f-display);font-weight:400;font-size:clamp(2rem,4.4vw,3rem)
       <li><a href="#herramientas">Herramientas</a></li>
       <li><a href="clases/">Clases</a></li>
       <li><a href="#investigacion">Investigación</a></li>
+      <li><a href="#ponencias">Ponencias</a></li>
       <li><a href="#produccion">Producción</a></li>
     </ul>
   </div>
@@ -325,7 +326,7 @@ h2{font-family:var(--f-display);font-weight:400;font-size:clamp(2rem,4.4vw,3rem)
       </div>
     </div>
 
-    <p class="sub" id="ponencias">ponencias</p>
+    <p class="sub" id="ponencias" style="scroll-margin-top:90px">ponencias</p>
     <ul class="timeline reveal">
       <li><span class="y">2026</span><div><div class="t">«¡Muy bien! pero argumenta tu respuesta». El desafío de la retroalimentación matemática en segundo ciclo básico</div><div class="d">Con Luis Zapata y Rafael Pontigo. 4.º Encuentro de Estudiantes en Pedagogía Básica, UMCE, Santiago. <a href="https://francoiro.github.io/ponencias/umce-2026/?proyectar" target="_blank" rel="noopener">Ver presentación</a></div></div><span class="st pr">ponencia</span></li>
       <li><span class="y">2025</span><div><div class="t">Percepciones de futuros docentes sobre tecnología en la enseñanza de la matemática</div><div class="d">RELME 38, Colombia. <a href="https://francoiro.github.io/relme38/" target="_blank" rel="noopener">Ver presentación</a></div></div><span class="st pr">ponencia</span></li>
@@ -457,8 +458,8 @@ tabs.forEach((t,i)=>{t.addEventListener('click',()=>show(i));t.addEventListener(
 
 /* ---------- Navegación y aparición ---------- */
 const nav=document.getElementById('nav');const links=[...nav.querySelectorAll('ul a')];
-const secs=links.map(l=>document.querySelector(l.getAttribute('href')));
-function onScroll(){nav.classList.toggle('scrolled',scrollY>40);let cur=-1;secs.forEach((s,i)=>{if(s.getBoundingClientRect().top<innerHeight*.4)cur=i;});links.forEach((l,i)=>l.classList.toggle('on',i===cur));}
+const secs=links.map(l=>{const href=l.getAttribute('href');return href.startsWith('#')?document.querySelector(href):null;});
+function onScroll(){nav.classList.toggle('scrolled',scrollY>40);let cur=-1;secs.forEach((s,i)=>{if(s&&s.getBoundingClientRect().top<innerHeight*.4)cur=i;});links.forEach((l,i)=>l.classList.toggle('on',i===cur));}
 addEventListener('scroll',onScroll,{passive:true});onScroll();
 if(!RM){const els=[...document.querySelectorAll('.reveal')].filter(el=>el.getBoundingClientRect().top>innerHeight);
   els.forEach(el=>el.classList.add('pre'));
