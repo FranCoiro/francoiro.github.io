@@ -67,6 +67,10 @@ html,body{height:100%;background:#0F161F;overflow:hidden;font-family:'Nunito San
 .dot{position:absolute;width:40px;height:40px;border-radius:20px;background:#B9C6D3;transform:translate(var(--x0),var(--y0));transition:transform 1.1s cubic-bezier(.4,.1,.2,1) var(--d),background .6s ease var(--d)}
 #reco:has([data-step="2"].shown) .dot{transform:translate(var(--x1),var(--y1));background:var(--c)}
 #reco:has([data-step="2"].shown) .imposs{opacity:0!important;transition:opacity .3s}
+.slide.on .sticky{animation:stickin .7s cubic-bezier(.3,1.5,.5,1) .5s both}
+@keyframes stickin{from{opacity:0;transform:rotate(-12deg) scale(.6) translateY(-40px)}to{opacity:1;transform:rotate(-1.5deg)}}
+.slide.on .glow{animation:glow 1.2s ease-in-out .4s 3}
+@keyframes glow{0%,100%{box-shadow:0 0 0 0 rgba(242,153,74,0)}50%{box-shadow:0 0 0 12px rgba(242,153,74,.55)}}
 .slide [data-grow]{transition:width 1.3s cubic-bezier(.2,.7,.2,1) .15s}
 /* panel de notas */
 #notes{position:absolute;left:0;right:0;bottom:0;background:#141D28;border-top:1px solid #2A3A4D;color:#C9D3DD;padding:18px 40px 22px;display:flex;gap:40px}
@@ -371,7 +375,10 @@ body:not(.proj) #bar{display:none}
 <div style="display:flex;flex-direction:column;gap:16px">
 <p style="font-size:24px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:#B54A17">MCME · Dimensión emergente PE</p>
 <h2 style="font-family:'Domine', Georgia, serif;font-size:60px;font-weight:700;line-height:1.15;width:1040px">¿Qué lugar le da el comentario al estudiante?</h2>
-<p style="font-size:30px;line-height:1.4;color:#4A5260;width:1040px">No estaba en el diseño. Surgió del corpus.</p>
+<div class="sticky" style="display:flex;gap:18px;align-items:center;width:880px;background:#FFE27A;border-radius:6px;padding:16px 26px;box-shadow:0 10px 22px rgba(30,42,56,.18);transform:rotate(-1.5deg)">
+<svg aria-hidden="true" width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="#1E2A38" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M9 18h6"/><path d="M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2V17h5v-1.1c0-.8.4-1.5 1-2A6 6 0 0 0 12 3Z"/></svg>
+<p style="font-size:30px;line-height:1.3;color:#1E2A38"><b style="font-size:34px;letter-spacing:2px">¡EMERGENTE!</b> No estaba en el diseño, apareció al codificar el corpus</p>
+</div>
 </div>
 <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:24px">
 <div data-step="1" style="display:flex;flex-direction:column;gap:12px;background:#FBFAF6;border:1px solid #E2DCCD;border-radius:16px;padding:32px">
@@ -399,7 +406,7 @@ body:not(.proj) #bar{display:none}
 <p style="font-size:28px;line-height:1.4;color:#4A5260"><b style="color:#1E2A38">PE0</b> <span class="hw">“Valentina tiene la razón, porque si la torta la dividimos en 3 partes les va a tocar un pedazo mayor a cada uno”</span></p>
 <p style="font-size:28px;line-height:1.4;color:#4A5260"><b style="color:#1E2A38">PE3</b> <span class="hw">“En las fracciones el denominador nos dice en cuántas partes cortamos la pizza… Dibújalo y descubre quién recibe el trozo más grande”</span></p>
 </div>
-<div class="dimnav" style="position:absolute;top:128px;right:128px;width:564px;display:flex;gap:12px"><div style="width:180px;display:flex;flex-direction:column;gap:4px;background:#E7E1D3;border-radius:14px;padding:16px 18px;transition:background .4s"><p style="font-family:'Domine', Georgia, serif;font-size:36px;font-weight:700;line-height:1;color:#8A8F98">LM</p><p style="font-size:24px;line-height:1.2;color:#6A707A">Lenguaje matemático</p></div><div style="width:180px;display:flex;flex-direction:column;gap:4px;background:#E7E1D3;border-radius:14px;padding:16px 18px;transition:background .4s"><p style="font-family:'Domine', Georgia, serif;font-size:36px;font-weight:700;line-height:1;color:#8A8F98">LD</p><p style="font-size:24px;line-height:1.2;color:#6A707A">Mediación didáctica</p></div><div style="width:180px;display:flex;flex-direction:column;gap:4px;background:#1E2A38;border-radius:14px;padding:16px 18px;transition:background .4s"><p style="font-family:'Domine', Georgia, serif;font-size:36px;font-weight:700;line-height:1;color:#F08A4B">PE</p><p style="font-size:24px;line-height:1.2;color:#F5F1E8">Posición del estudiante</p></div></div>
+<div class="dimnav" style="position:absolute;top:128px;right:128px;width:564px;display:flex;gap:12px"><div style="width:180px;display:flex;flex-direction:column;gap:4px;background:#E7E1D3;border-radius:14px;padding:16px 18px;transition:background .4s"><p style="font-family:'Domine', Georgia, serif;font-size:36px;font-weight:700;line-height:1;color:#8A8F98">LM</p><p style="font-size:24px;line-height:1.2;color:#6A707A">Lenguaje matemático</p></div><div style="width:180px;display:flex;flex-direction:column;gap:4px;background:#E7E1D3;border-radius:14px;padding:16px 18px;transition:background .4s"><p style="font-family:'Domine', Georgia, serif;font-size:36px;font-weight:700;line-height:1;color:#8A8F98">LD</p><p style="font-size:24px;line-height:1.2;color:#6A707A">Mediación didáctica</p></div><div class="glow" style="width:180px;display:flex;flex-direction:column;gap:4px;background:#1E2A38;border-radius:14px;padding:16px 18px;transition:background .4s"><p style="font-family:'Domine', Georgia, serif;font-size:36px;font-weight:700;line-height:1;color:#F08A4B">PE</p><p style="font-size:24px;line-height:1.2;color:#F5F1E8">Posición del estudiante</p></div></div>
 </section>
 <section class="slide paper" id="res-tg" style="background:#F5F1E8;color:#1E2A38;font-family:'Nunito Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:48px">
 <div style="display:flex;flex-direction:column;gap:16px">
