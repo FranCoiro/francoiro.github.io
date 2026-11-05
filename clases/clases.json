@@ -78,6 +78,20 @@
     {
       "curso": "2basico",
       "asignatura": "Matemática",
+      "fecha": "2026-11-05",
+      "titulo": "Clasificar y detectives del error",
+      "descripcion": "Clasificar y contar los útiles del estuche con tabla de conteo, y tres pictogramas con errores escondidos para encontrar y corregir. Sin impresión.",
+      "carpeta": "2basico/2026-11-05-clasificar-y-detectives/",
+      "materiales": [
+        {
+          "nombre": "Presentación",
+          "archivo": "index.html"
+        }
+      ]
+    },
+    {
+      "curso": "2basico",
+      "asignatura": "Matemática",
       "fecha": "2026-10-30",
       "titulo": "Construir e interpretar pictogramas",
       "descripcion": "Cuatro situaciones en cómic animado: conteo con tabla, construcción del pictograma y preguntas con revisión paso a paso.",
