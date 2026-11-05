@@ -120,25 +120,25 @@ const SITS=[
  {t:"Frutas de la canasta",bg:"#fff8e1",scene:"#ffe9c7",who:[MAMA,SOFIA],unit:"frutas",one:"fruta",
   talk:[[0,"Mañana es la once del curso y debo llevar fruta para todos."],[1,"¡Hagamos brochetas con una fruta de cada tipo!"],[0,"Pero no sé qué fruta alcanza y cuál falta comprar."],[1,"¡Contemos la canasta! La que tenga menos, la compramos."]],
   cap:"Esta es la canasta. ¿Qué fruta falta comprar?",
-  cols:[["Manzanas",6,"manzana","f"],["Plátanos",3,"platano","m"],["Uvas",8,"uva","f"],["Naranjas",5,"naranja","f"]],
-  end:[[1,"¡Hay que comprar plátanos! Tenemos solo 3."],[0,"Y ya tenemos 22 frutas en total. ¡Vamos a la feria!"]]},
+  cols:[["Manzanas",6,"manzana","f"],["Plátanos",3,"platano","m"],["Naranjas",5,"naranja","f"]],
+  end:[[1,"¡Hay que comprar plátanos! Tenemos solo 3."],[0,"Y ya tenemos 14 frutas en total. ¡Vamos a la feria!"]]},
  {t:"Animales de la mascotería",bg:"#e3f2fd",scene:"#d4ecd5",who:[PEPE,MATIAS],unit:"animales",one:"animal",
   talk:[[0,"¡Ay, no! Se me acabó la comida de los animales."],[1,"¡Pobrecitos! ¿Y cuánta comida tiene que pedir?"],[0,"Debo saber cuántos hay de cada uno para no equivocarme."],[1,"¡Yo lo ayudo a contar! Así ninguno se queda sin comer."]],
   cap:"Estos son los animales de don Pepe.",
-  cols:[["Peces",4,"pez","m"],["Pollitos",7,"pollito","m"],["Tortugas",2,"tortuga","f"],["Caracoles",5,"caracol","m"]],
-  end:[[0,"¡Son 18 animales! Ya puedo hacer el pedido."],[1,"Pida más comida para pollitos: ¡son los que más hay!"]]},
+  cols:[["Peces",4,"pez","m"],["Pollitos",7,"pollito","m"],["Tortugas",2,"tortuga","f"]],
+  end:[[0,"¡Son 13 animales! Ya puedo hacer el pedido."],[1,"Pida más comida para pollitos: ¡son los que más hay!"]]},
  {t:"Útiles de la sala",bg:"#f3e5f5",scene:"#e6dcd6",who:[PROFE,BENJA],unit:"útiles",one:"útil",
   talk:[[0,"¡El director nos va a regalar útiles nuevos!"],[1,"¡Bacán! ¿Nos va a regalar de todo?"],[0,"Solo del útil que tengamos menos. Hay que avisarle hoy."],[1,"¡Entonces contemos lo que hay sobre la mesa!"]],
   cap:"Estos son los útiles de la mesa. ¿De cuál tenemos menos?",
-  cols:[["Lápices",7,"lapiz","m"],["Gomas",4,"goma","f"],["Libros",6,"libro","m"],["Reglas",2,"regla","f"]],
+  cols:[["Lápices",7,"lapiz","m"],["Gomas",4,"goma","f"],["Reglas",2,"regla","f"]],
   end:[[1,"¡Hay que pedir reglas! Solo tenemos 2."],[0,"¡Muy bien! Le aviso al director ahora mismo."]]},
  {t:"Pasteles más vendidos",bg:"#fce4ec",scene:"#fff8dc",who:[ROSA,AMANDA],unit:"pasteles",one:"pastel",
   talk:[[0,"Mañana es la fiesta del barrio y vendrá muchísima gente."],[1,"¿Qué pastel vas a hornear, tía Rosa?"],[0,"¡El que más se vendió hoy! Pero perdí la cuenta..."],[1,"¡Dibujaste cada venta en tu cuaderno! Contémoslas."]],
   cap:"El cuaderno de tía Rosa. ¿Qué pastel se vendió más?",
-  cols:[["Galletas",5,"galleta","f"],["Tortas",3,"torta","f"],["Alfajores",4,"alfajor","m"],["Donas",7,"dona","f"]],
+  cols:[["Galletas",5,"galleta","f"],["Tortas",3,"torta","f"],["Donas",7,"dona","f"]],
   end:[[1,"¡Las donas! Se vendieron 7, más que todos los otros."],[0,"¡Mañana horneo muchas donas para la fiesta!"]]},
 ];
-const STORYQ=[["¿Qué fruta falta comprar?", "Plátanos", "Es la fruta que tiene menos: solo hay 3."], ["¿Para cuántos animales debe pedir comida don Pepe?", "Para 18 animales", "4 peces, 7 pollitos, 2 tortugas y 5 caracoles."], ["¿De qué útil tenemos menos?", "Reglas", "Solo hay 2. Hay que pedirle reglas al director."], ["¿Qué pastel se vendió más?", "Donas", "Se vendieron 7. Tía Rosa debe hornear donas."]];
+const STORYQ=[["¿Qué fruta falta comprar?", "Plátanos", "Es la fruta que tiene menos: solo hay 3."], ["¿Para cuántos animales debe pedir comida don Pepe?", "Para 13 animales", "4 peces, 7 pollitos y 2 tortugas."], ["¿De qué útil tenemos menos?", "Reglas", "Solo hay 2. Hay que pedirle reglas al director."], ["¿Qué pastel se vendió más?", "Donas", "Se vendieron 7. Tía Rosa debe hornear donas."]];
 const art=(g)=>g==="f"?"Las":"Los", cuantos=(g)=>g==="f"?"¿Cuántas":"¿Cuántos";
 
 /* posiciones mezcladas (fijas por situación) */
@@ -210,17 +210,18 @@ function count(S,st,fresh){
   const X=[1040,1225,1455,1550], top=172;
   o+=`<rect x="${X[0]}" y="${top}" width="${X[3]-X[0]}" height="58" fill="#e7ecf3" stroke="#1e2833" stroke-width="3"/>`;
   [["Elemento",0],["Conteo",1],["Total",2]].forEach(([l,i])=>o+=`<text x="${(X[i]+X[i+1])/2}" y="${top+39}" text-anchor="middle" font-size="27" font-weight="800">${l}</text>`);
+  const RH=620/S.cols.length;
   S.cols.forEach((c,i)=>{
-    const ry=top+58+i*155, cy=ry+77;
-    o+=`<rect x="${X[0]}" y="${ry}" width="${X[3]-X[0]}" height="155" fill="${i===f?'var(--accent-soft)':'#fff'}" stroke="#1e2833" stroke-width="3"/>`;
-    o+=sc(I[c[2]],(X[0]+X[1])/2,ry+58,1.05)+`<text x="${(X[0]+X[1])/2}" y="${ry+130}" text-anchor="middle" font-size="27" font-weight="700">${c[0]}</text>`;
+    const ry=top+58+i*RH, cy=ry+RH/2;
+    o+=`<rect x="${X[0]}" y="${ry}" width="${X[3]-X[0]}" height="${RH}" fill="${i===f?'var(--accent-soft)':'#fff'}" stroke="#1e2833" stroke-width="3"/>`;
+    o+=sc(I[c[2]],(X[0]+X[1])/2,cy-19,1.05)+`<text x="${(X[0]+X[1])/2}" y="${cy+53}" text-anchor="middle" font-size="27" font-weight="700">${c[0]}</text>`;
     if(i<done){
       const anim=i===f&&rev;
       o+=tally(X[1]+30,cy,c[1],anim?0.4:null,T);
       o+=`<text x="${(X[2]+X[3])/2}" y="${cy+22}" text-anchor="middle" font-size="64" class="disp${anim?' pop':''}" style="fill:var(--accent);${anim?`animation-delay:${(0.5+c[1]*T).toFixed(2)}s`:''}">${c[1]}</text>`;
     }
   });
-  [1,2].forEach(i=>o+=`<line x1="${X[i]}" y1="${top}" x2="${X[i]}" y2="${top+58+4*155}" stroke="#1e2833" stroke-width="3"/>`);
+  [1,2].forEach(i=>o+=`<line x1="${X[i]}" y1="${top}" x2="${X[i]}" y2="${top+58+620}" stroke="#1e2833" stroke-width="3"/>`);
   return o;
 }
 function task(S,st,fresh){
@@ -228,7 +229,7 @@ function task(S,st,fresh){
   o+=`<g class="pop"><rect x="80" y="140" width="860" height="200" rx="26" fill="var(--accent)"/>`+lines(510,240,["Crea el pictograma","y responde las preguntas"],56,`class="disp" style="fill:#fff"`)+`</g>`;
   // hoja de trabajo en miniatura
   o+=`<g class="rise" style="animation-delay:.5s"><rect x="250" y="390" width="400" height="440" rx="12" fill="#fff" stroke="#1e2833" stroke-width="4"/>`;
-  const xs=[320,400,480,560];
+  const xs=S.cols.length===3?[350,450,550]:[320,400,480,560];
   S.cols.forEach((c,i)=>{o+=`<text x="${xs[i]}" y="700" text-anchor="middle" font-size="20" style="fill:#9aa7b6">____</text>`;
     o+=`<line x1="${xs[i]-30}" y1="${670}" x2="${xs[i]+30}" y2="670" stroke="#1e2833" stroke-width="3"/>`});
   for(let q=0;q<3;q++)o+=`<line x1="285" y1="${720+q*35}" x2="615" y2="${720+q*35}" stroke="#9aa7b6" stroke-width="3"/>`;
@@ -239,15 +240,16 @@ function task(S,st,fresh){
   const X=[1040,1225,1455,1550], top=172;
   o+=`<rect x="${X[0]}" y="${top}" width="${X[3]-X[0]}" height="58" fill="#e7ecf3" stroke="#1e2833" stroke-width="3"/>`;
   [["Elemento",0],["Conteo",1],["Total",2]].forEach(([l,i])=>o+=`<text x="${(X[i]+X[i+1])/2}" y="${top+39}" text-anchor="middle" font-size="27" font-weight="800">${l}</text>`);
-  S.cols.forEach((c,i)=>{const ry=top+58+i*155,cy=ry+77;
-    o+=`<rect x="${X[0]}" y="${ry}" width="${X[3]-X[0]}" height="155" fill="#fff" stroke="#1e2833" stroke-width="3"/>`;
-    o+=sc(I[c[2]],(X[0]+X[1])/2,ry+58,1.05)+`<text x="${(X[0]+X[1])/2}" y="${ry+130}" text-anchor="middle" font-size="27" font-weight="700">${c[0]}</text>`;
+  const RH=620/S.cols.length;
+  S.cols.forEach((c,i)=>{const ry=top+58+i*RH,cy=ry+RH/2;
+    o+=`<rect x="${X[0]}" y="${ry}" width="${X[3]-X[0]}" height="${RH}" fill="#fff" stroke="#1e2833" stroke-width="3"/>`;
+    o+=sc(I[c[2]],(X[0]+X[1])/2,cy-19,1.05)+`<text x="${(X[0]+X[1])/2}" y="${cy+53}" text-anchor="middle" font-size="27" font-weight="700">${c[0]}</text>`;
     o+=tally(X[1]+30,cy,c[1],null,0)+`<text x="${(X[2]+X[3])/2}" y="${cy+22}" text-anchor="middle" font-size="64" class="disp" style="fill:var(--accent)">${c[1]}</text>`;});
-  [1,2].forEach(i=>o+=`<line x1="${X[i]}" y1="${top}" x2="${X[i]}" y2="${top+58+4*155}" stroke="#1e2833" stroke-width="3"/>`);
+  [1,2].forEach(i=>o+=`<line x1="${X[i]}" y1="${top}" x2="${X[i]}" y2="${top+58+620}" stroke="#1e2833" stroke-width="3"/>`);
   return o;
 }
 function picto(S,st,fresh){
-  let o='';const xs=[150,390,630,870],base=770,q=st.q;
+  let o='';const xs=S.cols.length===3?[210,510,810]:[150,390,630,870],base=770,q=st.q;
   const answered=k=>k<q||(k===q&&st.ans);
   o+=`<g class="${fresh?'fade':''}">${panel(30,100,960,770,"#ffffff")}</g>`;
   o+=`<text x="510" y="160" text-anchor="middle" font-size="32" font-weight="800">Cada dibujo representa 1 ${S.one}</text>`;
