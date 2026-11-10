@@ -15,6 +15,20 @@
   ],
   "clases": [
     {
+      "curso": "2basico",
+      "asignatura": "Matemática",
+      "fecha": "2026-11-10",
+      "titulo": "Guía: tablas de conteo y pictogramas",
+      "descripcion": "Guía de trabajo autónomo (≈70 min) con 5 situaciones: contar rayas de la tabla de conteo, construir el pictograma y responder preguntas de mayor y menor preferencia, más que / menos que, cuántos más y total. Incluye 3 pausas para corregir y solucionario.",
+      "carpeta": "2basico/2026-11-10-guia-pictogramas/",
+      "materiales": [
+        {
+          "nombre": "Guía (PDF)",
+          "archivo": "guia.pdf"
+        }
+      ]
+    },
+    {
       "curso": "4basico",
       "asignatura": "Matemática",
       "evaluada": true,
