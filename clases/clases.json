@@ -15,6 +15,21 @@
   ],
   "clases": [
     {
+      "curso": "4basico",
+      "asignatura": "Matemática",
+      "evaluada": true,
+      "fecha": "2026-11-11",
+      "titulo": "Guía evaluada: números decimales",
+      "descripcion": "Guía evaluada (27 pts): pintar décimos y centésimos en la grilla de 100, escribir decimales en palabras, ubicarlos en la recta numérica, sumar y restar en vertical coma bajo coma y encontrar el error de Pedro. Incluye solucionario, pauta y escala de notas.",
+      "carpeta": "4basico/2026-11-11-evaluacion-decimales/",
+      "materiales": [
+        {
+          "nombre": "Guía evaluada (PDF)",
+          "archivo": "guia-evaluada.pdf"
+        }
+      ]
+    },
+    {
       "curso": "2basico",
       "asignatura": "Matemática",
       "fecha": "2026-11-10",
