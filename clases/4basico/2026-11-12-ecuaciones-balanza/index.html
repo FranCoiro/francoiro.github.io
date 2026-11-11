@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ecuaciones con la balanza · 4.º básico</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1f2a44; --soft:#5b6478; --paper:#fbf8f1; --line:#e9e2d2;
+  --x:#6c4fd8; --cube:#f2a541; --cubeS:#c47d17; --red:#e04848; --grn:#22997f;
+  --wood:#9a6b45; --woodD:#7a5233;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--paper);color:var(--ink);font-family:'Lexend',system-ui,sans-serif}
+body{background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:34px 34px}
+#app{height:100vh;display:grid;grid-template-rows:1fr auto}
+.stage{position:relative;overflow:hidden;padding:2.6vh 4vw 1vh;cursor:pointer}
+.screen{height:100%;display:flex;flex-direction:column;animation:enter .5s ease}
+@keyframes enter{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:none}}
+.sh{margin-bottom:1.6vh}
+.kicker{font-size:clamp(12px,1.1vw,18px);letter-spacing:.12em;text-transform:uppercase;color:var(--soft);font-weight:600}
+.sh h2{margin:.2em 0 0;font-size:clamp(22px,3vw,48px);font-weight:700;line-height:1.1}
+.split{flex:1;display:grid;grid-template-columns:1.15fr 1fr;gap:3vw;align-items:center;min-height:0}
+.panel{display:flex;flex-direction:column;gap:1.1vh}
+.panel p{margin:0;font-size:clamp(16px,1.75vw,29px);line-height:1.35}
+.hid{opacity:0;transform:translateY(14px);transition:opacity .5s,transform .5s}
+.hid.show{opacity:1;transform:none}
+.ask{color:var(--x);font-weight:600}
+.warn{color:var(--red);font-weight:700}
+.ok{color:var(--grn);font-weight:700}
+.red{color:var(--red)} .grn{color:var(--grn)}
+.eq{font-size:clamp(24px,3vw,50px);font-weight:600;letter-spacing:.02em;white-space:nowrap}
+.eq.big{font-size:clamp(30px,3.8vw,64px)}
+.eq.ans{display:inline-block;background:#fff;border:3px solid var(--x);border-radius:16px;padding:.1em .6em;align-self:flex-start}
+i.x{font-style:italic;color:var(--x);font-weight:700;font-family:Georgia,serif;font-size:1.08em}
+.legend{font-size:clamp(14px,1.4vw,22px)!important;color:var(--soft)}
+.key,.def{background:#fff;border-left:8px solid var(--x);border-radius:12px;padding:.7em 1em;font-size:clamp(17px,1.9vw,31px);box-shadow:0 6px 18px rgba(31,42,68,.08);line-height:1.35}
+.key{border-left-color:var(--grn);font-weight:600}
+.tag{font-size:.6em;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--x);margin-bottom:.2em}
+
+/* Balanza */
+.balance{position:relative;width:100%}
+.balance svg{width:100%;max-height:64vh;display:block;overflow:visible}
+.bstatus{text-align:center;font-weight:700;font-size:clamp(15px,1.6vw,26px);height:1.5em;transition:color .3s}
+.bstatus.eqb{color:var(--grn)} .bstatus.neq{color:var(--red)} .bstatus.pulse{animation:pulse 1s ease 2}
+@keyframes pulse{50%{transform:scale(1.15)}}
+.wood{fill:var(--wood)} .beam{fill:var(--woodD)} .pivot{fill:#3b2a1d} .hook{fill:#3b2a1d}
+.string{stroke:#6d6d6d;stroke-width:2.5}
+.dish{fill:#cfd6e0;stroke:#8a96a8;stroke-width:3}
+.needle{fill:var(--red)} .tick{stroke:var(--ink);stroke-width:4;stroke-linecap:round}
+.item{transition:transform .5s ease}
+.inner{transform-box:fill-box;transform-origin:center bottom}
+.inner.pop{animation:pop .45s cubic-bezier(.3,1.6,.5,1)}
+.inner.out{animation:out .4s ease forwards}
+@keyframes pop{from{transform:translateY(-60px) scale(.4);opacity:0}to{transform:none;opacity:1}}
+@keyframes out{to{transform:translateY(-50px) scale(.5);opacity:0}}
+.cube{fill:var(--cube);stroke:var(--cubeS);stroke-width:2.5;transition:fill .3s,stroke .3s}
+.shine{fill:#fff;opacity:.55}
+.ghost{fill:rgba(224,72,72,.07);stroke:var(--red);stroke-width:2.5;stroke-dasharray:6 4}
+.sack{fill:var(--x);stroke:#4a32a8;stroke-width:3}
+.sacktxt{fill:#fff;font-family:Georgia,serif;font-style:italic;font-weight:700;font-size:40px}
+.sack.rev{fill:var(--grn);stroke:#167360;transition:fill .4s}
+.sacktxt.rev{font-family:'Lexend',sans-serif;font-style:normal;font-size:38px}
+.panlabel{font-family:'Lexend',sans-serif;font-weight:700;font-size:46px;fill:var(--ink)}
+
+/* Portada */
+.cover{flex:1;display:grid;grid-template-columns:1.1fr 1fr;align-items:center;gap:3vw}
+.cover h1{font-size:clamp(34px,5vw,86px);line-height:1.02;margin:.15em 0 .4em}
+.cover h1 span{color:var(--x)}
+.obj{background:#fff;border:3px solid var(--ink);border-radius:18px;padding:.8em 1.1em;font-size:clamp(18px,2.1vw,34px);line-height:1.35;box-shadow:8px 8px 0 var(--ink)}
+.obj .tag{color:var(--ink)}
+.note{margin-top:1.2em;font-size:clamp(16px,1.7vw,27px);color:var(--soft)}
+
+/* Reglas */
+.rules{flex:1;display:flex;flex-direction:column;justify-content:center;gap:2vh;max-width:1200px}
+.rule{display:flex;gap:1em;align-items:center;background:#fff;border-radius:16px;padding:.7em 1em;box-shadow:0 6px 18px rgba(31,42,68,.08);font-size:clamp(18px,2.1vw,34px)}
+.rule .n{flex:none;width:1.8em;height:1.8em;border-radius:50%;background:var(--x);color:#fff;display:grid;place-items:center;font-weight:700}
+.contr{display:flex;gap:2vw;flex-wrap:wrap}
+.contr div{background:#fff;border:3px dashed var(--x);border-radius:14px;padding:.4em .9em;font-size:clamp(20px,2.4vw,40px);font-weight:600}
+
+/* Tarjetas juntos */
+.cards{flex:1;display:grid;grid-template-columns:repeat(3,1fr);gap:2vw;align-items:start;margin-top:2vh}
+.card{background:#fff;border-radius:18px;padding:1.2em 1em;box-shadow:0 8px 22px rgba(31,42,68,.1);display:flex;flex-direction:column;gap:1.4vh;min-height:52vh}
+.card .eq{font-size:clamp(22px,2.6vw,44px)}
+.card .eq.big{font-size:clamp(26px,3.1vw,52px);border-bottom:3px solid var(--line);padding-bottom:.3em}
+.chip{align-self:flex-start;background:#efeafd;color:var(--x);border-radius:999px;padding:.3em .9em;font-weight:600;font-size:clamp(13px,1.3vw,22px)}
+.card .eq.op{font-size:clamp(16px,1.9vw,32px)}
+.card .ok{font-size:clamp(16px,1.7vw,28px)}
+
+/* Práctica */
+.practice-top{display:flex;justify-content:space-between;align-items:flex-end;gap:2vw;flex-wrap:wrap}
+.timer{display:flex;align-items:center;gap:.5em;background:#fff;border-radius:16px;padding:.35em .6em;box-shadow:0 6px 18px rgba(31,42,68,.1);cursor:default}
+.timer .tt{font-size:clamp(28px,3.6vw,60px);font-weight:700;min-width:3.3em;text-align:center;font-variant-numeric:tabular-nums}
+.timer.done .tt{color:var(--red);animation:pulse 1s ease infinite}
+.timer button,.nav button{font-family:inherit;font-size:clamp(14px,1.3vw,20px);border:0;border-radius:10px;padding:.45em .8em;background:#ece7db;color:var(--ink);cursor:pointer;font-weight:600}
+.timer button:hover,.nav button:hover{background:#ddd5c3}
+.grid9{flex:1;display:grid;grid-template-columns:repeat(3,1fr);gap:1.6vh 2vw;margin-top:2.4vh;align-content:center}
+.ex{background:#fff;border-radius:14px;padding:.6em .9em;box-shadow:0 4px 14px rgba(31,42,68,.07);display:flex;justify-content:space-between;align-items:center;gap:.6em}
+.ex .eq{font-size:clamp(18px,2.1vw,36px)}
+.ex .lt{color:var(--soft);font-weight:700;margin-right:.4em}
+.ex .sol{text-align:right}
+.ex .sol .eq{font-size:clamp(18px,2.1vw,34px);color:var(--x)}
+.ex .sol small{display:block;white-space:nowrap;color:var(--grn);font-weight:600;font-size:clamp(12px,1.2vw,19px)}
+.ex.star{border:2px solid #f2c94c}
+.banner{font-size:clamp(18px,2vw,32px);font-weight:700;color:var(--grn)}
+
+/* Pausa */
+.statement{font-size:clamp(34px,4.6vw,78px);font-weight:700;text-align:center;background:#fff;border-radius:18px;padding:.25em .4em;box-shadow:0 6px 18px rgba(31,42,68,.08)}
+.statement small{display:block;font-size:.35em;color:var(--soft);font-weight:600}
+.res{font-size:clamp(18px,2vw,32px);font-weight:700;text-align:center;min-height:1.4em}
+
+/* Cierre */
+.ticket{display:flex;flex-direction:column;gap:2vh}
+.titem{background:#fff;border-radius:14px;padding:.6em 1em;box-shadow:0 4px 14px rgba(31,42,68,.07);font-size:clamp(18px,2vw,32px);display:flex;justify-content:space-between;align-items:center;gap:1em;flex-wrap:wrap}
+.titem .a{color:var(--x);font-weight:700}
+
+/* Barra */
+.nav{display:flex;align-items:center;gap:1vw;padding:.7vh 2vw;background:rgba(255,255,255,.85);border-top:1px solid var(--line);backdrop-filter:blur(4px)}
+.nav .info{flex:1;display:flex;align-items:center;gap:1vw;min-width:0}
+.nav .t{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:clamp(12px,1.1vw,17px)}
+.dots{display:flex;gap:5px}
+.dots i{width:10px;height:10px;border-radius:50%;background:#d8d0be;cursor:pointer}
+.dots i.on{background:var(--x)}
+.hint{font-size:clamp(11px,1vw,15px);color:var(--soft);white-space:nowrap}
+.hint.go{color:var(--x);font-weight:700;animation:blink 1.6s ease infinite}
+@keyframes blink{50%{opacity:.35}}
+.bar{height:5px;background:#e6dfcf;border-radius:3px;width:min(200px,18vw);overflow:hidden}
+.bar b{display:block;height:100%;background:var(--grn);width:0;transition:width .3s}
+
+@media (max-width:820px){
+  .split,.cover{grid-template-columns:1fr}
+  .cards,.grid9{grid-template-columns:1fr}
+  .stage{overflow:auto}
+  .card{min-height:auto}
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <main class="stage" id="stage"></main>
+  <nav class="nav">
+    <button id="prev" title="Atrás (←)">◀</button>
+    <div class="info">
+      <span class="t" id="ntitle"></span>
+      <div class="dots" id="dots"></div>
+      <div class="bar"><b id="bar"></b></div>
+      <span class="hint" id="hint"></span>
+    </div>
+    <button id="fs" title="Pantalla completa (F)">⛶</button>
+    <button id="next" title="Avanzar (→ o espacio)">▶</button>
+  </nav>
+</div>
+
+<script>
+/* ---------- utilidades ---------- */
+const SVGNS = 'http://www.w3.org/2000/svg';
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+function svgEl(tag, attrs = {}, parent){
+  const e = document.createElementNS(SVGNS, tag);
+  for (const k in attrs) e.setAttribute(k, attrs[k]);
+  if (parent) parent.appendChild(e);
+  return e;
+}
+const X = s => s.replace(/x/g, '<i class="x">x</i>');
+const show = (...els) => els.forEach(e => e && e.classList.add('show'));
+
+/* ---------- Balanza ---------- */
+class Balance{
+  constructor(host){
+    this.items = {L:[], R:[]};
+    this.angle = 0; this.labelMode = false; this.lw = {L:0, R:0};
+    const wrap = document.createElement('div'); wrap.className = 'balance';
+    host.appendChild(wrap);
+    const svg = svgEl('svg', {viewBox:'0 0 800 400'});
+    wrap.appendChild(svg);
+    this.st = document.createElement('div'); this.st.className = 'bstatus';
+    wrap.appendChild(this.st);
+    svgEl('rect', {x:250, y:372, width:300, height:18, rx:9, class:'wood'}, svg);
+    svgEl('path', {d:'M 386 372 L 392 128 L 408 128 L 414 372 Z', class:'wood'}, svg);
+    svgEl('line', {x1:400, y1:52, x2:400, y2:66, class:'tick'}, svg);
+    this.pan = {}; this.ig = {}; this.lab = {};
+    for (const s of ['L','R']){
+      const g = svgEl('g', {}, svg);
+      svgEl('line', {x1:0, y1:0, x2:-112, y2:150, class:'string'}, g);
+      svgEl('line', {x1:0, y1:0, x2:112, y2:150, class:'string'}, g);
+      svgEl('path', {d:'M -128 150 L 128 150 Q 112 176 0 176 Q -112 176 -128 150 Z', class:'dish'}, g);
+      this.ig[s] = svgEl('g', {transform:'translate(0,150)'}, g);
+      this.lab[s] = svgEl('text', {x:0, y:136, class:'panlabel', 'text-anchor':'middle'}, g);
+      svgEl('circle', {cx:0, cy:0, r:7, class:'hook'}, g);
+      this.pan[s] = g;
+    }
+    this.beam = svgEl('g', {}, svg);
+    svgEl('rect', {x:132, y:112, width:536, height:16, rx:8, class:'beam'}, this.beam);
+    svgEl('path', {d:'M 394 116 L 400 72 L 406 116 Z', class:'needle'}, this.beam);
+    svgEl('circle', {cx:400, cy:120, r:13, class:'pivot'}, svg);
+    this.render(0);
+  }
+  render(a){
+    this.angle = a;
+    this.beam.setAttribute('transform', `rotate(${a} 400 120)`);
+    const r = a * Math.PI / 180, c = Math.cos(r) * 260, s = Math.sin(r) * 260;
+    this.pan.L.setAttribute('transform', `translate(${400 - c},${120 - s})`);
+    this.pan.R.setAttribute('transform', `translate(${400 + c},${120 + s})`);
+  }
+  weight(side){
+    if (this.labelMode) return this.lw[side];
+    return this.items[side].reduce((t, it) =>
+      t + (it.type === 'cube' ? 1 : it.type === 'ghost' ? -1 : it.type === 'bag' ? it.value : 0), 0);
+  }
+  target(){
+    const d = this.weight('R') - this.weight('L');
+    return d === 0 ? 0 : Math.sign(d) * Math.min(13, 6 + Math.abs(d) * 1.2);
+  }
+  animateTo(t, dur = 900){
+    cancelAnimationFrame(this.raf);
+    const from = this.angle, t0 = performance.now();
+    const ease = p => { const c1 = 1.4, c3 = c1 + 1; return 1 + c3 * Math.pow(p - 1, 3) + c1 * Math.pow(p - 1, 2); };
+    return new Promise(res => {
+      const step = now => {
+        const p = Math.min(1, (now - t0) / dur);
+        this.render(from + (t - from) * ease(p));
+        if (p < 1) this.raf = requestAnimationFrame(step); else res();
+      };
+      this.raf = requestAnimationFrame(step);
+    });
+  }
+  tilt(instant){
+    const t = this.target();
+    this.status(t === 0);
+    if (instant){ this.render(t); return Promise.resolve(); }
+    return this.animateTo(t);
+  }
+  status(level){
+    this.st.className = 'bstatus ' + (level ? 'eqb' : 'neq');
+    this.st.textContent = level ? '⚖️ En equilibrio' : 'Desequilibrada';
+  }
+  pulse(){ this.st.classList.remove('pulse'); void this.st.offsetWidth; this.st.classList.add('pulse'); }
+  positions(side){
+    const list = this.items[side], out = new Map();
+    const bag = list.find(i => i.type === 'bag');
+    const others = list.filter(i => i.type !== 'bag');
+    if (bag) out.set(bag, {x:-68, y:0});
+    const cols = bag ? 3 : 5;
+    others.forEach((it, i) => {
+      const r = Math.floor(i / cols), c = i % cols;
+      let x;
+      if (bag) x = -12 + c * 38;
+      else { const n = Math.min(cols, others.length - r * cols); x = (c - (n - 1) / 2) * 38; }
+      out.set(it, {x, y:-19 - r * 38});
+    });
+    return out;
+  }
+  layout(side){
+    this.positions(side).forEach((p, it) => { it.el.style.transform = `translate(${p.x}px,${p.y}px)`; });
+  }
+  makeItem(type, value){
+    const g = svgEl('g', {class:'item'});
+    const inner = svgEl('g', {class:'inner'}, g);
+    const it = {type, value, el:g, inner};
+    if (type === 'bag'){
+      it.shape = svgEl('path', {class:'sack', d:'M -32 0 Q -42 -44 -17 -62 L -11 -71 L -21 -84 L 21 -84 L 11 -71 L 17 -62 Q 42 -44 32 0 Z'}, inner);
+      svgEl('line', {x1:-13, y1:-70, x2:13, y2:-70, stroke:'#fff', 'stroke-width':3, 'stroke-linecap':'round'}, inner);
+      it.txt = svgEl('text', {x:0, y:-18, class:'sacktxt', 'text-anchor':'middle'}, inner);
+      it.txt.textContent = 'x';
+    } else {
+      it.shape = svgEl('rect', {x:-17, y:-17, width:34, height:34, rx:6, class: type === 'ghost' ? 'ghost' : 'cube'}, inner);
+      if (type === 'cube') svgEl('rect', {x:-11, y:-12, width:10, height:5, rx:2.5, class:'shine'}, inner);
+    }
+    return it;
+  }
+  async add(side, type = 'cube', n = 1, {instant = false, value = 0, stagger = 300} = {}){
+    for (let k = 0; k < n; k++){
+      const it = this.makeItem(type, value);
+      this.items[side].push(it);
+      const p = this.positions(side).get(it);
+      it.el.style.transform = `translate(${p.x}px,${p.y}px)`;
+      this.ig[side].appendChild(it.el);
+      this.layout(side);
+      if (!instant){
+        it.inner.classList.add('pop');
+        this.tilt();
+        await sleep(stagger);
+      }
+    }
+    if (instant) this.tilt(true);
+  }
+  async remove(side, n, {stagger = 320} = {}){
+    for (let k = 0; k < n; k++){
+      const list = this.items[side];
+      let idx = -1;
+      for (let i = list.length - 1; i >= 0; i--) if (list[i].type === 'cube'){ idx = i; break; }
+      if (idx < 0) break;
+      const [it] = list.splice(idx, 1);
+      it.inner.classList.add('out');
+      setTimeout(() => it.el.remove(), 420);
+      this.tilt();
+      await sleep(stagger);
+    }
+    this.layout(side);
+  }
+  async fillGhosts(side, n){
+    for (let k = 0; k < n; k++){
+      const it = this.items[side].find(i => i.type === 'ghost');
+      if (!it) break;
+      it.type = 'filled';
+      it.shape.setAttribute('class', 'cube');
+      it.inner.classList.remove('pop'); void it.inner.offsetWidth; it.inner.classList.add('pop');
+      this.tilt();
+      await sleep(380);
+    }
+    await sleep(700);
+    const filled = this.items[side].filter(i => i.type === 'filled');
+    filled.forEach(it => { it.inner.classList.add('out'); setTimeout(() => it.el.remove(), 420); });
+    this.items[side] = this.items[side].filter(i => i.type !== 'filled');
+    await sleep(420);
+    this.layout(side);
+  }
+  revealBag(side = 'L'){
+    const it = this.items[side].find(i => i.type === 'bag');
+    if (!it) return;
+    it.txt.textContent = it.value;
+    it.shape.classList.add('rev'); it.txt.classList.add('rev');
+    it.inner.classList.remove('pop'); void it.inner.offsetWidth; it.inner.classList.add('pop');
+  }
+  setLabels(l, r, wl, wr){
+    this.labelMode = true; this.lw = {L:wl, R:wr};
+    this.lab.L.textContent = l; this.lab.R.textContent = r;
+    this.st.className = 'bstatus'; this.st.textContent = '¿?';
+    return this.animateTo(0, 600);
+  }
+}
+
+/* ---------- Temporizador ---------- */
+let cleanups = [];
+function makeTimer(host, minutes = 12){
+  const box = document.createElement('div'); box.className = 'timer';
+  box.innerHTML = '<button data-a="-">−1</button><span class="tt"></span><button data-a="+">+1</button><button data-a="p">▶</button><button data-a="r">↺</button>';
+  host.appendChild(box);
+  const tt = box.querySelector('.tt'), pb = box.querySelector('[data-a="p"]');
+  let base = minutes * 60, left = base, running = false, end = 0;
+  const fmt = s => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+  const draw = () => { tt.textContent = fmt(Math.max(0, Math.ceil(left))); box.classList.toggle('done', running === false && left <= 0); pb.textContent = running ? '⏸' : '▶'; };
+  const iv = setInterval(() => {
+    if (!running) return;
+    left = (end - Date.now()) / 1000;
+    if (left <= 0){ left = 0; running = false; }
+    draw();
+  }, 200);
+  cleanups.push(() => clearInterval(iv));
+  box.addEventListener('click', e => {
+    const a = e.target.dataset.a; if (!a) return;
+    if (a === 'p'){ running = !running; if (running){ if (left <= 0) left = base; end = Date.now() + left * 1000; } }
+    if (a === 'r'){ running = false; left = base; }
+    if (a === '+' || a === '-'){
+      const d = a === '+' ? 60 : -60;
+      left = Math.max(60, left + d); if (!running) base = Math.max(60, base + d);
+      if (running) end = Date.now() + left * 1000;
+    }
+    draw();
+  });
+  draw();
+  return {stop(){ running = false; draw(); }};
+}
+
+/* ---------- Pantalla con balanza ---------- */
+function balanceScreen(el, title, kicker, panel){
+  el.innerHTML = `<header class="sh"><div class="kicker">${kicker}</div><h2>${title}</h2></header>
+    <div class="split"><div class="bal"></div><div class="panel">${panel}</div></div>`;
+  const bl = new Balance(el.querySelector('.bal'));
+  return {bl, q: s => el.querySelector(s)};
+}
+
+/* ---------- Pantallas ---------- */
+const screens = [
+  { title:'Objetivo', build(el){
+    el.innerHTML = `<div class="cover"><div>
+        <div class="kicker">4.º básico · Matemática</div>
+        <h1>Ecuaciones con la <span>balanza</span></h1>
+        <div class="obj hid" id="o1"><div class="tag">Objetivo</div>Resolver ecuaciones de un paso con adición y sustracción, usando una balanza.</div>
+        <div class="note hid" id="o2">✏️ Escribe la fecha y el objetivo en tu cuaderno.</div>
+      </div><div class="bal"></div></div>`;
+    const bl = new Balance(el.querySelector('.bal'));
+    bl.add('L','bag',1,{instant:true, value:4}); bl.add('L','cube',2,{instant:true}); bl.add('R','cube',6,{instant:true});
+    bl.render(-12); bl.st.textContent = '';
+    setTimeout(() => bl.tilt(), 500);
+    const q = s => el.querySelector(s);
+    return [ () => show(q('#o1')), () => show(q('#o2')) ];
+  }},
+
+  { title:'¿Cuándo está en equilibrio?', build(el){
+    const {bl, q} = balanceScreen(el, '¿Cuándo está en equilibrio?', 'La balanza', `
+      <p class="hid" id="a">Pongo <b>3 cubos</b> a la izquierda.</p>
+      <p class="hid ask" id="b">¿Qué hago para que vuelva al equilibrio? 🤔</p>
+      <p class="hid" id="c">Pongo <b>3 cubos</b> a la derecha.</p>
+      <div class="eq hid" id="e1">3 = 3</div>
+      <p class="hid" id="d">Si agrego <b>2 cubos</b> solo a la izquierda…</p>
+      <p class="hid" id="e">…tengo que agregar <b>2</b> a la derecha también.</p>
+      <div class="eq hid" id="e2">3 + 2 = 3 + 2</div>
+      <div class="key hid" id="k">⚖️ Lo que hago en un lado, lo hago en el otro.</div>`);
+    bl.status(true);
+    return [
+      async () => { show(q('#a')); await bl.add('L','cube',3); },
+      () => show(q('#b')),
+      async () => { show(q('#c')); await bl.add('R','cube',3); await sleep(500); show(q('#e1')); bl.pulse(); },
+      async () => { show(q('#d')); await bl.add('L','cube',2); },
+      async () => { show(q('#e')); await bl.add('R','cube',2); await sleep(500); show(q('#e2')); bl.pulse(); },
+      () => show(q('#k')),
+    ];
+  }},
+
+  { title:'El número misterioso', build(el){
+    const {bl, q} = balanceScreen(el, 'El número misterioso', 'Una bolsa con cubos', `
+      <p class="hid" id="a">En la bolsa hay cubos, pero <b>no sabemos cuántos</b>.</p>
+      <p class="hid" id="b">La balanza está en <b>equilibrio</b>: los dos lados pesan lo mismo.</p>
+      <p class="hid ask" id="c">¿Cuántos cubos hay en la bolsa? Piénsalo en silencio 🤫</p>
+      <div class="hid" id="d"><div class="eq big">${X('x + 3 = 8')}</div>
+        <p class="legend"><i class="x">x</i> = el número que no conocemos (los cubos de la bolsa)</p></div>
+      <div class="def hid" id="e"><div class="tag">Para el cuaderno ✏️</div>Una <b>ecuación</b> es una igualdad con un número desconocido. <b>Resolverla</b> es encontrar ese número.</div>`);
+    bl.add('L','bag',1,{instant:true, value:5}); bl.add('L','cube',3,{instant:true}); bl.add('R','cube',8,{instant:true});
+    return [
+      () => show(q('#a')),
+      () => { show(q('#b')); bl.pulse(); },
+      () => show(q('#c')),
+      () => show(q('#d')),
+      () => show(q('#e')),
+    ];
+  }},
+
+  { title:'Resolvemos x + 3 = 8', build(el){
+    const {bl, q} = balanceScreen(el, `Resolvemos ${X('x + 3 = 8')}`, 'Ejemplo 1 · con suma', `
+      <div class="eq big">${X('x + 3 = 8')}</div>
+      <p class="hid" id="a">🎯 Meta: dejar la bolsa <b>sola</b>.</p>
+      <p class="hid" id="b">Quito <b class="red">3 cubos</b> de la izquierda…</p>
+      <p class="hid warn" id="b2">¡Se desequilibró! 😮</p>
+      <p class="hid" id="c">…entonces quito <b class="red">3 cubos</b> de la derecha también.</p>
+      <div class="eq hid" id="e1">${X('x + 3')} <span class="red">− 3</span> = 8 <span class="red">− 3</span></div>
+      <div class="eq ans hid" id="e2">${X('x = 5')}</div>
+      <p class="hid ok" id="d">Compruebo: 5 + 3 = 8 ✓</p>`);
+    bl.add('L','bag',1,{instant:true, value:5}); bl.add('L','cube',3,{instant:true}); bl.add('R','cube',8,{instant:true});
+    return [
+      () => show(q('#a')),
+      async () => { show(q('#b')); await bl.remove('L',3); await sleep(600); show(q('#b2')); },
+      async () => { show(q('#c')); await bl.remove('R',3); await sleep(500); show(q('#e1')); bl.pulse(); },
+      () => { show(q('#e2')); bl.revealBag(); },
+      () => show(q('#d')),
+    ];
+  }},
+
+  { title:'Resolvemos x + 6 = 10', build(el){
+    const {bl, q} = balanceScreen(el, `Ahora piensa tú: ${X('x + 6 = 10')}`, 'Ejemplo 2 · con suma', `
+      <div class="eq big">${X('x + 6 = 10')}</div>
+      <p class="hid ask" id="a">¿Cuántos cubos quito de cada lado? 🤔</p>
+      <p class="hid" id="b">Quito <b class="red">6 cubos</b> de cada lado, al mismo tiempo.</p>
+      <div class="eq hid" id="e1">${X('x + 6')} <span class="red">− 6</span> = 10 <span class="red">− 6</span></div>
+      <div class="eq ans hid" id="e2">${X('x = 4')}</div>
+      <p class="hid ok" id="c">Compruebo: 4 + 6 = 10 ✓</p>`);
+    bl.add('L','bag',1,{instant:true, value:4}); bl.add('L','cube',6,{instant:true}); bl.add('R','cube',10,{instant:true});
+    return [
+      () => show(q('#a')),
+      async () => { show(q('#b')); await Promise.all([bl.remove('L',6), bl.remove('R',6)]); await sleep(400); show(q('#e1')); bl.pulse(); },
+      () => { show(q('#e2')); bl.revealBag(); },
+      () => show(q('#c')),
+    ];
+  }},
+
+  { title:'Resolvemos x − 4 = 3', build(el){
+    const {bl, q} = balanceScreen(el, `Con resta: ${X('x − 4 = 3')}`, 'Ejemplo 3 · con resta', `
+      <div class="eq big">${X('x − 4 = 3')}</div>
+      <p class="hid" id="a">A la bolsa le <b>sacaron 4 cubos</b> (los <b class="red">punteados</b>).</p>
+      <p class="hid" id="b">🎯 Meta: dejar la bolsa sola y completa. Para eso, <b class="grn">devuelvo 4 cubos</b>.</p>
+      <p class="hid" id="c">Agrego <b class="grn">4 cubos</b> a la izquierda…</p>
+      <p class="hid warn" id="c2">¡Se desequilibró! 😮</p>
+      <p class="hid" id="d">…entonces agrego <b class="grn">4 cubos</b> a la derecha también.</p>
+      <div class="eq hid" id="e1">${X('x − 4')} <span class="grn">+ 4</span> = 3 <span class="grn">+ 4</span></div>
+      <div class="eq ans hid" id="e2">${X('x = 7')}</div>
+      <p class="hid ok" id="f">Compruebo: 7 − 4 = 3 ✓</p>`);
+    bl.add('L','bag',1,{instant:true, value:7}); bl.add('L','ghost',4,{instant:true}); bl.add('R','cube',3,{instant:true});
+    return [
+      () => show(q('#a')),
+      () => show(q('#b')),
+      async () => { show(q('#c')); await bl.fillGhosts('L',4); await sleep(300); show(q('#c2')); },
+      async () => { show(q('#d')); await bl.add('R','cube',4); await sleep(500); show(q('#e1')); bl.pulse(); },
+      () => { show(q('#e2')); bl.revealBag(); },
+      () => show(q('#f')),
+    ];
+  }},
+
+  { title:'¿Cómo resuelvo una ecuación?', build(el){
+    el.innerHTML = `<header class="sh"><div class="kicker">Para el cuaderno ✏️</div><h2>¿Cómo resuelvo una ecuación?</h2></header>
+      <div class="rules">
+        <div class="rule hid" id="r1"><span class="n">1</span><div>Miro qué le pasa a la <i class="x">x</i>: ¿le <b>suman</b> o le <b>restan</b> un número?</div></div>
+        <div class="rule hid" id="r2"><span class="n">2</span><div>Hago la <b>operación contraria</b> en los <b>dos lados</b> para dejar la <i class="x">x</i> sola.</div></div>
+        <div class="contr hid" id="r3"><div>si suma <span class="red">+ 3</span> ➜ resto <span class="red">− 3</span></div><div>si resta <span class="grn">− 4</span> ➜ sumo <span class="grn">+ 4</span></div></div>
+        <div class="rule hid" id="r4"><span class="n">3</span><div><b>Compruebo:</b> reemplazo la <i class="x">x</i> por mi resultado y veo si se cumple la igualdad.</div></div>
+      </div>`;
+    const q = s => el.querySelector(s);
+    return [ () => show(q('#r1')), () => show(q('#r2')), () => show(q('#r3')), () => show(q('#r4')) ];
+  }},
+
+  { title:'Hagámoslo juntos', build(el){
+    const data = [
+      {eq:'x + 9 = 15', chip:'Suma 9 ➜ resto 9', op:`${X('x + 9')} <span class="red">− 9</span> = 15 <span class="red">− 9</span>`, ans:'x = 6', ok:'6 + 9 = 15 ✓'},
+      {eq:'x − 5 = 6', chip:'Resta 5 ➜ sumo 5', op:`${X('x − 5')} <span class="grn">+ 5</span> = 6 <span class="grn">+ 5</span>`, ans:'x = 11', ok:'11 − 5 = 6 ✓'},
+      {eq:'7 + x = 12', chip:'Suma 7 ➜ resto 7', op:`${X('7 + x')} <span class="red">− 7</span> = 12 <span class="red">− 7</span>`, ans:'x = 5', ok:'7 + 5 = 12 ✓'},
+    ];
+    el.innerHTML = `<header class="sh"><div class="kicker">Práctica guiada</div><h2>Hagámoslo juntos</h2></header>
+      <div class="cards">${data.map((d, i) => `
+        <div class="card"><div class="eq big">${X(d.eq)}</div>
+          <span class="chip hid" id="c${i}a">${d.chip}</span>
+          <div class="eq op hid" id="c${i}b">${d.op}</div>
+          <div class="eq ans hid" id="c${i}c">${X(d.ans)}</div>
+          <p class="ok hid" id="c${i}d">${d.ok}</p></div>`).join('')}</div>`;
+    const steps = [];
+    data.forEach((d, i) => ['a','b','c','d'].forEach(k => steps.push(() => show(el.querySelector(`#c${i}${k}`)))));
+    return steps;
+  }},
+
+  { title:'Ejercitación en el cuaderno', build(el){
+    const data = [
+      ['x + 4 = 9','x = 5','5 + 4 = 9'], ['x + 7 = 15','x = 8','8 + 7 = 15'], ['x − 3 = 7','x = 10','10 − 3 = 7'],
+      ['x − 8 = 4','x = 12','12 − 8 = 4'], ['5 + x = 14','x = 9','5 + 9 = 14'], ['x + 25 = 40','x = 15','15 + 25 = 40'],
+      ['x − 15 = 20','x = 35','35 − 15 = 20'], ['30 + x = 52','x = 22','30 + 22 = 52'], ['x − 100 = 250','x = 350','350 − 100 = 250'],
+    ];
+    const L = 'abcdefghi';
+    el.innerHTML = `<div class="practice-top"><header class="sh"><div class="kicker">Trabajo individual · en silencio</div>
+        <h2>Resuelve en tu cuaderno y comprueba</h2></header><div id="tm"></div></div>
+      <div class="banner hid" id="bn">✔ Corrección: revisa y marca tus respuestas</div>
+      <div class="grid9">${data.map((d, i) => `
+        <div class="ex${i === 8 ? ' star' : ''}"><div class="eq"><span class="lt">${L[i]})</span>${X(d[0])}${i === 8 ? ' ⭐' : ''}</div>
+        <div class="sol hid" id="s${i}"><div class="eq">${X(d[1])}</div><small>${d[2]} ✓</small></div></div>`).join('')}</div>`;
+    const tm = makeTimer(el.querySelector('#tm'), 12);
+    const steps = [ () => { tm.stop(); show(el.querySelector('#bn')); } ];
+    data.forEach((d, i) => steps.push(() => show(el.querySelector('#s' + i))));
+    return steps;
+  }},
+
+  { title:'Pausa activa: la balanza humana', build(el){
+    const items = [
+      ['4 + 3', '7', 7, 7, ''], ['6 + 2', '10', 8, 10, ''], ['15 − 5', '10', 10, 10, ''],
+      ['12', '3 + 4', 12, 7, ''], ['20 − 1', '18', 19, 18, ''], ['x + 2', '9', 9, 9, 'si x = 7'],
+    ];
+    const {bl, q} = balanceScreen(el, 'Pausa activa: la balanza humana 🧍', 'De pie · brazos estirados', `
+      <p>🧍 Ponte de pie. <b>Tus brazos son una balanza.</b></p>
+      <p>Si los dos lados valen lo mismo ➜ <b class="grn">brazos rectos</b>.</p>
+      <p>Si un lado vale más ➜ <b class="red">baja ese brazo</b>.</p>
+      <div class="statement hid" id="st"></div>
+      <div class="res" id="res"></div>`);
+    bl.labelMode = true; bl.st.textContent = '';
+    const steps = [];
+    items.forEach(([l, r, wl, wr, note]) => {
+      steps.push(() => {
+        const st = q('#st');
+        st.innerHTML = `${X(l)} &nbsp;⚖&nbsp; ${X(r)}${note ? `<small>${X(note)}</small>` : ''}`;
+        st.classList.remove('show'); void st.offsetWidth; show(st);
+        q('#res').textContent = '';
+        return bl.setLabels(l, r, wl, wr);
+      });
+      steps.push(async () => {
+        await bl.tilt();
+        const res = q('#res');
+        if (wl === wr){ res.innerHTML = '<span class="grn">Brazos rectos: ¡valen lo mismo! ⚖️</span>'; bl.pulse(); }
+        else res.innerHTML = `<span class="red">Baja el brazo ${wl > wr ? 'izquierdo' : 'derecho'}: vale más.</span>`;
+      });
+    });
+    return steps;
+  }},
+
+  { title:'Cierre: ticket de salida', build(el){
+    const {bl, q} = balanceScreen(el, 'Ticket de salida ✏️', 'Cierre', `
+      <div class="ticket">
+        <div class="titem"><span>1) ${X('x + 5 = 12')}</span><span class="a hid" id="a1">${X('x = 7')}</span></div>
+        <div class="titem"><span>2) ${X('x − 6 = 9')}</span><span class="a hid" id="a2">${X('x = 15')}</span></div>
+        <div class="titem"><span>3) Completa: “Para que la balanza siga en equilibrio, lo que hago en un lado…”</span>
+          <span class="a hid" id="a3">…lo hago también en el otro.</span></div>
+        <div class="key hid" id="k">Hoy aprendimos: una ecuación es como una balanza en equilibrio. Para encontrar la <i class="x">x</i>, hago la operación contraria en los dos lados.</div>
+      </div>`);
+    bl.add('L','bag',1,{instant:true, value:7}); bl.add('L','cube',5,{instant:true}); bl.add('R','cube',12,{instant:true});
+    return [
+      async () => { await Promise.all([bl.remove('L',5), bl.remove('R',5)]); bl.revealBag(); show(q('#a1')); },
+      () => show(q('#a2')),
+      () => show(q('#a3')),
+      () => show(q('#k')),
+    ];
+  }},
+];
+
+/* ---------- Motor de pasos ---------- */
+const stage = document.getElementById('stage');
+let cur = 0, steps = [], si = 0, busy = false;
+const dots = document.getElementById('dots');
+screens.forEach((s, i) => { const d = document.createElement('i'); d.title = s.title; d.onclick = e => { e.stopPropagation(); go(i); }; dots.appendChild(d); });
+
+function go(i){
+  cleanups.forEach(f => f()); cleanups = [];
+  cur = Math.max(0, Math.min(screens.length - 1, i));
+  stage.innerHTML = '';
+  const sec = document.createElement('section'); sec.className = 'screen';
+  stage.appendChild(sec);
+  steps = screens[cur].build(sec) || []; si = 0; busy = false;
+  try { history.replaceState(null, '', '#p' + (cur + 1)); } catch(e){}
+  updateNav();
+}
+async function next(){
+  if (busy) return;
+  if (si < steps.length){
+    busy = true;
+    try { await steps[si++](); } catch(e){ console.error(e); }
+    busy = false; updateNav();
+  } else if (cur < screens.length - 1) go(cur + 1);
+}
+function prev(){ if (si > 0) go(cur); else if (cur > 0) go(cur - 1); }
+function updateNav(){
+  document.getElementById('ntitle').textContent = `${cur + 1}/${screens.length} · ${screens[cur].title}`;
+  [...dots.children].forEach((d, i) => d.classList.toggle('on', i === cur));
+  document.getElementById('bar').style.width = steps.length ? (si / steps.length * 100) + '%' : '100%';
+  const h = document.getElementById('hint');
+  const done = si >= steps.length;
+  h.textContent = done ? (cur < screens.length - 1 ? 'Siguiente pantalla ▶' : 'Fin de la clase') : 'Clic o → para avanzar';
+  h.className = 'hint' + (done && cur < screens.length - 1 ? ' go' : '');
+}
+document.getElementById('next').onclick = e => { e.stopPropagation(); next(); };
+document.getElementById('prev').onclick = e => { e.stopPropagation(); prev(); };
+document.getElementById('fs').onclick = e => {
+  e.stopPropagation();
+  try { if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(() => {}); else document.exitFullscreen(); } catch(err){}
+};
+stage.addEventListener('click', e => { if (e.target.closest('button, .timer')) return; next(); });
+document.addEventListener('keydown', e => {
+  if (['ArrowRight',' ','PageDown','Enter'].includes(e.key)){ e.preventDefault(); next(); }
+  else if (['ArrowLeft','PageUp','Backspace'].includes(e.key)){ e.preventDefault(); prev(); }
+  else if (e.key === 'f' || e.key === 'F') document.getElementById('fs').click();
+});
+const m = /^#p(\d+)$/.exec(location.hash);
+go(m ? parseInt(m[1]) - 1 : 0);
+</script>
+</body>
+</html>

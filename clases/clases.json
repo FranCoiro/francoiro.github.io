@@ -17,6 +17,20 @@
     {
       "curso": "4basico",
       "asignatura": "Matemática",
+      "fecha": "2026-11-12",
+      "titulo": "Ecuaciones con la balanza",
+      "descripcion": "Primera clase de ecuaciones de un paso con suma y resta: balanza animada en equilibrio, la bolsa con la x, ejemplos x + 3 = 8, x + 6 = 10 y x − 4 = 3, regla para el cuaderno, ejercitación con cronómetro y corrección, pausa activa «la balanza humana» y ticket de salida.",
+      "carpeta": "4basico/2026-11-12-ecuaciones-balanza/",
+      "materiales": [
+        {
+          "nombre": "Presentación",
+          "archivo": "index.html"
+        }
+      ]
+    },
+    {
+      "curso": "4basico",
+      "asignatura": "Matemática",
       "evaluada": true,
       "fecha": "2026-11-11",
       "titulo": "Guía evaluada: números decimales",
