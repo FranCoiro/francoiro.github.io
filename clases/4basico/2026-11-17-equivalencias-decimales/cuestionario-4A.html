@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cuestionario: columnas y cuadritos (4.º A)</title>
+<style>
+  :root { --ink:#1f2933; --paint:#4a8fd9; --ok:#27a35a; --bad:#e04848; --bg:#f3f6fb; }
+  * { box-sizing:border-box; }
+  html,body { margin:0; height:100%; font-family:"Segoe UI", Arial, sans-serif; color:var(--ink); background:var(--bg); }
+  .app { max-width:1100px; margin:0 auto; min-height:100vh; display:flex; flex-direction:column; padding:16px 22px; }
+  .bar { display:flex; align-items:center; gap:14px; font-weight:700; font-size:18px; }
+  .prog { flex:1; height:14px; background:#dde4ee; border-radius:8px; overflow:hidden; }
+  .prog i { display:block; height:100%; background:var(--paint); transition:width .4s; }
+  .score { background:#fff; border-radius:20px; padding:4px 14px; box-shadow:0 1px 3px #0002; }
+  .tag { display:inline-block; font-size:15px; font-weight:700; color:#fff; background:#7b61c9; border-radius:14px; padding:3px 12px; margin-top:12px; }
+  .card { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; }
+  .q { font-size:clamp(26px,3.6vw,44px); font-weight:800; text-align:center; line-height:1.2; display:flex; align-items:center; gap:14px; flex-wrap:wrap; justify-content:center; }
+  .pics { display:flex; gap:30px; align-items:flex-end; flex-wrap:wrap; justify-content:center; min-height:10px; }
+  .pics .pc { display:flex; flex-direction:column; align-items:center; gap:6px; font-size:22px; font-weight:700; }
+  .opts { display:grid; grid-template-columns:1fr 1fr; gap:16px; width:100%; max-width:860px; }
+  .opts.two { max-width:700px; }
+  .opt { border:none; border-radius:16px; padding:18px 12px; font-size:clamp(26px,3.4vw,42px); font-weight:800; color:#fff; cursor:pointer;
+         box-shadow:0 5px 0 #0003; transition:transform .1s, opacity .3s; display:flex; align-items:center; justify-content:center; gap:10px; min-height:90px; }
+  .opt:hover { transform:translateY(-2px); }
+  .opt:active { transform:translateY(2px); box-shadow:0 2px 0 #0003; }
+  .opt .sh { font-size:.6em; opacity:.85; }
+  .c0 { background:#3f7fe0; } .c1 { background:#e0523f; } .c2 { background:#2fa66b; } .c3 { background:#e7a720; }
+  .opt.dim { opacity:.25; }
+  .opt.right { outline:6px solid var(--ok); outline-offset:3px; opacity:1; }
+  .opt.wrong { outline:6px solid #333; outline-offset:3px; }
+  .fb { font-size:clamp(20px,2.4vw,28px); font-weight:700; text-align:center; min-height:1.4em; }
+  .fb.ok { color:var(--ok); } .fb.bad { color:var(--bad); }
+  .nextb { font-size:22px; padding:12px 30px; border-radius:14px; border:none; background:var(--ink); color:#fff; cursor:pointer; visibility:hidden; }
+  .frac { display:inline-flex; flex-direction:column; align-items:center; line-height:1; vertical-align:middle; }
+  .frac b { border-bottom:.09em solid currentColor; padding:0 .15em .08em; }
+  .frac span { padding-top:.08em; }
+  .start, .end { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:18px; text-align:center; }
+  .start h1, .end h1 { font-size:clamp(32px,4.5vw,56px); margin:0; }
+  .big { font-size:clamp(22px,2.6vw,30px); }
+  .go { font-size:30px; padding:16px 44px; border-radius:18px; border:none; background:var(--paint); color:#fff; font-weight:800; cursor:pointer; box-shadow:0 5px 0 #0003; }
+  .stars { font-size:60px; letter-spacing:8px; color:#e7a720; }
+  .miss { font-size:18px; color:#555; max-width:760px; }
+  .pop { animation:pop .35s ease; } @keyframes pop { 0%{transform:scale(.9);opacity:0} 100%{transform:none;opacity:1} }
+</style>
+</head>
+<body>
+<div class="app" id="app"></div>
+<script>
+const fr = (a,b) => `<span class="frac"><b>${a}</b><span>${b}</span></span>`;
+function grid(n, size=170, mode='cols') {
+  // mode 'cols': n columnas completas; 'cells': n cuadritos (por columnas)
+  const c=size/10, cells = mode==='cols' ? n*10 : n;
+  let s=`<svg width="${size}" height="${size}" viewBox="-2 -2 ${size+4} ${size+4}">`;
+  for (let k=0;k<cells;k++){ const col=Math.floor(k/10), row=k%10; s+=`<rect x="${col*c}" y="${row*c}" width="${c}" height="${c}" fill="var(--paint)"/>`; }
+  for (let j=1;j<10;j++) s+=`<line x1="0" y1="${j*c}" x2="${size}" y2="${j*c}" stroke="#8a96a3" stroke-width="1"/>`;
+  for (let i=1;i<10;i++) s+=`<line x1="${i*c}" y1="0" x2="${i*c}" y2="${size}" stroke="#1f2933" stroke-width="2"/>`;
+  return s+`<rect x="0" y="0" width="${size}" height="${size}" fill="none" stroke="#1f2933" stroke-width="4"/></svg>`;
+}
+const pc = (svg, cap) => `<div class="pc">${svg}<div>${cap}</div></div>`;
+
+// tipo, pregunta, imágenes, opciones (la primera es la correcta; se mezclan), explicación
+const Q = [
+  {lv:'Columnas y cuadritos', q:'1 columna = ¿cuántos cuadritos?', pic:()=>pc(grid(1),'1 columna'), o:['10','100'], ex:'1 columna = 10 cuadritos'},
+  {lv:'Columnas y cuadritos', q:'3 columnas = ¿cuántos cuadritos?', pic:()=>pc(grid(3),'3 columnas'), o:['30','3'], ex:'3 columnas × 10 = 30 cuadritos'},
+  {lv:'Columnas y cuadritos', q:'5 columnas = ¿cuántos cuadritos?', pic:()=>pc(grid(5),'5 columnas'), o:['50','5','500'], ex:'5 columnas = 50 cuadritos'},
+  {lv:'Columnas y cuadritos', q:'8 columnas = ¿cuántos cuadritos?', o:['80','8','18','800'], ex:'8 columnas × 10 = 80 cuadritos', after:()=>pc(grid(8),'8 columnas')},
+  {lv:'Al revés', q:'20 cuadritos = ¿cuántas columnas?', pic:()=>pc(grid(2),'20 cuadritos'), o:['2','20'], ex:'20 cuadritos = 2 columnas'},
+  {lv:'Al revés', q:'70 cuadritos = ¿cuántas columnas?', pic:()=>pc(grid(7),'70 cuadritos'), o:['7','70','17'], ex:'70 cuadritos = 7 columnas'},
+  {lv:'Al revés', q:'40 cuadritos = ¿cuántas columnas?', o:['4','40','14','400'], ex:'40 cuadritos = 4 columnas', after:()=>pc(grid(4),'4 columnas')},
+  {lv:'Dos formas', q:'Contando <u>columnas</u>, ¿qué fracción está pintada?', pic:()=>pc(grid(4),''), o:[fr(4,10), fr(4,100)], ex:`4 columnas de 10 → ${fr(4,10)}`},
+  {lv:'Dos formas', q:'Contando <u>cuadritos</u>, ¿qué fracción está pintada?', pic:()=>pc(grid(4),''), o:[fr(40,100), fr(4,100)], ex:`40 cuadritos de 100 → ${fr(40,100)}`},
+  {lv:'Dos formas', q:`${fr(6,10)} = ${fr('?',100)}`, pic:()=>pc(grid(6),''), o:['60','6','600'], ex:`6 columnas = 60 cuadritos → ${fr(6,10)} = ${fr(60,100)}`},
+  {lv:'Dos formas', q:`${fr(3,10)} = ?`, o:[fr(30,100), fr(3,100), fr(13,100)], ex:`3 columnas = 30 cuadritos → ${fr(3,10)} = ${fr(30,100)}`, after:()=>pc(grid(3),'')},
+  {lv:'Dos formas', q:'0,7 = ?', o:['0,70','0,07','7,0'], ex:'7 décimos = 70 centésimos → 0,7 = 0,70', after:()=>pc(grid(7),'')},
+  {lv:'¿Son iguales?', q:`${fr(4,10)} y ${fr(40,100)}`, o:['Sí','No'], ex:'4 columnas = 40 cuadritos', after:()=>pc(grid(4),fr(4,10))+pc(grid(40,170,'cells'),fr(40,100))},
+  {lv:'¿Son iguales?', q:'0,6 y 0,06', o:['No','Sí'], ex:'0,6 son 6 columnas; 0,06 son solo 6 cuadritos', after:()=>pc(grid(6),'0,6')+pc(grid(6,170,'cells'),'0,06')},
+  {lv:'¿Son iguales?', q:`${fr(2,10)} y ${fr(2,100)}`, o:['No','Sí'], ex:`${fr(2,10)} son 2 columnas = 20 cuadritos`, after:()=>pc(grid(2),fr(2,10))+pc(grid(2,170,'cells'),fr(2,100))},
+  {lv:'¿Son iguales?', q:`0,3 y ${fr(30,100)}`, o:['Sí','No'], ex:'3 columnas = 30 cuadritos', after:()=>pc(grid(3),'0,3')+pc(grid(30,170,'cells'),fr(30,100))},
+  {lv:'¿Son iguales?', q:`${fr(7,10)} y ${fr(70,100)}`, o:['Sí','No'], ex:'7 columnas = 70 cuadritos', after:()=>pc(grid(7),fr(7,10))+pc(grid(70,170,'cells'),fr(70,100))},
+  {lv:'¿Son iguales?', q:'0,5 y 0,05', o:['No','Sí'], ex:'0,5 son 5 columnas; 0,05 son 5 cuadritos', after:()=>pc(grid(5),'0,5')+pc(grid(5,170,'cells'),'0,05')},
+  {lv:'¿Son iguales?', q:`0,9 y ${fr(90,100)}`, o:['Sí','No'], ex:'9 columnas = 90 cuadritos', after:()=>pc(grid(9),'0,9')+pc(grid(90,170,'cells'),fr(90,100))},
+  {lv:'¿Son iguales?', q:`${fr(8,10)} y ${fr(8,100)}`, o:['No','Sí'], ex:`${fr(8,10)} son 80 cuadritos, no 8`, after:()=>pc(grid(8),fr(8,10))+pc(grid(8,170,'cells'),fr(8,100))},
+];
+const SH = ['▲','◆','●','■'];
+let i=0, pts=0, missed=[];
+const app = document.getElementById('app');
+
+function shuffle(a){ const b=a.map((v,k)=>[v,k]); for(let k=b.length-1;k>0;k--){const j=Math.floor(Math.random()*(k+1));[b[k],b[j]]=[b[j],b[k]];} return b; }
+function header(){ return `<div class="bar"><span>${Math.min(i+1,Q.length)} / ${Q.length}</span><div class="prog"><i style="width:${i/Q.length*100}%"></i></div><span class="score">⭐ ${pts}</span></div>`; }
+
+function startScreen(){
+  app.innerHTML = `<div class="start pop"><h1>Columnas y cuadritos</h1>
+    <div class="big">${pc(grid(1,150),'1 columna = 10 cuadritos = 1 décimo')}</div>
+    <div class="big">${Q.length} preguntas · ¡responde y suma estrellas!</div>
+    <button class="go" id="go">Comenzar ▶</button></div>`;
+  document.getElementById('go').onclick = () => { i=0; pts=0; missed=[]; show(); };
+}
+function show(){
+  const it = Q[i];
+  // los "¿son iguales?" mantienen Sí/No en ese orden
+  const isYN = it.o.includes('Sí');
+  const order = isYN ? ['Sí','No'].map(v=>[v, it.o.indexOf(v)]) : shuffle(it.o);
+  app.innerHTML = header() + `<div><span class="tag">${it.lv}</span></div>
+    <div class="card pop">
+      <div class="q">${it.lv==='¿Son iguales?'?'¿Son iguales?&nbsp;':''}${it.q}</div>
+      <div class="pics" id="pics">${it.pic?it.pic():''}</div>
+      <div class="opts ${order.length===2?'two':''}">${order.map(([v,k],n)=>`<button class="opt c${n}" data-k="${k}"><span class="sh">${SH[n]}</span>${v}</button>`).join('')}</div>
+      <div class="fb" id="fb"></div>
+      <button class="nextb" id="nx">${i<Q.length-1?'Siguiente ▶':'Ver resultado ▶'}</button>
+    </div>`;
+  const btns=[...document.querySelectorAll('.opt')];
+  btns.forEach(b=>b.onclick=()=>{
+    const ok = b.dataset.k==='0';
+    btns.forEach(x=>{ x.disabled=true; if(x.dataset.k==='0') x.classList.add('right'); else x.classList.add('dim'); });
+    if(!ok){ b.classList.remove('dim'); b.classList.add('wrong'); missed.push(it); } else pts++;
+    const fb=document.getElementById('fb'); fb.className='fb '+(ok?'ok':'bad');
+    fb.innerHTML=(ok?'¡Correcto! ':'Casi… ')+it.ex;
+    if(it.after) document.getElementById('pics').innerHTML = it.after();
+    document.querySelector('.score').textContent='⭐ '+pts;
+    document.getElementById('nx').style.visibility='visible';
+  });
+  document.getElementById('nx').onclick=()=>{ i++; if(i<Q.length) show(); else endScreen(); };
+}
+function endScreen(){
+  const r = pts/Q.length, st = r>=.9?3:r>=.6?2:r>0?1:0;
+  app.innerHTML = `<div class="bar"><span>${Q.length} / ${Q.length}</span><div class="prog"><i style="width:100%"></i></div><span class="score">⭐ ${pts}</span></div>
+   <div class="end pop"><h1>${st===3?'¡Excelente!':st===2?'¡Muy bien!':'¡Sigue practicando!'}</h1>
+   <div class="stars">${'★'.repeat(st)}${'☆'.repeat(3-st)}</div>
+   <div class="big">Respondiste bien <b>${pts}</b> de <b>${Q.length}</b></div>
+   ${missed.length?`<div class="miss"><b>Para repasar:</b> ${missed.map(m=>m.ex).join(' · ')}</div>`:''}
+   <div class="big">Recuerda: <b>1 columna = 10 cuadritos = 1 décimo</b></div>
+   <button class="go" id="again">Jugar otra vez ↻</button></div>`;
+  document.getElementById('again').onclick=()=>{ i=0; pts=0; missed=[]; show(); };
+}
+startScreen();
+</script>
+</body>
+</html>
