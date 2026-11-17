@@ -18,6 +18,20 @@
       "curso": "4basico",
       "asignatura": "Matemática",
       "fecha": "2026-11-17",
+      "titulo": "Guía: ecuaciones con balanza",
+      "descripcion": "Guía para imprimir (4 páginas) para trabajar en grupos de 3 o 4 con la balanza numérica: ¿dónde va la pesa?, el número escondido (□ + a = b), ecuaciones con resta escritas como suma, problemas y cierre. Cada ejercicio trae su balanza de referencia y recuadros grandes para responder.",
+      "carpeta": "4basico/2026-11-17-guia-ecuaciones-balanza/",
+      "materiales": [
+        {
+          "nombre": "Guía (PDF)",
+          "archivo": "guia.pdf"
+        }
+      ]
+    },
+    {
+      "curso": "4basico",
+      "asignatura": "Matemática",
+      "fecha": "2026-11-17",
       "titulo": "Equivalencias entre décimos, centésimos y milésimos",
       "descripcion": "1 columna = 10 cuadritos: presentaciones interactivas que construyen paso a paso la relación entre columnas y cuadritos (tabla, camino al revés, lo mismo escrito de dos formas) hasta las equivalencias 4/10 = 40/100, con comparaciones «¿son iguales?» y ejercicios para pintar. 4.º A (35 min): presentación hasta el Practiquemos 3 y guía «columnas y cuadritos» (partes 1 a 4). 4.º B (90 min): presentación completa con milésimos y desafío, ficha pegable y la misma guía.",
       "carpeta": "4basico/2026-11-17-equivalencias-decimales/",
