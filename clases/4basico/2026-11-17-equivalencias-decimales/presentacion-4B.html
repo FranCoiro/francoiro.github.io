@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Décimos y equivalencias (4.º B)</title>
+<title>Columnas y cuadritos (4.º B)</title>
 <style>
   :root { --paint:#4a8fd9; --paint2:#f2a541; --ink:#1f2933; --soft:#eef2f6; --ok:#2e9e5b; --bad:#d64545; }
   * { box-sizing:border-box; }
@@ -251,28 +251,70 @@ const steps = [
 ];
 
 
-const INTRO = [
-  { t:'Pintamos 3 de 10 partes', x:'El cuadrado es 1 entero dividido en 10 partes iguales. ¿Cómo escribo lo pintado?',
+// ===== 4.º B: progresión cuadritos ↔ columnas =====
+function colBuilder() {
+  setTimeout(()=>{
+    let n = 0;
+    const draw = (reveal) => {
+      $('cbg').innerHTML = square({lines:'grid', paintCols:n, size:260});
+      let rows = '';
+      for (let i=1;i<=n;i++) rows += `<tr><td>${i}</td><td>${(i<n||reveal)? i*10 : '?'}</td></tr>`;
+      $('cbt').innerHTML = `<tr><th>Columnas</th><th>Cuadritos</th></tr>` + rows;
+    };
+    draw(true);
+    $('cadd').onclick = () => { if (n<6) { n++; draw(false); $('cshow').disabled=false; } if (n===6) $('cadd').disabled=true; };
+    $('cshow').onclick = () => { draw(true); $('cshow').disabled=true; if (n>=4) $('cq').style.visibility='visible'; };
+  });
+  return `<div class="col"><div id="cbg"></div></div>
+    <div class="col"><div class="btns"><button class="opt" id="cadd">+ 1 columna</button><button class="opt" id="cshow" disabled>¿Cuántos cuadritos?</button></div>
+      <table class="pat" id="cbt"></table>
+      <div id="cq" class="fade" style="visibility:hidden;text-align:center"><div class="cap">¿Y 8 columnas?</div>
+      ${question(['8','80'], '80', ok=>setMsg('cm', ok?'¡Sí! 8 columnas = 80 cuadritos':'Cada columna tiene 10 cuadritos…', ok?'ok':'bad'))}<div class="msg" id="cm"></div></div></div>`;
+}
+const PROG = [
+  { t:'El entero en 10 columnas', x:'¿En cuántas columnas iguales está dividido?',
+    r: () => `<div class="col">${square({lines:'cols'})}</div>
+      <div class="col">${question(['5','10'], '10', ok=>setMsg('p1', ok?`Cada columna es <b>1 décimo</b><br><span class="eq big">${fr(1,10)} = 0,1</span>`:'Cuenta las columnas.', ok?'ok':'bad'))}
+      <div class="msg" id="p1"></div></div>` },
+  { t:'Pintamos 3 columnas', x:'¿Cómo escribo lo pintado?',
     r: () => `<div class="col">${square({lines:'cols', paintCols:3})}</div>
-      <div class="col">${question([fr(3,10).replace(/"/g,"'"), fr(10,3).replace(/"/g,"'")].map((x,i)=>i?'10/3':'3/10'), '3/10', ok=>setMsg('i1', ok?`${fr(3,10)} &nbsp;«tres décimos»`:'Arriba van las partes pintadas; abajo, en cuántas partes dividí.', ok?'ok':'bad'))}
-      <div class="msg" id="i1" style="font-size:30px;max-width:420px"></div></div>` },
-  { t:'Los décimos también se escriben con coma', x:'En la tabla posicional, los décimos van después de la coma.',
-    r: () => `<div class="col"><table class="pv"><tr><th>U</th><th>,</th><th>d</th></tr><tr><td>0</td><td>,</td><td>3</td></tr></table></div>
-      <div class="col"><div class="eq">${fr(3,10)} = 0,3</div><div class="msg">Se leen igual: «tres décimos»</div></div>` },
-  { t:'Pintamos la mitad', x:'¿5 de 10 partes es la mitad?',
-    r: () => `<div class="col">${square({lines:'cols', paintCols:5})}</div>
-      <div class="col">${question(['Sí','No'], 'Sí', ok=>setMsg('i3', ok?`<div class="eq">${fr(5,10)} = 0,5</div>la mitad del entero`:'Mira: hay 5 pintadas y 5 sin pintar.', ok?'ok':'bad'))}
-      <div class="msg" id="i3"></div></div>` },
-  { t:'De fracción a decimal', x:'¿Cómo se escribe <b>6/10</b> como decimal?',
-    r: () => `<div class="col">${square({lines:'cols', paintCols:6, size:240})}</div>
-      <div class="col"><div class="eq">${fr(6,10)} = ?</div>${question(['0,6','6,0'], '0,6', ok=>setMsg('i4', ok?'¡Sí! 6 décimos: el 6 va después de la coma.':'6,0 son 6 enteros… ¡mucho más que lo pintado!', ok?'ok':'bad'))}
-      <div class="msg" id="i4" style="max-width:420px"></div></div>` },
-  { t:'De decimal a fracción', x:'¿Cómo se escribe <b>0,8</b> como fracción?',
-    r: () => `<div class="col">${square({lines:'cols', paintCols:8, size:240})}</div>
-      <div class="col"><div class="eq">0,8 = ?</div>${question(['8/10','8/100'], '8/10', ok=>setMsg('i5', ok?`0,8 = ${fr(8,10)} &nbsp;«ocho décimos»`:'Una cifra después de la coma son décimos.', ok?'ok':'bad'))}
-      <div class="msg" id="i5" style="font-size:30px"></div></div>` },
+      <div class="col">${question(['3/10','10/3'], '3/10', ok=>setMsg('p2', ok?`<span class="eq">${fr(3,10)} = 0,3</span><br>«tres décimos»`:'Arriba van las columnas pintadas; abajo, cuántas hay en total.', ok?'ok':'bad'))}
+      <div class="msg" id="p2" style="max-width:420px"></div></div>` },
+  { t:'Cortamos cada columna en cuadritos', x:'¿Cuántos cuadritos tiene <b>1 columna</b>?',
+    r: () => `<div class="col">${square({lines:'grid', animLines:true, hlCol:0})}</div>
+      <div class="col">${question(['10','100'], '10', ok=>{ setMsg('p3', ok?'':'Cuenta los de la columna marcada.', ok?'ok':'bad'); if(ok) $('k3').style.visibility='visible'; })}
+      <div class="msg" id="p3"></div><div class="key fade" id="k3" style="visibility:hidden">1 columna = 10 cuadritos</div></div>` },
+  { t:'¿Y el entero completo?', x:'¿Cuántos cuadritos tiene todo el cuadrado?',
+    r: () => `<div class="col">${square({lines:'grid'})}</div>
+      <div class="col">${question(['10','100'], '100', ok=>setMsg('p4', ok?`10 columnas × 10 cuadritos = 100<br>Cada cuadrito es <b>1 centésimo</b>: <span class="eq big">${fr(1,100)} = 0,01</span>`:'Son 10 columnas de 10 cuadritos…', ok?'ok':'bad'))}
+      <div class="msg" id="p4" style="max-width:460px"></div></div>` },
+  { t:'Columnas y cuadritos', x:'Agreguemos columnas de a una. ¿Cuántos cuadritos hay?',
+    r: () => colBuilder() },
+  { t:'Al revés: de cuadritos a columnas', x:'Pinté <b>20 cuadritos</b>. ¿Cuántas columnas completas son?',
+    r: () => `<div class="col">${square({lines:'grid', paintCols:2})}</div>
+      <div class="col">${question(['2','20'], '2', ok=>setMsg('p6', ok?'20 cuadritos = 2 columnas':'Cuenta las columnas pintadas.', ok?'ok':'bad'))}
+      <div class="msg" id="p6"></div></div>` },
+  { t:'Al revés: de cuadritos a columnas', x:'Pinté <b>60 cuadritos</b>. ¿Cuántas columnas completas son?',
+    r: () => `<div class="col">${square({lines:'grid', paintCols:6})}</div>
+      <div class="col">${question(['6','60'], '6', ok=>setMsg('p7', ok?'60 cuadritos = 6 columnas':'Cada columna tiene 10 cuadritos…', ok?'ok':'bad'))}
+      <div class="msg" id="p7"></div></div>` },
+  { t:'Lo mismo, escrito de dos formas', x:'Miramos lo pintado contando <b>columnas</b> y contando <b>cuadritos</b>.',
+    r: () => { setTimeout(()=>{ let ph=0; $('v8').onclick=()=>{ ph++;
+        if(ph===1){ $('l8').innerHTML=`2 columnas de 10 → ${fr(2,10)}`; $('v8').textContent='Contar cuadritos ▶'; }
+        else if(ph===2){ $('r8').innerHTML=`20 cuadritos de 100 → ${fr(20,100)}`; $('v8').textContent='¿Entonces? ▶'; }
+        else { setMsg('m8', `<span class="eq">${fr(2,10)} = ${fr(20,100)}</span><br>0,2 = 0,20 &nbsp;— ¡es lo mismo pintado!`, 'ok'); $('v8').style.display='none'; } }; });
+      return `<div class="col">${square({lines:'grid', paintCols:2})}</div>
+        <div class="col" style="gap:14px"><button class="opt" id="v8" style="background:var(--ink);color:#fff">Contar columnas ▶</button>
+        <div class="cap" id="l8"></div><div class="cap" id="r8"></div><div class="msg" id="m8"></div></div>`; } },
 ];
-steps.unshift(...INTRO);
+{
+  const base = ['1 columna = 1 décimo','Cortamos cada columna en 10','Pintamos 5 columnas','Tu turno: 3 columnas'];
+  const mil = steps.find(st => st.t==='Cortamos un cuadrito en 10');
+  for (let i=steps.length-1;i>=0;i--) if (base.includes(steps[i].t) || steps[i]===mil) steps.splice(i,1);
+  steps.unshift(...PROG);
+  const i9 = steps.findIndex(st => st.t==='Practiquemos 9');
+  steps.splice(i9, 0, mil);
+}
 let cur = 0;
 try { const h = parseInt((location.hash||'').replace('#paso-',''),10); if (h>=1 && h<=steps.length) cur = h-1; } catch(e) {}
 function render() {
