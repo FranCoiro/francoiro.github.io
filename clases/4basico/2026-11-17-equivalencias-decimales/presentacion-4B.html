@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Décimos y equivalencias (4.º B)</title>
+<style>
+  :root { --paint:#4a8fd9; --paint2:#f2a541; --ink:#1f2933; --soft:#eef2f6; --ok:#2e9e5b; --bad:#d64545; }
+  * { box-sizing:border-box; }
+  html,body { margin:0; height:100%; font-family: "Segoe UI", Arial, sans-serif; color:var(--ink); background:#fff; }
+  .app { display:flex; flex-direction:column; height:100vh; max-width:1200px; margin:0 auto; padding:18px 28px; }
+  .top { display:flex; justify-content:space-between; align-items:center; font-size:15px; color:#667; }
+  .dots { display:flex; gap:5px; }
+  .dots i { width:10px; height:10px; border-radius:50%; background:#d5dbe2; }
+  .dots i.on { background:var(--paint); }
+  h1 { font-size:clamp(26px,3.4vw,42px); margin:10px 0 6px; line-height:1.15; }
+  .txt { font-size:clamp(19px,2.2vw,27px); line-height:1.35; min-height:2.6em; }
+  .stage { flex:1; display:flex; align-items:center; justify-content:center; gap:40px; flex-wrap:wrap; min-height:0; }
+  .col { display:flex; flex-direction:column; align-items:center; gap:10px; }
+  .cap { font-size:clamp(18px,2vw,24px); font-weight:600; }
+  .eq { font-size:clamp(30px,4.2vw,54px); font-weight:700; display:flex; align-items:center; gap:18px; flex-wrap:wrap; justify-content:center; }
+  .frac { display:inline-flex; flex-direction:column; align-items:center; line-height:1; }
+  .frac b { border-bottom:4px solid currentColor; padding:0 8px 4px; }
+  .frac span { padding-top:4px; }
+  .big { font-size:clamp(22px,2.6vw,32px); }
+  .btns { display:flex; gap:16px; justify-content:center; flex-wrap:wrap; margin:6px 0; }
+  .opt { font-size:clamp(20px,2.4vw,28px); padding:10px 26px; border-radius:14px; border:3px solid var(--ink); background:#fff; cursor:pointer; font-weight:700; }
+  .opt:hover { background:var(--soft); }
+  .opt.ok { border-color:var(--ok); background:#e3f5ea; color:var(--ok); }
+  .opt.bad { border-color:var(--bad); background:#fbe6e6; color:var(--bad); }
+  .msg { font-size:clamp(19px,2.2vw,26px); font-weight:600; min-height:1.4em; text-align:center; }
+  .msg.ok { color:var(--ok); } .msg.bad { color:var(--bad); }
+  .nav { display:flex; justify-content:space-between; align-items:center; padding-top:10px; }
+  .nav button { font-size:20px; padding:10px 22px; border-radius:12px; border:none; background:var(--ink); color:#fff; cursor:pointer; }
+  .nav button:disabled { opacity:.25; cursor:default; }
+  .nav .hint { color:#889; font-size:14px; }
+  .key { background:#fff7e6; border-left:6px solid var(--paint2); padding:12px 18px; border-radius:8px; font-size:clamp(20px,2.4vw,28px); font-weight:600; }
+  table.pv { border-collapse:collapse; font-size:clamp(26px,3.2vw,40px); }
+  table.pv th, table.pv td { border:3px solid var(--ink); width:1.8em; height:1.5em; text-align:center; }
+  table.pv th { background:var(--soft); font-size:.7em; }
+  table.pat { border-collapse:collapse; font-size:clamp(22px,2.6vw,32px); }
+  table.pat th, table.pat td { border:2px solid #9aa5b1; padding:8px 18px; text-align:center; }
+  table.pat th { background:var(--soft); }
+  table.pat tr.hide td { color:transparent; }
+  .fade { animation: fade .6s ease both; }
+  @keyframes fade { from { opacity:0; transform:translateY(6px);} to { opacity:1; transform:none; } }
+  svg .hl { animation: fade .8s ease both; }
+  .counter { font-size:clamp(40px,6vw,80px); font-weight:800; color:var(--paint); min-width:2.2em; text-align:center; }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="top"><span>Décimos, centésimos y milésimos</span><div class="dots" id="dots"></div></div>
+  <h1 id="title"></h1>
+  <div class="txt" id="text"></div>
+  <div class="stage" id="stage"></div>
+  <div class="nav">
+    <button id="prev">◀ Anterior</button>
+    <span class="hint">También puedes usar las flechas del teclado</span>
+    <button id="next">Siguiente ▶</button>
+  </div>
+</div>
+
+<script>
+const S = 300; // tamaño del cuadrado (px)
+const fr = (a,b) => `<span class="frac"><b>${a}</b><span>${b}</span></span>`;
+
+// Dibuja el entero como cuadrado. lines: 'cols' (10 tiras) o 'grid' (100 cuadritos)
+function square({lines='cols', paintCols=0, paintCells=0, cellOrder='col', hlCol=-1, animLines=false, size=S, color='var(--paint)', paintCellsList=null}) {
+  const c = size/10;
+  let s = `<svg width="${size}" height="${size}" viewBox="-2 -2 ${size+4} ${size+4}">`;
+  // pintado por columnas
+  for (let i=0;i<paintCols;i++) s += `<rect x="${i*c}" y="0" width="${c}" height="${size}" fill="${color}"/>`;
+  // pintado por cuadritos (orden columna por columna, de arriba hacia abajo)
+  const cells = paintCellsList || Array.from({length:paintCells},(_,k)=>k);
+  for (const k of cells) {
+    const col = cellOrder==='col' ? Math.floor(k/10) : k%10;
+    const row = cellOrder==='col' ? k%10 : Math.floor(k/10);
+    s += `<rect x="${col*c}" y="${row*c}" width="${c}" height="${c}" fill="${color}"/>`;
+  }
+  if (hlCol>=0) s += `<rect class="hl" x="${hlCol*c}" y="0" width="${c}" height="${size}" fill="none" stroke="var(--paint2)" stroke-width="6"/>`;
+  if (lines==='grid') {
+    s += `<g ${animLines?'class="hl"':''}>`;
+    for (let j=1;j<10;j++) s += `<line x1="0" y1="${j*c}" x2="${size}" y2="${j*c}" stroke="#7b8794" stroke-width="1.2"/>`;
+    s += `</g>`;
+  }
+  for (let i=1;i<10;i++) s += `<line x1="${i*c}" y1="0" x2="${i*c}" y2="${size}" stroke="#1f2933" stroke-width="2"/>`;
+  s += `<rect x="0" y="0" width="${size}" height="${size}" fill="none" stroke="#1f2933" stroke-width="4"/></svg>`;
+  return s;
+}
+
+// Un cuadrito ampliado dividido en 10 franjas (milésimos)
+function zoomCell(paint=0) {
+  const W=260, H=260, w=W/10;
+  let s = `<svg width="${W}" height="${H}" viewBox="-3 -3 ${W+6} ${H+6}">`;
+  for (let i=0;i<paint;i++) s += `<rect x="${i*w}" y="0" width="${w}" height="${H}" fill="var(--paint2)"/>`;
+  for (let i=1;i<10;i++) s += `<line class="hl" x1="${i*w}" y1="0" x2="${i*w}" y2="${H}" stroke="#1f2933" stroke-width="1.5" style="animation-delay:${i*0.08}s"/>`;
+  s += `<rect x="0" y="0" width="${W}" height="${H}" fill="none" stroke="#1f2933" stroke-width="5"/></svg>`;
+  return s;
+}
+
+function question(opts, correct, onAnswer) {
+  // devuelve html + registra handler
+  const id = 'q'+Math.random().toString(36).slice(2,7);
+  setTimeout(()=>{
+    document.querySelectorAll(`#${id} .opt`).forEach(b=>{
+      b.onclick = () => {
+        const ok = b.dataset.v === correct;
+        b.classList.add(ok?'ok':'bad');
+        onAnswer(ok, b.dataset.v);
+      };
+    });
+  });
+  return `<div id="${id}" class="btns">${opts.map(o=>`<button class="opt" data-v="${o}">${o}</button>`).join('')}</div>`;
+}
+const $ = id => document.getElementById(id);
+function setMsg(id, html, cls='') { const m=$(id); if(m){ m.className='msg fade '+cls; m.innerHTML=html; } }
+
+
+// Cuadrícula para pintar con clics (genérica)
+function paintEx(label, target, okMsg) {
+  setTimeout(() => {
+    const cells = new Set(); const size = 300, c = size/10;
+    function draw() {
+      let h = `<svg width="${size}" height="${size+26}" viewBox="-2 -26 ${size+4} ${size+28}" style="cursor:pointer">`;
+      for (let i=0;i<10;i++) h += `<text x="${i*c+c/2}" y="-8" text-anchor="middle" font-size="16" fill="#667" data-col="${i}">▼</text>`;
+      for (let k=0;k<100;k++) { const col=Math.floor(k/10), row=k%10;
+        h += `<rect data-k="${k}" x="${col*c}" y="${row*c}" width="${c}" height="${c}" fill="${cells.has(k)?'var(--paint)':'#fff'}" stroke="#7b8794" stroke-width="1"/>`; }
+      for (let i=1;i<10;i++) h += `<line x1="${i*c}" y1="0" x2="${i*c}" y2="${size}" stroke="#1f2933" stroke-width="2" pointer-events="none"/>`;
+      h += `<rect x="0" y="0" width="${size}" height="${size}" fill="none" stroke="#1f2933" stroke-width="4" pointer-events="none"/></svg>`;
+      $('pgrid').innerHTML = h;
+      $('pgrid').querySelectorAll('rect[data-k]').forEach(r => r.onclick = () => { const k=+r.dataset.k; cells.has(k)?cells.delete(k):cells.add(k); draw(); });
+      $('pgrid').querySelectorAll('text[data-col]').forEach(t => t.onclick = () => { const col=+t.dataset.col; const all=[...Array(10)].every((_,r)=>cells.has(col*10+r));
+        for (let r=0;r<10;r++) all?cells.delete(col*10+r):cells.add(col*10+r); draw(); });
+    }
+    draw();
+    $('clr').onclick = () => { cells.clear(); draw(); setMsg('pm',''); };
+    $('chk').onclick = () => { const n = cells.size;
+      if (n===target) setMsg('pm', okMsg, 'ok');
+      else setMsg('pm', `Pintaste ${n} cuadritos. Revisa: ¿cuántos cuadritos son ${label}?`, 'bad'); };
+  });
+  return `<div class="col"><div id="pgrid"></div></div>
+    <div class="col"><div class="eq">${label}</div><button class="opt" id="chk">Comprobar</button><button class="opt" id="clr" style="font-size:18px;padding:6px 16px">Borrar</button>
+    <div class="msg" id="pm" style="max-width:380px"></div></div>`;
+}
+
+// Comparación por partes: A (columnas) y B (cuadritos)
+function stagedEq({aTxt, bTxt, aCols, bCells, step, equal, finalMsg}) {
+  setTimeout(()=>{
+    let ph = 0;
+    $('ver').onclick = () => {
+      ph++;
+      if (ph===1) { $('sa').innerHTML = `<div class="col fade">${square({lines:'cols', paintCols:aCols, size:200})}<div class="cap">${aTxt} → ${aCols} columnas</div></div>`; $('ver').innerHTML = `Ahora ${bTxt} ▶`; }
+      if (ph===2) { $('sb').innerHTML = `<div class="col fade"><div id="gb">${square({lines:'grid', size:200})}</div><div class="cap">${bTxt} → <span id="cb">0 cuadritos</span></div></div>`;
+        $('ver').disabled = true; let n=0; const total = bCells/step;
+        const it = setInterval(()=>{ n++; $('gb').innerHTML = square({lines:'grid', paintCells:n*step, size:200}); $('cb').textContent = (n*step)+' cuadritos';
+          if(n>=total){ clearInterval(it); $('ver').disabled=false; $('ver').textContent='¿Cómo se relacionan? ▶'; } }, step===10?600:350); }
+      if (ph===3) { $('sa').innerHTML = `<div class="col">${square({lines:'grid', animLines:true, paintCols:aCols, size:200})}<div class="cap">${aTxt} → ${aCols} columnas = ${aCols*10} cuadritos</div></div>`;
+        $('mid').innerHTML = `<span class="fade" style="color:${equal?'var(--ok)':'var(--bad)'}">${equal?'=':'≠'}</span>`;
+        setMsg('em', finalMsg, equal?'ok':'bad'); $('ver').style.display='none'; }
+    };
+  });
+  return `<div style="display:flex;flex-direction:column;align-items:center;gap:8px;width:100%">
+    <div style="display:flex;align-items:center;gap:20px">
+      <div class="eq">${aTxt} <span>y</span> ${bTxt}</div>
+      ${question(['Sí','No'], '__none__', ()=>{})}
+      <button class="opt" id="ver" style="background:var(--ink);color:#fff">Veamos ${aTxt} ▶</button>
+    </div>
+    <div style="display:flex;align-items:center;gap:30px;min-height:260px">
+      <div id="sa"></div><div id="mid" class="eq" style="min-width:30px"></div><div id="sb"></div>
+    </div>
+    <div class="msg" id="em"></div></div>`;
+}
+
+const steps = [
+  { t:'1 columna = 1 décimo',
+    x:'El cuadrado es 1 entero, dividido en 10 columnas.',
+    r: () => `<div class="col">${square({lines:'cols', hlCol:0})}</div>
+      <div class="col fade"><div class="eq">1 columna = ${fr(1,10)} = 0,1</div></div>` },
+
+  { t:'Cortamos cada columna en 10',
+    x:'¿Cuántos cuadritos tiene una columna?',
+    r: () => `<div class="col">${square({lines:'grid', animLines:true, hlCol:0})}</div>
+      <div class="col">${question(['10','100'], '10', ok=>{ setMsg('m1', ok?'':'Cuenta los de la columna marcada.', ok?'ok':'bad'); if(ok) $('k1').style.visibility='visible'; })}
+      <div class="msg" id="m1"></div>
+      <div class="key fade" id="k1" style="visibility:hidden">10 cuadritos = 1 columna = 1 décimo<br>${fr(10,100)} = ${fr(1,10)}</div></div>` },
+
+  { t:'Pintamos 5 columnas',
+    x:'¿Cuántos cuadritos son?',
+    r: () => `<div class="col">${square({lines:'grid', paintCols:5})}</div>
+      <div class="col">${question(['5','50'], '50', ok=>{ setMsg('m2', ok?'':'Cada columna tiene 10 cuadritos.', ok?'ok':'bad'); if(ok) $('k2').style.visibility='visible'; })}
+      <div class="msg" id="m2"></div>
+      <div id="k2" class="fade" style="visibility:hidden"><div class="eq">${fr(5,10)} = ${fr(50,100)}</div><div class="eq big">0,5 = 0,50</div></div></div>` },
+
+  { t:'Tu turno: 3 columnas',
+    x:'¿Cuántos cuadritos son 3 décimos?',
+    r: () => `<div class="col" id="g3">${square({lines:'grid', paintCols:3})}</div>
+      <div class="col">${question(['3','30'], '30', ok=>setMsg('m3', ok?`<div class="eq">${fr(3,10)} = ${fr(30,100)}</div><div class="eq big">0,3 = 0,30</div>`:'Cada columna tiene 10 cuadritos.', ok?'ok':'bad'))}
+      <div class="msg" id="m3"></div></div>` },
+
+  { t:'Cortamos un cuadrito en 10',
+    x:'Cada franja es 1 milésimo. ¿Cuántos milésimos son 20 cuadritos?',
+    r: () => `<div class="col">${zoomCell(0)}<div class="cap">1 cuadrito = 10 milésimos</div></div>
+      <div class="col">${square({lines:'grid', paintCols:2, size:240})}<div class="cap">20 cuadritos</div></div>
+      <div class="col">${question(['20','200'], '200', ok=>setMsg('m4', ok?`<div class="eq">${fr(2,10)} = ${fr(20,100)} = ${fr(200,1000)}</div><div class="eq big">0,2 = 0,20 = 0,200</div>`:'Cada cuadrito tiene 10 milésimos.', ok?'ok':'bad'))}
+      <div class="msg" id="m4"></div></div>` },
+
+  { t:'Practiquemos 1', x:'¿Son iguales? Primero piensa, después lo vemos.',
+    r: () => stagedEq({aTxt:fr(4,10), bTxt:fr(40,100), aCols:4, bCells:40, step:10, equal:true,
+      finalMsg:`4 columnas = 40 cuadritos &nbsp;→&nbsp; ${fr(4,10)} = ${fr(40,100)} &nbsp;·&nbsp; 0,4 = 0,40`}) },
+
+  { t:'Practiquemos 2', x:'¿Son iguales? Primero piensa, después lo vemos.',
+    r: () => stagedEq({aTxt:'0,6', bTxt:'0,06', aCols:6, bCells:6, step:1, equal:false,
+      finalMsg:`0,6 son 6 columnas = 60 cuadritos. 0,06 son solo 6 cuadritos. &nbsp; 0,6 = 0,60 ≠ 0,06`}) },
+
+  { t:'Practiquemos 3', x:'¿Son iguales? Primero piensa, después lo vemos.',
+    r: () => stagedEq({aTxt:fr(2,10), bTxt:fr(2,100), aCols:2, bCells:2, step:1, equal:false,
+      finalMsg:`2 columnas = 20 cuadritos. ${fr(2,100)} son solo 2 cuadritos. &nbsp; ${fr(2,10)} = ${fr(20,100)} ≠ ${fr(2,100)}`}) },
+
+  { t:'Practiquemos 4', x:'Pinta en la cuadrícula. Haz clic en los cuadritos (o en ▼ para pintar una columna).',
+    r: () => paintEx('0,4', 40, `¡Muy bien! 4 columnas = 40 cuadritos<br>${fr(4,10)} = ${fr(40,100)} = 0,4`) },
+  { t:'Practiquemos 5', x:'Pinta en la cuadrícula.',
+    r: () => paintEx('0,7', 70, `¡Muy bien! 7 columnas = 70 cuadritos<br>${fr(7,10)} = ${fr(70,100)} = 0,7`) },
+  { t:'Practiquemos 6', x:'Pinta en la cuadrícula.',
+    r: () => paintEx('0,25', 25, `¡Muy bien! 2 columnas y 5 cuadritos = 25 cuadritos<br>${fr(25,100)} = 0,25`) },
+  { t:'Practiquemos 7', x:'Pinta en la cuadrícula.',
+    r: () => paintEx(fr(3,10), 30, `¡Muy bien! 3 columnas = 30 cuadritos<br>${fr(3,10)} = ${fr(30,100)} = 0,3`) },
+
+  { t:'Practiquemos 8', x:'Completa la equivalencia.',
+    r: () => `<div class="col"><div class="eq">${fr(7,10)} = ${fr('?',100)}</div>
+      ${question(['7','70','700'], '70', ok=>setMsg('e4', ok?`${fr(7,10)} = ${fr(70,100)} &nbsp;·&nbsp; 0,7 = 0,70`:'7 columnas… ¿cuántos cuadritos?', ok?'ok':'bad'))}
+      <div class="msg" id="e4" style="font-size:30px"></div></div>` },
+
+  { t:'Practiquemos 9', x:'Completa la equivalencia.',
+    r: () => `<div class="col"><div class="eq">0,3 = ${fr('?',1000)}</div>
+      ${question(['3','30','300'], '300', ok=>setMsg('e5', ok?`0,3 = ${fr(3,10)} = ${fr(30,100)} = ${fr(300,1000)}`:'3 columnas = 30 cuadritos, y cada cuadrito tiene 10 milésimos…', ok?'ok':'bad'))}
+      <div class="msg" id="e5" style="font-size:30px"></div></div>` },
+
+  { t:'Desafío',
+    x:'Sofía dice que <b>0,35 es mayor que 0,5</b> porque 35 es mayor que 5. ¿Tiene razón?',
+    r: () => `<div class="col">${question(['Sí','No'], 'No', ok=>{ setMsg('e7', ok?'¡Correcto! 0,5 = 0,50 y 50 cuadritos es más que 35.':'Mira los dibujos…', ok?'ok':'bad');
+        $('ge7').innerHTML = `<div class="col">${square({lines:'grid', paintCells:35, size:200})}<div class="cap">0,35</div></div><div class="col">${square({lines:'grid', paintCols:5, size:200})}<div class="cap">0,5 = 0,50</div></div>`; })}
+      <div class="msg" id="e7" style="max-width:420px"></div></div><div id="ge7" style="display:flex;gap:24px"></div>` },
+
+  { t:'Para recordar',
+    x:'',
+    r: () => `<div class="col" style="gap:22px">
+      <div class="key">1 columna = 10 cuadritos = 100 franjas</div>
+      <div class="eq">${fr(1,10)} = ${fr(10,100)} = ${fr(100,1000)}</div>
+      <div class="eq big">0,5 = 0,50 = 0,500</div></div>` },
+];
+
+
+const INTRO = [
+  { t:'Pintamos 3 de 10 partes', x:'El cuadrado es 1 entero dividido en 10 partes iguales. ¿Cómo escribo lo pintado?',
+    r: () => `<div class="col">${square({lines:'cols', paintCols:3})}</div>
+      <div class="col">${question([fr(3,10).replace(/"/g,"'"), fr(10,3).replace(/"/g,"'")].map((x,i)=>i?'10/3':'3/10'), '3/10', ok=>setMsg('i1', ok?`${fr(3,10)} &nbsp;«tres décimos»`:'Arriba van las partes pintadas; abajo, en cuántas partes dividí.', ok?'ok':'bad'))}
+      <div class="msg" id="i1" style="font-size:30px;max-width:420px"></div></div>` },
+  { t:'Los décimos también se escriben con coma', x:'En la tabla posicional, los décimos van después de la coma.',
+    r: () => `<div class="col"><table class="pv"><tr><th>U</th><th>,</th><th>d</th></tr><tr><td>0</td><td>,</td><td>3</td></tr></table></div>
+      <div class="col"><div class="eq">${fr(3,10)} = 0,3</div><div class="msg">Se leen igual: «tres décimos»</div></div>` },
+  { t:'Pintamos la mitad', x:'¿5 de 10 partes es la mitad?',
+    r: () => `<div class="col">${square({lines:'cols', paintCols:5})}</div>
+      <div class="col">${question(['Sí','No'], 'Sí', ok=>setMsg('i3', ok?`<div class="eq">${fr(5,10)} = 0,5</div>la mitad del entero`:'Mira: hay 5 pintadas y 5 sin pintar.', ok?'ok':'bad'))}
+      <div class="msg" id="i3"></div></div>` },
+  { t:'De fracción a decimal', x:'¿Cómo se escribe <b>6/10</b> como decimal?',
+    r: () => `<div class="col">${square({lines:'cols', paintCols:6, size:240})}</div>
+      <div class="col"><div class="eq">${fr(6,10)} = ?</div>${question(['0,6','6,0'], '0,6', ok=>setMsg('i4', ok?'¡Sí! 6 décimos: el 6 va después de la coma.':'6,0 son 6 enteros… ¡mucho más que lo pintado!', ok?'ok':'bad'))}
+      <div class="msg" id="i4" style="max-width:420px"></div></div>` },
+  { t:'De decimal a fracción', x:'¿Cómo se escribe <b>0,8</b> como fracción?',
+    r: () => `<div class="col">${square({lines:'cols', paintCols:8, size:240})}</div>
+      <div class="col"><div class="eq">0,8 = ?</div>${question(['8/10','8/100'], '8/10', ok=>setMsg('i5', ok?`0,8 = ${fr(8,10)} &nbsp;«ocho décimos»`:'Una cifra después de la coma son décimos.', ok?'ok':'bad'))}
+      <div class="msg" id="i5" style="font-size:30px"></div></div>` },
+];
+steps.unshift(...INTRO);
+let cur = 0;
+try { const h = parseInt((location.hash||'').replace('#paso-',''),10); if (h>=1 && h<=steps.length) cur = h-1; } catch(e) {}
+function render() {
+  const st = steps[cur];
+  $('title').textContent = st.t;
+  $('text').innerHTML = st.x;
+  $('stage').innerHTML = st.r();
+  $('stage').classList.remove('fade'); void $('stage').offsetWidth; $('stage').classList.add('fade');
+  $('prev').disabled = cur===0; $('next').disabled = cur===steps.length-1;
+  $('dots').innerHTML = steps.map((_,i)=>`<i class="${i<=cur?'on':''}"></i>`).join('');
+  try { history.replaceState(null,'','#paso-'+(cur+1)); } catch(e) {}
+}
+$('prev').onclick = () => { if(cur>0){cur--;render();} };
+$('next').onclick = () => { if(cur<steps.length-1){cur++;render();} };
+document.addEventListener('keydown', e => { if(e.key==='ArrowRight') $('next').click(); if(e.key==='ArrowLeft') $('prev').click(); });
+render();
+</script>
+</body>
+</html>
