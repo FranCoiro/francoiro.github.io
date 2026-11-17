@@ -17,6 +17,28 @@
     {
       "curso": "4basico",
       "asignatura": "Matemática",
+      "fecha": "2026-11-17",
+      "titulo": "Equivalencias entre décimos, centésimos y milésimos",
+      "descripcion": "10 cuadritos = 1 columna = 1 décimo: presentación interactiva con explicación en 5 pasos, comparaciones «¿son iguales?» (4/10 y 40/100, 0,6 y 0,06, 2/10 y 2/100), ejercicios para pintar en la cuadrícula, equivalencias con milésimos y desafío. Incluye guía de 4.º A (equivalencias pintando) y ficha pegable con guía de 4.º B (décimos y centésimos).",
+      "carpeta": "4basico/2026-11-17-equivalencias-decimales/",
+      "materiales": [
+        {
+          "nombre": "Presentación",
+          "archivo": "index.html"
+        },
+        {
+          "nombre": "Guía 4.º A (PDF)",
+          "archivo": "guia-4A.pdf"
+        },
+        {
+          "nombre": "Ficha pegable y guía 4.º B (PDF)",
+          "archivo": "ficha-y-guia-4B.pdf"
+        }
+      ]
+    },
+    {
+      "curso": "4basico",
+      "asignatura": "Matemática",
       "fecha": "2026-11-12",
       "titulo": "Ecuaciones con la balanza",
       "descripcion": "Primera clase de ecuaciones de un paso con suma y resta: balanza animada en equilibrio, la bolsa con la x, ejemplos x + 3 = 8, x + 6 = 10 y x − 4 = 3, regla para el cuaderno, ejercitación con cronómetro y corrección, pausa activa «la balanza humana» y ticket de salida.",
