@@ -19,20 +19,24 @@
       "asignatura": "Matemática",
       "fecha": "2026-11-17",
       "titulo": "Equivalencias entre décimos, centésimos y milésimos",
-      "descripcion": "10 cuadritos = 1 columna = 1 décimo: presentación interactiva con explicación en 5 pasos, comparaciones «¿son iguales?» (4/10 y 40/100, 0,6 y 0,06, 2/10 y 2/100), ejercicios para pintar en la cuadrícula, equivalencias con milésimos y desafío. Incluye guía de 4.º A (equivalencias pintando) y ficha pegable con guía de 4.º B (décimos y centésimos).",
+      "descripcion": "10 cuadritos = 1 columna = 1 décimo: presentación interactiva con explicación en 5 pasos, comparaciones «¿son iguales?» (4/10 y 40/100, 0,6 y 0,06, 2/10 y 2/100), ejercicios para pintar en la cuadrícula, equivalencias con milésimos y desafío. 4.º A (35 min): presentación hasta el Practiquemos 7 y guía de apoyo de una página. 4.º B (90 min): presentación completa, guía de apoyo con ampliación y ficha pegable.",
       "carpeta": "4basico/2026-11-17-equivalencias-decimales/",
       "materiales": [
         {
-          "nombre": "Presentación",
+          "nombre": "Presentación 4.º A (35 min)",
+          "archivo": "presentacion-4A.html"
+        },
+        {
+          "nombre": "Guía de apoyo 4.º A (PDF)",
+          "archivo": "guia-apoyo-4A.pdf"
+        },
+        {
+          "nombre": "Presentación completa (4.º B)",
           "archivo": "index.html"
         },
         {
-          "nombre": "Guía de apoyo (PDF)",
+          "nombre": "Guía de apoyo con ampliación (PDF)",
           "archivo": "guia-apoyo.pdf"
-        },
-        {
-          "nombre": "Guía 4.º A (PDF)",
-          "archivo": "guia-4A.pdf"
         },
         {
           "nombre": "Ficha pegable y guía 4.º B (PDF)",
