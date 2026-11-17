@@ -315,7 +315,7 @@ const PROG = [
   const i9 = steps.findIndex(st => st.t==='Practiquemos 9');
   steps.splice(i9, 0, mil);
 }
-const SKIP=['Practiquemos 8','Practiquemos 9','Desafío','Cortamos un cuadrito en 10'];
+const SKIP=['Practiquemos 4','Practiquemos 5','Practiquemos 6','Practiquemos 7','Practiquemos 8','Practiquemos 9','Desafío','Cortamos un cuadrito en 10'];
 for (let i=steps.length-1;i>=0;i--) if (SKIP.includes(steps[i].t)) steps.splice(i,1);
 let cur = 0;
 try { const h = parseInt((location.hash||'').replace('#paso-',''),10); if (h>=1 && h<=steps.length) cur = h-1; } catch(e) {}
