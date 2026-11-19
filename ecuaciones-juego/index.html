@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ecuaciones con balanza · Juegos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --azul:#2f6fd6; --azul-o:#1d4f9e; --amarillo:#f7d33a; --rojo:#d93a2f; --naranjo:#e8890c; --naranjo-c:#fde7c2;
+    --verde:#1f9d55; --verde-c:#e3f6ea; --morado:#7a4fd6; --tinta:#24324a; --gris:#5b6a86; --linea:#dfe6f3;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;min-height:100%}
+  body{font-family:Poppins,system-ui,sans-serif;color:var(--tinta);
+       background:radial-gradient(circle at 15% 10%,#3d7ee6 0,#2f6fd6 35%,#1d4f9e 100%);min-height:100vh;
+       display:flex;flex-direction:column;align-items:center;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+  .marco{width:100%;max-width:1100px;padding:16px;flex:1;display:flex;flex-direction:column}
+  header{display:flex;align-items:center;gap:12px;color:#fff;margin-bottom:12px;min-height:48px}
+  header h1{font-size:22px;margin:0;flex:1;line-height:1.15}
+  header h1 small{display:block;font-size:13px;font-weight:600;opacity:.85}
+  .chip{background:rgba(255,255,255,.18);border-radius:999px;padding:6px 14px;font-weight:700;font-size:15px;white-space:nowrap}
+  .ib{border:0;background:rgba(255,255,255,.18);color:#fff;font:700 15px Poppins,sans-serif;border-radius:999px;padding:8px 14px;cursor:pointer}
+  .ib:hover{background:rgba(255,255,255,.28)}
+  .hoja{background:#fff;border-radius:24px;box-shadow:0 10px 30px rgba(0,0,0,.25);padding:22px;flex:1;display:flex;flex-direction:column}
+  .oculto{display:none!important}
+
+  /* Menú */
+  .menu{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:18px;margin:auto 0;align-content:center}
+  .act{border:0;border-radius:20px;padding:20px;text-align:left;color:#fff;cursor:pointer;font-family:inherit;
+       box-shadow:0 5px 0 rgba(0,0,0,.18);transition:transform .1s;min-height:260px;justify-content:center;display:flex;flex-direction:column;gap:6px}
+  .act:active{transform:translateY(3px);box-shadow:0 2px 0 rgba(0,0,0,.18)}
+  .act .ico{font-size:56px;line-height:1}
+  .act b{font-size:24px}
+  .act span{font-size:16px;opacity:.95}
+  .a1{background:var(--morado)} .a2{background:var(--verde)} .a3{background:var(--naranjo)}
+  .defi{background:#fff6d1;border-left:6px solid var(--amarillo);border-radius:12px;padding:12px 16px;font-size:16px;margin-bottom:16px}
+
+  /* Completar definición */
+  .frase{font-size:clamp(20px,2.8vw,30px);font-weight:600;line-height:2.2;text-align:center;margin:10px 0 24px}
+  .hueco{display:inline-flex;align-items:center;justify-content:center;min-width:170px;height:52px;border:3px dashed #b9c6dc;border-radius:14px;
+         vertical-align:middle;padding:0 14px;margin:0 4px;cursor:pointer;color:var(--azul);font-weight:800;background:#f6f8fc}
+  .hueco.lleno{border-style:solid;border-color:var(--azul);background:#eef4ff}
+  .hueco.ok{border-color:var(--verde);background:var(--verde-c);color:var(--verde)}
+  .hueco.mal{border-color:var(--rojo);background:#fdecea;color:var(--rojo)}
+  .banco{display:flex;flex-wrap:wrap;gap:12px;justify-content:center}
+  .pal{border:0;border-radius:14px;background:var(--morado);color:#fff;font:700 clamp(18px,2.2vw,24px) Poppins,sans-serif;padding:12px 22px;cursor:pointer;
+       box-shadow:0 4px 0 #5a35a8}
+  .pal:active{transform:translateY(2px);box-shadow:0 2px 0 #5a35a8}
+  .pal.usada{visibility:hidden}
+
+  /* Clasificar */
+  .tarros{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:14px;flex:1}
+  .tarro{border:3px dashed var(--linea);border-radius:20px;padding:12px;min-height:200px;display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;transition:background .15s}
+  .tarro h3{margin:0 0 4px;font-size:20px}
+  .tarro.si{border-color:#9fd8b6;background:#f3fbf6} .tarro.si h3{color:var(--verde)}
+  .tarro.no{border-color:#f0b6b0;background:#fff6f5} .tarro.no h3{color:var(--rojo)}
+  .tarro.listo{background:#fffbe6}
+  .tarro .mini{font:700 18px Poppins,sans-serif;padding:6px 12px;border-radius:10px;background:#fff;border:2px solid var(--linea)}
+  .mazo{display:flex;flex-direction:column;align-items:center;gap:10px}
+  .carta{background:#fff;border:4px solid var(--azul);border-radius:20px;padding:18px 40px;font-size:clamp(30px,5vw,52px);font-weight:800;
+         box-shadow:0 8px 0 var(--azul-o);min-width:260px;text-align:center;cursor:grab;touch-action:none;position:relative}
+  .carta.arrastra{cursor:grabbing;z-index:10;box-shadow:0 18px 30px rgba(0,0,0,.25)}
+  .carta.sacude{animation:sacude .4s}
+  @keyframes sacude{20%,60%{transform:translateX(-10px)}40%,80%{transform:translateX(10px)}}
+  .q{display:inline-block;width:.72em;height:.72em;border:4px solid var(--naranjo);background:var(--naranjo-c);border-radius:6px;vertical-align:-.04em}
+  .tarro .mini .q{border-width:2px}
+
+  /* Quiz */
+  .pregunta{font-size:clamp(20px,2.6vw,28px);font-weight:800;text-align:center;margin:0 0 8px}
+  .imagen{display:flex;justify-content:center;margin-bottom:10px}
+  .imagen svg{flex:1;width:100%;max-width:820px;height:auto}
+  .grande{font-size:clamp(40px,7vw,72px);font-weight:800;text-align:center;margin:20px 0}
+  .opciones{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:auto}
+  .op{border:0;border-radius:16px;color:#fff;font:800 clamp(20px,2.6vw,30px) Poppins,sans-serif;padding:16px 12px;cursor:pointer;
+      display:flex;align-items:center;gap:12px;text-align:left;min-height:76px}
+  .op .forma{width:34px;height:34px;flex:none;background:rgba(255,255,255,.3);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px}
+  .op:nth-child(1){background:#d93a2f;box-shadow:0 5px 0 #a8271f} .op:nth-child(2){background:#2f6fd6;box-shadow:0 5px 0 #1d4f9e}
+  .op:nth-child(3){background:#e8a316;box-shadow:0 5px 0 #b57c06} .op:nth-child(4){background:#1f9d55;box-shadow:0 5px 0 #157540}
+  .op:active{transform:translateY(3px)}
+  .op .q{border-color:#fff;background:rgba(255,255,255,.25)}
+  .op.atenuar{opacity:.3}
+  .op.bien{outline:6px solid #fff;outline-offset:-6px}
+  .fb{text-align:center;font-weight:800;font-size:22px;min-height:34px;margin:8px 0}
+  .fb.ok{color:var(--verde)} .fb.no{color:var(--rojo)}
+  .siguiente{align-self:center;margin-top:10px}
+  .btn{border:0;border-radius:14px;background:var(--azul);color:#fff;font:800 20px Poppins,sans-serif;padding:14px 28px;cursor:pointer;box-shadow:0 4px 0 var(--azul-o)}
+  .btn.sec{background:#eef1f7;color:var(--tinta);box-shadow:0 4px 0 #cfd8e8}
+  .btn:active{transform:translateY(2px)}
+  .barra{height:10px;background:#eef1f7;border-radius:5px;overflow:hidden;margin-bottom:14px}
+  .barra i{display:block;height:100%;background:var(--amarillo);width:0;transition:width .3s}
+
+  /* Final */
+  .final{text-align:center;margin:auto;padding:20px}
+  .final .estrellas{font-size:60px;letter-spacing:6px;color:#f2b705}
+  .final h2{font-size:34px;margin:8px 0}
+  .final p{font-size:18px;color:var(--gris);margin:6px 0 20px}
+  .final .bts{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+  .confeti{position:fixed;top:-20px;width:12px;height:18px;border-radius:3px;pointer-events:none;z-index:50;animation:cae linear forwards}
+  @keyframes cae{to{transform:translateY(110vh) rotate(720deg)}}
+  @media (max-width:640px){.opciones{grid-template-columns:1fr}.tarros{grid-template-columns:1fr}.hueco{min-width:120px}}
+</style>
+</head>
+<body>
+<div class="marco">
+  <header>
+    <button class="ib oculto" id="volver">← Menú</button>
+    <h1 id="titulo">Ecuaciones con balanza<small>4.º básico</small></h1>
+    <span class="chip oculto" id="marcador">★ 0</span>
+    <span class="chip oculto" id="reloj">0:00</span>
+    <button class="ib" id="sonido" title="Sonido">🔊</button>
+  </header>
+  <div class="hoja" id="hoja"></div>
+</div>
+
+<script>
+(() => {
+  const DEF = 'Una ecuación es una expresión matemática que relaciona valores variables y constantes mediante una igualdad.';
+  const Q = '<span class="q"></span>';
+  const hoja = document.getElementById('hoja');
+  const $ = id => document.getElementById(id);
+  const mezclar = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+
+  // ---------- sonido (Web Audio) ----------
+  let audio = null, conSonido = true;
+  function tono(frecs, dur = .12, tipo = 'sine') {
+    if (!conSonido) return;
+    try {
+      audio = audio || new (window.AudioContext || window.webkitAudioContext)();
+      audio.resume && audio.resume();
+      frecs.forEach((f, i) => {
+        const o = audio.createOscillator(), g = audio.createGain(), t = audio.currentTime + i * dur;
+        o.type = tipo; o.frequency.value = f; o.connect(g); g.connect(audio.destination);
+        g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(.3, t + .02); g.gain.exponentialRampToValueAtTime(.0001, t + dur);
+        o.start(t); o.stop(t + dur + .02);
+      });
+    } catch (e) {}
+  }
+  const bien = () => tono([660, 880], .11);
+  const mal = () => tono([220, 180], .16, 'square');
+  const fanfarria = () => tono([523, 659, 784, 1047], .13);
+  $('sonido').onclick = () => { conSonido = !conSonido; $('sonido').textContent = conSonido ? '🔊' : '🔇'; };
+
+  // ---------- marcador y reloj ----------
+  let puntos = 0, inicio = 0, relojT = null;
+  const ponerPuntos = n => { puntos = n; $('marcador').textContent = '★ ' + n; };
+  function arrancarReloj() {
+    inicio = Date.now(); clearInterval(relojT);
+    const pinta = () => { const s = Math.floor((Date.now() - inicio) / 1000); $('reloj').textContent = Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); };
+    pinta(); relojT = setInterval(pinta, 500);
+  }
+  const tiempo = () => $('reloj').textContent;
+  function cabecera(titulo, juego) {
+    $('titulo').innerHTML = titulo + '<small>Ecuaciones con balanza · 4.º básico</small>';
+    $('volver').classList.toggle('oculto', !juego);
+    $('marcador').classList.toggle('oculto', !juego);
+    $('reloj').classList.toggle('oculto', !juego);
+    if (juego) { ponerPuntos(0); arrancarReloj(); } else clearInterval(relojT);
+  }
+  $('volver').onclick = menu;
+
+  function confeti() {
+    const cs = ['#d93a2f', '#2f6fd6', '#f7d33a', '#1f9d55', '#e8890c', '#7a4fd6'];
+    for (let i = 0; i < 70; i++) {
+      const c = document.createElement('div'); c.className = 'confeti';
+      c.style.left = Math.random() * 100 + 'vw'; c.style.background = cs[i % cs.length];
+      c.style.animationDuration = 1.8 + Math.random() * 1.8 + 's'; c.style.animationDelay = Math.random() * .6 + 's';
+      document.body.appendChild(c); setTimeout(() => c.remove(), 4500);
+    }
+  }
+  function final(aciertos, total, otra) {
+    clearInterval(relojT);
+    const r = aciertos / total, est = r >= .9 ? 3 : r >= .6 ? 2 : r > 0 ? 1 : 0;
+    hoja.innerHTML = `<div class="final"><div class="estrellas">${'★'.repeat(est)}${'☆'.repeat(3 - est)}</div>
+      <h2>${aciertos} de ${total}</h2><p>Tiempo: ${tiempo()}</p>
+      <div class="bts"><button class="btn" id="otra">Jugar de nuevo ↻</button><button class="btn sec" id="alMenu">Menú</button></div></div>`;
+    $('otra').onclick = otra; $('alMenu').onclick = menu;
+    if (est >= 2) { fanfarria(); confeti(); }
+  }
+
+  // ---------- balanza (SVG) ----------
+  function balanza(izq, der, ladoQ) {
+    const CX = 500, BY = 20, BH = 40, px = (s, k) => CX + s * (22 + k * 39);
+    let s = `<svg viewBox="0 0 1000 285" xmlns="http://www.w3.org/2000/svg">`;
+    s += `<rect x="${CX - 11}" y="${BY}" width="22" height="215" fill="#d93a2f"/>
+      <rect x="${CX - 135}" y="221" width="105" height="16" rx="3" fill="#2f6fd6"/><rect x="${CX + 30}" y="221" width="105" height="16" rx="3" fill="#2f6fd6"/>
+      <rect x="${CX - 150}" y="235" width="300" height="26" rx="4" fill="#d93a2f"/>
+      <rect x="${px(-1, 10) - 26}" y="${BY}" width="${2 * (px(1, 10) - CX) + 52}" height="${BH}" rx="5" fill="#f7d33a" stroke="#c9a400" stroke-width="2"/>`;
+    for (const side of [-1, 1]) for (let k = 1; k <= 10; k++) {
+      const x = px(side, k);
+      s += `<text x="${x}" y="${BY + 21}" font-family="Poppins,sans-serif" font-weight="700" font-size="17" fill="#333" text-anchor="middle">${k}</text><circle cx="${x}" cy="${BY + 31}" r="3.5" fill="#8a7400"/>`;
+    }
+    s += `<rect x="${CX - 12}" y="${BY - 6}" width="24" height="${BH + 12}" rx="3" fill="#d93a2f"/><circle cx="${CX}" cy="${BY + 8}" r="4" fill="#222"/>`;
+    for (const [side, pesas] of [[-1, izq], [1, der]]) {
+      const cnt = {};
+      for (const k of pesas) {
+        const n = cnt[k] || 0; cnt[k] = n + 1;
+        const x = px(side, k), y = BY + BH - 6 + n * 76;
+        s += `<rect x="${x - 15}" y="${y}" width="30" height="72" rx="3" fill="#2f6fd6" stroke="#1d4f9e" stroke-width="2"/><circle cx="${x}" cy="${y + 12}" r="6" fill="#f7d33a" stroke="#c9a400" stroke-width="1.5"/>`;
+      }
+    }
+    if (ladoQ) {
+      const x = px(ladoQ, 5.5), y = 140;
+      s += `<rect x="${x - 17}" y="${y}" width="34" height="74" rx="4" fill="#fde7c2" stroke="#e8890c" stroke-width="3" stroke-dasharray="6 4"/>
+        <text x="${x}" y="${y + 50}" font-family="Poppins,sans-serif" font-weight="800" font-size="34" fill="#c46a00" text-anchor="middle">?</text>`;
+    }
+    return s + '</svg>';
+  }
+
+  // ---------- 1. Completa la definición ----------
+  function juegoDefinicion() {
+    cabecera('Completa la definición', true);
+    const huecos = [['variables', 'constantes'], ['variables', 'constantes'], ['igualdad']];
+    const banco = mezclar(['variables', 'constantes', 'igualdad', 'desigualdad', 'figuras', 'resta']);
+    const puestos = [null, null, null];   // índice del banco
+    let errores = 0;
+    hoja.innerHTML = `<p class="pregunta">Toca una palabra y luego el espacio donde va.</p>
+      <div class="frase">Una ecuación es una expresión matemática que relaciona valores
+        <span class="hueco" data-i="0"></span> y <span class="hueco" data-i="1"></span> mediante una <span class="hueco" data-i="2"></span>.</div>
+      <div class="banco">${banco.map((p, i) => `<button class="pal" data-b="${i}">${p}</button>`).join('')}</div>
+      <div class="fb" id="fb"></div>
+      <button class="btn siguiente" id="revisar">Revisar ✔</button>`;
+    let sel = null;
+    const pal = [...hoja.querySelectorAll('.pal')], hs = [...hoja.querySelectorAll('.hueco')];
+    const pintar = () => {
+      hs.forEach((h, i) => { h.textContent = puestos[i] == null ? '' : banco[puestos[i]]; h.className = 'hueco' + (puestos[i] == null ? '' : ' lleno'); });
+      pal.forEach((p, i) => { p.classList.toggle('usada', puestos.includes(i)); p.style.outline = sel === i ? '4px solid #f7d33a' : ''; });
+    };
+    pal.forEach(p => p.onclick = () => {
+      const i = +p.dataset.b;
+      sel = sel === i ? null : i;
+      pintar();
+    });
+    hs.forEach(h => h.onclick = () => {
+      const i = +h.dataset.i;
+      if (sel != null) { puestos[i] = sel; sel = null; }
+      else if (puestos[i] != null) puestos[i] = null;     // tocar un espacio lleno lo vacía
+      pintar();
+    });
+    $('revisar').onclick = () => {
+      if (puestos.includes(null)) { $('fb').className = 'fb no'; $('fb').textContent = 'Completa los tres espacios.'; mal(); return; }
+      const pal3 = puestos.map(i => banco[i]);
+      const ok = [pal3[0] !== pal3[1] && huecos[0].includes(pal3[0]), pal3[0] !== pal3[1] && huecos[1].includes(pal3[1]), pal3[2] === 'igualdad'];
+      let n = 0;
+      hs.forEach((h, i) => { h.classList.add(ok[i] ? 'ok' : 'mal'); if (ok[i]) n++; });
+      if (n === 3) {
+        bien(); ponerPuntos(3 - Math.min(2, errores));
+        $('fb').className = 'fb ok'; $('fb').textContent = '¡Muy bien! ' + DEF;
+        $('revisar').textContent = 'Terminar →';
+        $('revisar').onclick = () => final(3 - Math.min(2, errores), 3, juegoDefinicion);
+      } else {
+        errores++; mal();
+        $('fb').className = 'fb no'; $('fb').textContent = 'Algunas palabras no van ahí. Toca las rojas para sacarlas y prueba otra vez.';
+      }
+    };
+    pintar();
+  }
+
+  // ---------- 2. ¿Es una ecuación? ----------
+  const CARTAS = [
+    { t: `4 + ${Q} = 9`, si: true }, { t: 'x + 2 = 4', si: true }, { t: `${Q} − 3 = 5`, si: true },
+    { t: `9 = ${Q} + 4`, si: true }, { t: 'c + 4 = 8', si: true }, { t: '10 − p = 6', si: true },
+    { t: '7 + 3', si: false, por: 'No tiene igualdad (=).' }, { t: '4 + 5 = 9', si: false, por: 'Solo tiene números conocidos: no hay un valor variable.' },
+    { t: '8 > 5', si: false, por: 'Tiene “>”, no una igualdad.' }, { t: '12', si: false, por: 'Es solo un número.' },
+    { t: '6 + 2 + 1', si: false, por: 'No tiene igualdad (=).' }, { t: `${Q} + 3 < 10`, si: false, por: 'Tiene “<”, no una igualdad.' },
+  ];
+  function juegoClasificar() {
+    cabecera('¿Es una ecuación?', true);
+    const mazo = mezclar(CARTAS); let i = 0, aciertos = 0, intento = 0;
+    hoja.innerHTML = `<div class="barra"><i id="prog"></i></div>
+      <p class="pregunta">Arrastra la tarjeta (o tócala y luego toca la caja) donde corresponde.</p>
+      <div class="mazo" id="mazo"></div><div class="fb" id="fb"></div>
+      <div class="tarros"><div class="tarro si" id="tSi"><h3>✔ Es ecuación</h3></div><div class="tarro no" id="tNo"><h3>✘ No es ecuación</h3></div></div>`;
+    const tSi = $('tSi'), tNo = $('tNo');
+    let elegida = false;
+    function mostrar() {
+      $('prog').style.width = (i / mazo.length * 100) + '%';
+      if (i >= mazo.length) { setTimeout(() => final(aciertos, mazo.length, juegoClasificar), 600); return; }
+      intento = 0; elegida = false;
+      $('mazo').innerHTML = `<div class="carta" id="carta">${mazo[i].t}</div>`;
+      const c = $('carta');
+      let a = null;
+      c.addEventListener('pointerdown', e => { a = { x: e.clientX, y: e.clientY, m: false }; try { c.setPointerCapture(e.pointerId); } catch (_) {} });
+      c.addEventListener('pointermove', e => {
+        if (!a) return;
+        const dx = e.clientX - a.x, dy = e.clientY - a.y;
+        if (!a.m && Math.hypot(dx, dy) < 8) return;
+        a.m = true; c.classList.add('arrastra'); c.style.transform = `translate(${dx}px,${dy}px)`;
+        [tSi, tNo].forEach(t => { const r = t.getBoundingClientRect(); t.classList.toggle('listo', e.clientX > r.left && e.clientX < r.right && e.clientY > r.top && e.clientY < r.bottom); });
+      });
+      const soltar = e => {
+        if (!a) return;
+        c.classList.remove('arrastra');
+        if (a.m) {
+          const dentro = [tSi, tNo].find(t => { const r = t.getBoundingClientRect(); return e.clientX > r.left && e.clientX < r.right && e.clientY > r.top && e.clientY < r.bottom; });
+          [tSi, tNo].forEach(t => t.classList.remove('listo'));
+          c.style.transform = '';
+          if (dentro) decidir(dentro === tSi);
+        } else { elegida = !elegida; c.style.outline = elegida ? '5px solid #f7d33a' : ''; }
+        a = null;
+      };
+      c.addEventListener('pointerup', soltar); c.addEventListener('pointercancel', soltar);
+    }
+    tSi.onclick = () => { if (elegida) decidir(true); };
+    tNo.onclick = () => { if (elegida) decidir(false); };
+    function decidir(dijoSi) {
+      const k = mazo[i], fb = $('fb');
+      if (dijoSi === k.si) {
+        bien(); if (intento === 0) { aciertos++; ponerPuntos(aciertos); }
+        fb.className = 'fb ok'; fb.textContent = k.si ? '¡Sí! Tiene un valor variable y una igualdad.' : '¡Correcto! ' + k.por;
+        (k.si ? tSi : tNo).insertAdjacentHTML('beforeend', `<span class="mini">${k.t}</span>`);
+        i++; setTimeout(() => { fb.textContent = ''; mostrar(); }, 1100);
+      } else {
+        intento++; mal();
+        const c = $('carta'); c.classList.remove('sacude'); void c.offsetWidth; c.classList.add('sacude'); c.style.outline = ''; elegida = false;
+        fb.className = 'fb no'; fb.textContent = k.si ? 'Mira otra vez: ¿tiene una igualdad y un valor que no conocemos?' : k.por;
+      }
+    }
+    mostrar();
+  }
+
+  // ---------- 3. Quiz de la balanza ----------
+  const PREGUNTAS = [
+    { p: '¿Qué ecuación muestra la balanza?', img: [[3], [10], -1], ops: [`3 + ${Q} = 10`, `3 + 10 = ${Q}`, `10 + ${Q} = 3`, `${Q} − 3 = 10`] },
+    { p: `¿Cuánto vale ${Q}?`, img: [[5], [10, 2], -1], ops: ['7', '17', '5', '12'] },
+    { p: '¿En qué número va la pesa ?', img: [[6, 4], [], 1], ops: ['10', '2', '64', '24'] },
+    { p: '¿Qué ecuación muestra la balanza?', img: [[9], [4], 1], ops: [`9 = ${Q} + 4`, `9 + 4 = ${Q}`, `4 = ${Q} + 9`, `9 + ${Q} = 4`] },
+    { p: '¿Cuál de estas es una ecuación?', ops: ['x + 2 = 4', '7 + 3', '5 + 3 = 8', '6 > 2'] },
+    { p: `¿Cuánto vale ${Q}?`, img: [[], [5, 3], -1], ops: ['8', '2', '15', '53'] },
+    { p: `¿Cuánto vale ${Q}?`, grande: `10 − ${Q} = 7`, ops: ['3', '17', '7', '4'] },
+    { p: `¿Cuánto vale ${Q}?`, img: [[7, 3], [5], 1], ops: ['5', '15', '10', '2'] },
+    { p: 'En una ecuación, el signo = significa que…', ops: ['los dos lados valen lo mismo', 'después viene el resultado', 'hay que sumar todo', 'el lado derecho es mayor'] },
+    { p: `Escribe ${Q} − 4 = 4 como suma:`, grande: `${Q} − 4 = 4`, ops: [`${Q} = 4 + 4`, `${Q} = 4 − 4`, `${Q} + 4 = 4`, `4 + 4 = 0`] },
+  ];
+  function juegoQuiz() {
+    cabecera('Quiz de la balanza', true);
+    const orden = PREGUNTAS.map((q, n) => n); let i = 0, aciertos = 0;
+    function mostrar() {
+      if (i >= orden.length) { final(aciertos, orden.length, juegoQuiz); return; }
+      const q = PREGUNTAS[orden[i]], correcta = q.ops[0], ops = mezclar(q.ops);
+      const formas = ['▲', '◆', '●', '■'];
+      hoja.innerHTML = `<div class="barra"><i style="width:${i / orden.length * 100}%"></i></div>
+        <p class="pregunta">${i + 1}. ${q.p}</p>
+        ${q.img ? `<div class="imagen">${balanza(...q.img)}</div>` : q.grande ? `<div class="grande">${q.grande}</div>` : '<div style="flex:1"></div>'}
+        <div class="fb" id="fb"></div>
+        <div class="opciones">${ops.map((o, n) => `<button class="op" data-o="${n}"><span class="forma">${formas[n]}</span><span>${o}</span></button>`).join('')}</div>`;
+      let respondida = false;
+      hoja.querySelectorAll('.op').forEach(b => b.onclick = () => {
+        if (respondida) return; respondida = true;
+        const elegido = ops[+b.dataset.o], ok = elegido === correcta;
+        hoja.querySelectorAll('.op').forEach(x => { const es = ops[+x.dataset.o] === correcta; x.classList.toggle('bien', es); x.classList.toggle('atenuar', !es && x !== b); });
+        const fb = $('fb');
+        if (ok) { aciertos++; ponerPuntos(aciertos); bien(); fb.className = 'fb ok'; fb.textContent = '¡Correcto!'; }
+        else { mal(); fb.className = 'fb no'; fb.innerHTML = 'La respuesta era: ' + correcta; }
+        setTimeout(() => { i++; mostrar(); }, ok ? 1100 : 2000);
+      });
+    }
+    mostrar();
+  }
+
+  // ---------- menú ----------
+  function menu() {
+    cabecera('Ecuaciones con balanza', false);
+    hoja.innerHTML = `<div class="defi"><b>Ecuación:</b> ${DEF.replace('Una ecuación es una', 'una')}</div>
+      <div class="menu">
+        <button class="act a1" id="j1"><span class="ico">✍️</span><b>Completa la definición</b><span>Pon las palabras que faltan en la definición de ecuación.</span></button>
+        <button class="act a2" id="j2"><span class="ico">🗂️</span><b>¿Es una ecuación?</b><span>Clasifica 12 tarjetas: ¿es ecuación o no?</span></button>
+        <button class="act a3" id="j3"><span class="ico">⚖️</span><b>Quiz de la balanza</b><span>10 preguntas con balanzas: ¿qué ecuación es? ¿cuánto vale el número escondido?</span></button>
+      </div>`;
+    $('j1').onclick = juegoDefinicion; $('j2').onclick = juegoClasificar; $('j3').onclick = juegoQuiz;
+  }
+  menu();
+})();
+</script>
+</body>
+</html>

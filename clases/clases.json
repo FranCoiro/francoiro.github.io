@@ -47,6 +47,10 @@
         {
           "nombre": "Simulador de la balanza (con los ejercicios de la guía)",
           "archivo": "../../../balanza-numerica/"
+        },
+        {
+          "nombre": "Juegos estilo Wordwall",
+          "archivo": "../../../ecuaciones-juego/"
         }
       ]
     },
