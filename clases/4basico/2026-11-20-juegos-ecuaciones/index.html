@@ -221,55 +221,6 @@
     return s + '</svg>';
   }
 
-  // ---------- 1. Completa la definición ----------
-  function juegoDefinicion() {
-    cabecera('Completa la definición', true);
-    const huecos = [['variables', 'constantes'], ['variables', 'constantes'], ['igualdad']];
-    const banco = mezclar(['variables', 'constantes', 'igualdad', 'desigualdad', 'figuras', 'resta']);
-    const puestos = [null, null, null];   // índice del banco
-    let errores = 0;
-    hoja.innerHTML = `<p class="pregunta">Toca una palabra y luego el espacio donde va.</p>
-      <div class="frase">Una ecuación es una expresión matemática que relaciona valores
-        <span class="hueco" data-i="0"></span> y <span class="hueco" data-i="1"></span> mediante una <span class="hueco" data-i="2"></span>.</div>
-      <div class="banco">${banco.map((p, i) => `<button class="pal" data-b="${i}">${p}</button>`).join('')}</div>
-      <div class="fb" id="fb"></div>
-      <button class="btn siguiente" id="revisar">Revisar ✔</button>`;
-    let sel = null;
-    const pal = [...hoja.querySelectorAll('.pal')], hs = [...hoja.querySelectorAll('.hueco')];
-    const pintar = () => {
-      hs.forEach((h, i) => { h.textContent = puestos[i] == null ? '' : banco[puestos[i]]; h.className = 'hueco' + (puestos[i] == null ? '' : ' lleno'); });
-      pal.forEach((p, i) => { p.classList.toggle('usada', puestos.includes(i)); p.style.outline = sel === i ? '4px solid #f7d33a' : ''; });
-    };
-    pal.forEach(p => p.onclick = () => {
-      const i = +p.dataset.b;
-      sel = sel === i ? null : i;
-      pintar();
-    });
-    hs.forEach(h => h.onclick = () => {
-      const i = +h.dataset.i;
-      if (sel != null) { puestos[i] = sel; sel = null; }
-      else if (puestos[i] != null) puestos[i] = null;     // tocar un espacio lleno lo vacía
-      pintar();
-    });
-    $('revisar').onclick = () => {
-      if (puestos.includes(null)) { $('fb').className = 'fb no'; $('fb').textContent = 'Completa los tres espacios.'; mal(); return; }
-      const pal3 = puestos.map(i => banco[i]);
-      const ok = [pal3[0] !== pal3[1] && huecos[0].includes(pal3[0]), pal3[0] !== pal3[1] && huecos[1].includes(pal3[1]), pal3[2] === 'igualdad'];
-      let n = 0;
-      hs.forEach((h, i) => { h.classList.add(ok[i] ? 'ok' : 'mal'); if (ok[i]) n++; });
-      if (n === 3) {
-        bien(); ponerPuntos(3 - Math.min(2, errores));
-        $('fb').className = 'fb ok'; $('fb').textContent = '¡Muy bien! ' + DEF;
-        $('revisar').textContent = 'Terminar →';
-        $('revisar').onclick = () => final(3 - Math.min(2, errores), 3, juegoDefinicion);
-      } else {
-        errores++; mal();
-        $('fb').className = 'fb no'; $('fb').textContent = 'Algunas palabras no van ahí. Toca las rojas para sacarlas y prueba otra vez.';
-      }
-    };
-    pintar();
-  }
-
   // ---------- 2. ¿Es una ecuación? ----------
   const CARTAS = [
     { t: `4 + ${Q} = 9`, si: true }, { t: 'x + 2 = 4', si: true }, { t: `${Q} − 3 = 5`, si: true },
@@ -457,12 +408,11 @@
     cabecera('Ecuaciones con balanza', false);
     hoja.innerHTML = `<div class="defi"><b>Ecuación:</b> ${DEF.replace('Una ecuación es una', 'una')}</div>
       <div class="menu">
-        <button class="act a1" id="j1"><span class="ico">✍️</span><b>Completa la definición</b><span>Pon las palabras que faltan en la definición de ecuación.</span></button>
         <button class="act a2" id="j2"><span class="ico">🗂️</span><b>¿Es una ecuación?</b><span>Clasifica 12 tarjetas: ¿es ecuación o no?</span></button>
         <button class="act a3" id="j3"><span class="ico">⚖️</span><b>Quiz de la balanza</b><span>10 preguntas con balanzas: ¿qué ecuación es? ¿cuánto vale el número escondido?</span></button>
         <button class="act a4" id="j4"><span class="ico">🧮</span><b>Trabajo libre</b><span>La profe cuelga pesas donde quiera y la balanza suma sola cada lado.</span></button>
       </div>`;
-    $('j1').onclick = juegoDefinicion; $('j2').onclick = juegoClasificar; $('j3').onclick = juegoQuiz; $('j4').onclick = juegoLibre;
+    $('j2').onclick = juegoClasificar; $('j3').onclick = juegoQuiz; $('j4').onclick = juegoLibre;
   }
   menu();
 })();
