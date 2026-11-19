@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Monedas en la mesa</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;overflow:hidden;font-family:'Nunito',system-ui,sans-serif;
+    -webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
+  /* Mesa de madera */
+  #mesa{position:fixed;inset:0;background-color:#b9814d;
+    background-image:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='900' height='600'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.0035 0.09' numOctaves='4' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.35  0 0 0 0 0.2  0 0 0 0 0.08  0 0 0 1.1 -0.35'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E"),
+      repeating-linear-gradient(180deg, rgba(0,0,0,0) 0 140px, rgba(60,30,10,.18) 140px 142px, rgba(0,0,0,0) 142px 280px),
+      linear-gradient(180deg,#c48a55,#b77d48 50%,#c08652);
+    background-size:900px 600px, auto, auto}
+  /* Tablero (tercio superior) */
+  #hoja{position:fixed;left:2vw;right:2vw;top:1.6vh;height:31.5vh;background:#fff;
+    border:1px solid #d6dbe3;box-shadow:0 6px 14px rgba(40,20,5,.35);
+    padding:3.2% 1.2% 1.2% 1.2%;display:flex;gap:.5%}
+  .zona{height:100%;position:relative}
+  #z10{background:#eaa985;flex:58}
+  #z50{background:#f3df0b;flex:24}
+  #z100{background:#a9cdec;flex:18}
+  /* Monedas */
+  #capa{position:fixed;inset:0;pointer-events:none}
+  .moneda{position:absolute;pointer-events:auto;touch-action:none;cursor:grab;
+    transform:translate(-50%,-50%);will-change:left,top;
+    filter:drop-shadow(0 2px 2px rgba(0,0,0,.25))}
+  .moneda svg{display:block;width:100%;height:100%;transition:transform .12s}
+  .moneda.arrastrando{cursor:grabbing;filter:drop-shadow(0 12px 10px rgba(0,0,0,.35))}
+  .moneda.arrastrando svg{transform:scale(1.08)}
+  .moneda.anima{transition:left .45s cubic-bezier(.3,1.3,.5,1),top .45s cubic-bezier(.3,1.3,.5,1)}
+  /* Selección y brillo */
+  .moneda::after{content:'';position:absolute;inset:-9%;border-radius:50%;pointer-events:none;opacity:0;transition:opacity .15s}
+  .moneda.sel::after{opacity:1;border:5px solid #1f8fff;box-shadow:0 0 14px 3px rgba(31,143,255,.8)}
+  .moneda.sel svg{transform:translateY(-4px) scale(1.05)}
+  .moneda.brilla::after{opacity:1;border:5px solid #fff3a8;background:rgba(255,240,150,.45);animation:brillo 1s ease-in-out infinite}
+  @keyframes brillo{0%,100%{box-shadow:0 0 10px 4px rgba(255,214,40,.9),0 0 30px 10px rgba(255,240,150,.6)}
+    50%{box-shadow:0 0 22px 10px rgba(255,214,40,1),0 0 55px 22px rgba(255,240,150,.8)}}
+  .moneda.baja{transition:left .8s cubic-bezier(.25,.9,.35,1.15),top .8s cubic-bezier(.25,.9,.35,1.15)}
+  #barra{position:fixed;left:50%;bottom:16px;transform:translate(-50%,140%);z-index:100002;
+    display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:center;
+    background:rgba(255,250,243,.97);border-radius:22px;padding:12px 16px;max-width:calc(100vw - 32px);
+    box-shadow:0 8px 24px rgba(0,0,0,.35);transition:transform .25s;color:#3b2414}
+  #barra.visible{transform:translate(-50%,0)}
+  #infoSel{font-size:22px;font-weight:700;padding:0 6px}
+  #opciones{display:flex;gap:10px;flex-wrap:wrap}
+  .canje{border:0;border-radius:14px;background:#1f8fff;color:#fff;font:700 21px 'Nunito';padding:14px 20px;cursor:pointer;
+    box-shadow:0 3px 0 #136ac2}
+  .canje:active{transform:translateY(2px);box-shadow:0 1px 0 #136ac2}
+  .canje:disabled{background:#b9c6d4;box-shadow:none;cursor:default}
+  .canje small{font-size:15px}
+  .sec2{border:0;border-radius:14px;background:#f0e2cf;color:#5a2f12;font:800 20px 'Nunito';padding:14px 18px;cursor:pointer}
+  /* Controles */
+  .botones{position:fixed;right:16px;bottom:16px;display:flex;gap:10px;z-index:100000}
+  .btn{border:0;border-radius:999px;background:rgba(255,248,238,.92);color:#5a2f12;
+    font:800 19px 'Nunito',sans-serif;padding:14px 22px;cursor:pointer;
+    box-shadow:0 3px 8px rgba(0,0,0,.25);display:flex;align-items:center;gap:6px}
+  .btn:hover{background:#fff}
+  .btn svg{width:24px;height:24px}
+  #total{position:fixed;left:16px;bottom:16px;z-index:100000;background:rgba(255,248,238,.92);
+    color:#5a2f12;border-radius:14px;padding:8px 16px;font-weight:900;font-size:clamp(18px,3vh,32px);
+    box-shadow:0 3px 8px rgba(0,0,0,.25);display:none}
+  /* Panel de ajustes */
+  #panel{position:fixed;right:16px;bottom:72px;width:300px;max-width:calc(100vw - 32px);
+    background:#fffaf3;color:#3b2414;border-radius:16px;padding:18px;z-index:100001;
+    box-shadow:0 10px 30px rgba(0,0,0,.35);display:none}
+  #panel.abierto{display:block}
+  #panel h2{margin:0 0 12px;font-size:18px}
+  .fila{display:flex;align-items:center;justify-content:space-between;margin:10px 0}
+  .fila .eti{display:flex;align-items:center;gap:8px;font-weight:800}
+  .fila .eti span.dot{width:22px;height:22px;border-radius:50%;display:inline-block;border:3px solid}
+  .paso{display:flex;align-items:center;gap:6px}
+  .paso button{width:32px;height:32px;border-radius:50%;border:0;background:#f0e2cf;color:#5a2f12;
+    font:900 18px 'Nunito';cursor:pointer}
+  .paso input{width:48px;text-align:center;font:800 17px 'Nunito';border:1px solid #e1d2bd;
+    border-radius:8px;padding:4px;background:#fff;color:#3b2414}
+  .check{display:flex;align-items:center;gap:8px;margin:14px 0 4px;font-weight:700;font-size:15px}
+  .acciones{display:flex;gap:8px;margin-top:14px}
+  .acciones button{flex:1;border:0;border-radius:10px;padding:10px;font:800 15px 'Nunito';cursor:pointer}
+  .prim{background:#5a2f12;color:#fff}
+  .sec{background:#f0e2cf;color:#5a2f12}
+  .nota{font-size:12.5px;color:#7a6250;margin-top:10px;line-height:1.35}
+</style>
+</head>
+<body>
+<div id="mesa"></div>
+<div id="hoja">
+  <div class="zona" id="z10"></div>
+  <div class="zona" id="z50"></div>
+  <div class="zona" id="z100"></div>
+</div>
+<div id="capa"></div>
+
+<div id="total">En la mesa: $0</div>
+
+<div class="botones">
+  <button class="btn" id="bDevolver" title="Devolver todas las monedas">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg>Devolver todas</button>
+  <button class="btn" id="bPantalla" title="Pantalla completa">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
+  <button class="btn" id="bAjustes" title="Ajustes">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>Ajustes</button>
+</div>
+
+<div id="panel">
+  <h2>Cantidad de monedas</h2>
+  <div class="fila"><div class="eti"><span class="dot" style="background:#f7e3d2;border-color:#d8333a"></span>$10</div>
+    <div class="paso"><button data-d="10" data-s="-1">−</button><input id="n10" type="number" min="0" max="40"><button data-d="10" data-s="1">+</button></div></div>
+  <div class="fila"><div class="eti"><span class="dot" style="background:#f6e04a;border-color:#d4ab12"></span>$50</div>
+    <div class="paso"><button data-d="50" data-s="-1">−</button><input id="n50" type="number" min="0" max="40"><button data-d="50" data-s="1">+</button></div></div>
+  <div class="fila"><div class="eti"><span class="dot" style="background:#f7da1f;border-color:#9cc3e6"></span>$100</div>
+    <div class="paso"><button data-d="100" data-s="-1">−</button><input id="n100" type="number" min="0" max="40"><button data-d="100" data-s="1">+</button></div></div>
+  <label class="check"><input type="checkbox" id="cTotal"> Mostrar el total que hay en la mesa</label>
+  <div class="acciones">
+    <button class="sec" id="bOriginal">15 · 6 · 3</button>
+    <button class="prim" id="bAplicar">Aplicar</button>
+  </div>
+  <div class="nota">Arrastra monedas a la mesa. Toca las monedas de la mesa para seleccionarlas y cambiarlas por otra moneda. Para devolver una, arrástrala a su zona.</div>
+</div>
+
+<div id="barra">
+  <div id="infoSel"></div>
+  <div id="opciones"></div>
+  <button class="sec2" id="bDevSel">Devolver</button>
+  <button class="sec2" id="bLimpiar">✕</button>
+</div>
+
+<script>
+(() => {
+  const DENOMS = [10, 50, 100];
+  const ORIGINAL = {10: 15, 50: 6, 100: 3};
+  const zonas = {10: document.getElementById('z10'), 50: document.getElementById('z50'), 100: document.getElementById('z100')};
+  const capa = document.getElementById('capa');
+  let cfg = Object.assign({}, ORIGINAL, {total: false});
+  try { const g = JSON.parse(localStorage.getItem('monedas-cfg') || 'null'); if (g) cfg = Object.assign(cfg, g); } catch (e) {}
+
+  let monedas = [];   // {el, d, rot, jx, jy, slot, estado:'slot'|'zona'|'mesa', fx, fy}
+  let diam = 60, zTop = 10;
+
+  // Generador pseudoaleatorio con semilla para que la distribución sea estable
+  function rng(seed) { return () => { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; }; }
+
+  function svgMoneda(d, rot) {
+    const t = `<g transform="rotate(${rot})">`;
+    const deco = `<path d="M10 22 l10 -6" stroke="#7a5a3a" stroke-width="2" stroke-linecap="round"/>`;
+    if (d === 10) return `<svg viewBox="-54 -54 110 110"><circle cx="2" cy="4" r="49" fill="#3f8ed1"/>
+      <circle r="49" fill="#d8333a"/><circle r="44.5" fill="none" stroke="#fff" stroke-width="2.6" stroke-dasharray="0 5.3" stroke-linecap="round"/>
+      <circle r="40" fill="#f9e6d6"/><circle r="38" fill="none" stroke="#e7a6a0" stroke-width="1"/>
+      ${t}<text y="9" text-anchor="middle" font-family="Nunito" font-weight="900" font-size="27" fill="#5b1e1e">$10</text>${deco}</g></svg>`;
+    if (d === 50) return `<svg viewBox="-54 -54 110 110"><circle cx="2" cy="4" r="49" fill="#3f8ed1"/>
+      <circle r="49" fill="#e8c21a"/><circle r="44.5" fill="none" stroke="#a9810a" stroke-width="2.4" stroke-dasharray="0 5.3" stroke-linecap="round"/>
+      <circle r="40" fill="#f8e352"/><circle r="38" fill="none" stroke="#d1ad18" stroke-width="1.2"/>
+      ${t}<text y="9" text-anchor="middle" font-family="Nunito" font-weight="900" font-size="27" fill="#4a3208">$50</text>${deco}</g></svg>`;
+    return `<svg viewBox="-54 -54 110 110"><circle cx="2" cy="4" r="49" fill="#3f8ed1"/>
+      <circle r="49" fill="#e7f1fa"/><circle r="44.5" fill="none" stroke="#2c4f7c" stroke-width="2.4" stroke-dasharray="0 5.3" stroke-linecap="round"/>
+      <circle r="34" fill="#f7da1f"/>
+      ${t}<text y="8" text-anchor="middle" font-family="Nunito" font-weight="900" font-size="23" fill="#3a2a10">$100</text>
+      <path d="M12 26 l10 -6" stroke="#7a5a3a" stroke-width="2" stroke-linecap="round"/></g></svg>`;
+  }
+
+  function rectDe(el) { return el.getBoundingClientRect(); }
+
+  // Mejor cuadrícula para n monedas dentro de w×h
+  function grilla(n, w, h) {
+    let best = {c: 1, r: n, d: 0};
+    for (let c = 1; c <= Math.max(1, n); c++) {
+      const r = Math.ceil(n / c), d = Math.min(w / c, h / r);
+      if (d > best.d) best = {c, r, d};
+    }
+    return best;
+  }
+
+  function calcular() {
+    // Diámetro común: el menor que cabe en todas las zonas
+    let d = Infinity;
+    DENOMS.forEach(k => {
+      const n = cfg[k]; if (!n) return;
+      const r = rectDe(zonas[k]);
+      d = Math.min(d, grilla(n, r.width, r.height).d * 0.86);
+    });
+    const hojaH = rectDe(document.getElementById('hoja')).height;
+    diam = Math.max(26, Math.min(isFinite(d) ? d : 80, hojaH * 0.36));
+    monedas.forEach(m => { m.el.style.width = m.el.style.height = diam + 'px'; });
+  }
+
+  function posSlot(m) {
+    const r = rectDe(zonas[m.d]);
+    const n = cfg[m.d];
+    const g = grilla(n, r.width, r.height);
+    const cw = r.width / g.c, ch = r.height / g.r;
+    const col = m.slot % g.c, fila = Math.floor(m.slot / g.c);
+    const enFila = fila === g.r - 1 ? n - fila * g.c : g.c;          // centra la última fila
+    const offX = (g.c - enFila) * cw / 2;
+    const libreX = Math.max(0, (cw - diam) / 2 - 2), libreY = Math.max(0, (ch - diam) / 2 - 2);
+    return {
+      x: r.left + offX + cw * (col + .5) + m.jx * libreX,
+      y: r.top + ch * (fila + .5) + m.jy * libreY
+    };
+  }
+
+  function ubicar(m) {
+    let p;
+    if (m.estado === 'slot') p = posSlot(m);
+    else if (m.estado === 'zona') { const r = rectDe(zonas[m.d]); p = {x: r.left + m.fx * r.width, y: r.top + m.fy * r.height}; }
+    else p = {x: m.fx * innerWidth, y: m.fy * innerHeight};
+    m.el.style.left = p.x + 'px'; m.el.style.top = p.y + 'px';
+  }
+
+  function construir() {
+    capa.innerHTML = ''; monedas = []; barra.classList.remove('visible');
+    const azar = rng(20261118);
+    DENOMS.forEach(d => {
+      for (let i = 0; i < cfg[d]; i++) {
+        const el = document.createElement('div');
+        el.className = 'moneda';
+        const rot = 0; azar();
+        el.innerHTML = svgMoneda(d, rot);
+        const m = {el, d, slot: i, jx: azar() * 2 - 1, jy: azar() * 2 - 1, estado: 'slot', fx: 0, fy: 0};
+        el.style.zIndex = ++zTop;
+        capa.appendChild(el); monedas.push(m);
+        arrastrable(m);
+      }
+    });
+    calcular(); monedas.forEach(ubicar); actualizarTotal();
+  }
+
+  function desmarcar(m) { m.sel = false; m.el.classList.remove('sel'); }
+  function quitarBrillo(m) { clearTimeout(m.tBrillo); m.el.classList.remove('brilla'); }
+
+  function devolver(m) {
+    desmarcar(m); quitarBrillo(m);
+    m.estado = 'slot';
+    m.el.classList.add('anima'); ubicar(m);
+    setTimeout(() => m.el.classList.remove('anima'), 480);
+    actualizarTotal(); actualizarBarra();
+  }
+
+  // ---------- Selección y canje ----------
+  const barra = document.getElementById('barra');
+  const infoSel = document.getElementById('infoSel');
+  const opciones = document.getElementById('opciones');
+  const fmt = n => '$' + n.toLocaleString('es-CL');
+  const enTablero = d => monedas.filter(m => m.d === d && m.estado !== 'mesa');
+
+  function actualizarBarra() {
+    const sel = monedas.filter(m => m.sel);
+    if (!sel.length) { barra.classList.remove('visible'); return; }
+    const T = sel.reduce((s, m) => s + m.d, 0);
+    infoSel.innerHTML = `<b>${sel.length}</b> ${sel.length === 1 ? 'moneda' : 'monedas'} · <b>${fmt(T)}</b>`;
+    opciones.innerHTML = '';
+    DENOMS.forEach(D => {
+      if (T % D !== 0) return;
+      const n = T / D;
+      if (sel.every(m => m.d === D)) return;           // sería cambiar por lo mismo
+      if (n > 15) return;
+      const disponibles = enTablero(D).length + sel.filter(m => m.d === D).length;
+      const b = document.createElement('button');
+      b.className = 'canje';
+      b.innerHTML = `Cambiar por <b>${n}</b> de <b>${fmt(D)}</b>`;
+      if (disponibles < n) { b.disabled = true; b.title = 'No quedan suficientes en el tablero'; b.innerHTML += ' <small>(no alcanzan)</small>'; }
+      b.onclick = () => canjear(sel, D, n);
+      opciones.appendChild(b);
+    });
+    barra.classList.add('visible');
+  }
+
+  function canjear(sel, D, n) {
+    // Lugar donde aparecerán las monedas nuevas: alrededor del centro de las seleccionadas
+    const cx = sel.reduce((s, m) => s + parseFloat(m.el.style.left), 0) / sel.length;
+    const cy = sel.reduce((s, m) => s + parseFloat(m.el.style.top), 0) / sel.length;
+    sel.forEach(devolver);
+    const nuevas = enTablero(D)
+      .sort((a, b) => (a.estado === 'zona') - (b.estado === 'zona') || b.slot - a.slot)
+      .slice(0, n);
+    const cols = Math.min(n, 5), filas = Math.ceil(n / cols), paso = diam * 1.15;
+    const hojaR = rectDe(document.getElementById('hoja'));
+    const minY = hojaR.bottom + diam * .75, maxY = innerHeight - diam * .75 - 90;
+    let x0 = cx - (cols - 1) * paso / 2, y0 = cy - (filas - 1) * paso / 2;
+    x0 = Math.min(Math.max(x0, diam * .75), innerWidth - diam * .75 - (cols - 1) * paso);
+    y0 = Math.min(Math.max(y0, minY), Math.max(minY, maxY - (filas - 1) * paso));
+    nuevas.forEach((m, i) => {
+      const x = x0 + (i % cols) * paso, y = y0 + Math.floor(i / cols) * paso;
+      m.el.classList.add('baja');
+      m.el.style.zIndex = ++zTop;
+      m.estado = 'mesa'; m.fx = x / innerWidth; m.fy = y / innerHeight;
+      setTimeout(() => {
+        ubicar(m);
+        m.el.classList.add('brilla');
+        m.tBrillo = setTimeout(() => m.el.classList.remove('brilla'), 6000);
+        setTimeout(() => m.el.classList.remove('baja'), 900);
+      }, 350 + i * 90);
+    });
+    setTimeout(actualizarTotal, 400);
+    actualizarBarra();
+  }
+
+  document.getElementById('bDevSel').onclick = () => monedas.filter(m => m.sel).forEach(devolver);
+  document.getElementById('bLimpiar').onclick = () => { monedas.forEach(desmarcar); actualizarBarra(); };
+
+  function dentro(r, x, y) { return x >= r.left && x <= r.right && y >= r.top && y <= r.bottom; }
+
+  function arrastrable(m) {
+    const el = m.el;
+    let dx = 0, dy = 0, x0 = 0, y0 = 0, movido = false, ultimoToque = 0;
+    el.addEventListener('pointerdown', e => {
+      e.preventDefault();
+      el.setPointerCapture(e.pointerId);
+      el.classList.remove('anima'); el.classList.add('arrastrando');
+      el.style.zIndex = ++zTop;
+      const cx = parseFloat(el.style.left), cy = parseFloat(el.style.top);
+      dx = e.clientX - cx; dy = e.clientY - cy; x0 = e.clientX; y0 = e.clientY; movido = false;
+    });
+    el.addEventListener('pointermove', e => {
+      if (!el.hasPointerCapture(e.pointerId)) return;
+      if (Math.hypot(e.clientX - x0, e.clientY - y0) > 4) movido = true;
+      const x = Math.min(innerWidth - diam * .3, Math.max(diam * .3, e.clientX - dx));
+      const y = Math.min(innerHeight - diam * .3, Math.max(diam * .3, e.clientY - dy));
+      el.style.left = x + 'px'; el.style.top = y + 'px';
+    });
+    const soltar = e => {
+      if (!el.hasPointerCapture(e.pointerId)) return;
+      el.releasePointerCapture(e.pointerId);
+      el.classList.remove('arrastrando');
+      if (!movido) {                     // toque: seleccionar / quitar selección
+        quitarBrillo(m);
+        if (m.estado === 'mesa') { m.sel = !m.sel; el.classList.toggle('sel', m.sel); actualizarBarra(); }
+        return;
+      }
+      const x = parseFloat(el.style.left), y = parseFloat(el.style.top);
+      const propia = rectDe(zonas[m.d]);
+      const hoja = rectDe(document.getElementById('hoja'));
+      if (dentro(propia, x, y)) {
+        m.estado = 'zona'; m.fx = (x - propia.left) / propia.width; m.fy = (y - propia.top) / propia.height;
+        desmarcar(m); actualizarBarra();
+      } else if (dentro(hoja, x, y)) {
+        devolver(m); return;             // zona equivocada o borde de la hoja: vuelve a su lugar
+      } else {
+        m.estado = 'mesa'; m.fx = x / innerWidth; m.fy = y / innerHeight;
+      }
+      actualizarTotal();
+    };
+    el.addEventListener('pointerup', soltar);
+    el.addEventListener('pointercancel', soltar);
+  }
+
+  // Total en la mesa
+  const totalEl = document.getElementById('total');
+  function actualizarTotal() {
+    const t = monedas.filter(m => m.estado === 'mesa').reduce((s, m) => s + m.d, 0);
+    totalEl.textContent = 'En la mesa: $' + t.toLocaleString('es-CL');
+    totalEl.style.display = cfg.total ? 'block' : 'none';
+  }
+
+  // Botones
+  document.getElementById('bDevolver').onclick = () => monedas.forEach(m => { if (m.estado !== 'slot') devolver(m); });
+  document.getElementById('bPantalla').onclick = () => {
+    try {
+      if (document.fullscreenElement) document.exitFullscreen();
+      else document.documentElement.requestFullscreen().catch(() => {});
+    } catch (e) {}
+  };
+  const panel = document.getElementById('panel');
+  document.getElementById('bAjustes').onclick = () => { llenarPanel(); panel.classList.toggle('abierto'); };
+  function llenarPanel() {
+    DENOMS.forEach(d => document.getElementById('n' + d).value = cfg[d]);
+    document.getElementById('cTotal').checked = !!cfg.total;
+  }
+  panel.querySelectorAll('.paso button').forEach(b => b.onclick = () => {
+    const inp = document.getElementById('n' + b.dataset.d);
+    inp.value = Math.max(0, Math.min(40, (parseInt(inp.value) || 0) + +b.dataset.s));
+  });
+  document.getElementById('bOriginal').onclick = () => DENOMS.forEach(d => document.getElementById('n' + d).value = ORIGINAL[d]);
+  document.getElementById('bAplicar').onclick = () => {
+    DENOMS.forEach(d => cfg[d] = Math.max(0, Math.min(40, parseInt(document.getElementById('n' + d).value) || 0)));
+    cfg.total = document.getElementById('cTotal').checked;
+    try { localStorage.setItem('monedas-cfg', JSON.stringify(cfg)); } catch (e) {}
+    panel.classList.remove('abierto');
+    construir();
+  };
+  document.getElementById('cTotal').onchange = e => { cfg.total = e.target.checked; actualizarTotal();
+    try { localStorage.setItem('monedas-cfg', JSON.stringify(cfg)); } catch (err) {} };
+
+  let t;
+  addEventListener('resize', () => { clearTimeout(t); t = setTimeout(() => { calcular(); monedas.forEach(ubicar); }, 60); });
+
+  (document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve()).then(construir);
+})();
+</script>
+</body>
+</html>
