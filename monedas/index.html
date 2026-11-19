@@ -56,25 +56,26 @@
   .canje small{font-size:15px}
   .sec2{border:0;border-radius:14px;background:#f0e2cf;color:#5a2f12;font:800 20px 'Nunito';padding:14px 18px;cursor:pointer}
   /* Temporizador */
-  #timer{position:fixed;left:16px;top:calc(33.1vh + 16px);z-index:100000;width:200px;background:rgba(255,250,243,.95);
-    border-radius:18px;padding:10px 12px 12px;box-shadow:0 6px 16px rgba(0,0,0,.3);color:#3b2414;touch-action:manipulation}
-  #timer .tcab{display:flex;justify-content:space-between;align-items:center;font-weight:800;font-size:14px;color:#7a6250}
-  #timer .tcab button{border:0;background:none;font:900 20px 'Nunito';color:#7a6250;cursor:pointer;padding:0 4px;line-height:1}
-  #tDisp{font-weight:900;font-size:50px;text-align:center;line-height:1.1;font-variant-numeric:tabular-nums;cursor:pointer}
-  #tBarra{height:8px;border-radius:4px;background:#ecdcc6;overflow:hidden;margin:4px 0 10px}
+  #timer{position:fixed;left:16px;top:calc(33.1vh + 16px);z-index:100000;width:158px;background:rgba(255,250,243,.95);
+    border-radius:14px;padding:6px 9px 9px;cursor:grab;touch-action:none;box-shadow:0 6px 16px rgba(0,0,0,.3);color:#3b2414}
+  #timer.moviendo{cursor:grabbing;box-shadow:0 12px 26px rgba(0,0,0,.4)}
+  #timer .tcab{display:flex;justify-content:space-between;align-items:center;font-weight:800;font-size:12px;color:#7a6250}
+  #timer .tcab button{border:0;background:none;font:900 18px 'Nunito';color:#7a6250;cursor:pointer;padding:0 4px;line-height:1}
+  #tDisp{font-weight:900;font-size:38px;text-align:center;line-height:1.1;font-variant-numeric:tabular-nums;cursor:pointer}
+  #tBarra{height:6px;border-radius:3px;background:#ecdcc6;overflow:hidden;margin:3px 0 7px}
   #tBarra i{display:block;height:100%;width:100%;background:#2fb35a;transition:width .3s linear}
-  .tfila{display:flex;gap:6px;justify-content:center;margin-top:6px}
-  .tfila button{flex:1;border:0;border-radius:10px;background:#f0e2cf;color:#5a2f12;font:900 17px 'Nunito';padding:9px 0;cursor:pointer}
-  .tfila button.play{background:#2fb35a;color:#fff;font-size:20px}
-  .tfila.pre button{font-size:15px;padding:7px 0}
+  .tfila{display:flex;gap:4px;justify-content:center;margin-top:4px}
+  .tfila button{flex:1;border:0;border-radius:8px;background:#f0e2cf;color:#5a2f12;font:900 14px 'Nunito';padding:7px 0;cursor:pointer;min-width:0}
+  .tfila button.play{background:#2fb35a;color:#fff;font-size:16px}
+  .tfila.pre button{font-size:12.5px;padding:5px 0}
   #timer.poco #tDisp{color:#d9771c} #timer.poco #tBarra i{background:#e8a316}
   #timer.fin{background:#e0403f;color:#fff;animation:latido .8s ease-in-out infinite}
   #timer.fin .tcab,#timer.fin .tcab button{color:#ffe1e1}
-  @keyframes latido{50%{transform:scale(1.06)}}
-  #timer.mini{width:auto;padding:6px 14px}
+  @keyframes latido{50%{box-shadow:0 0 0 8px rgba(224,64,63,.35),0 6px 16px rgba(0,0,0,.3)}}
+  #timer.mini{width:auto;padding:4px 10px}
   #timer.mini .tcuerpo,#timer.mini .tcab span{display:none}
   #timer.mini .tcab{gap:8px}
-  #timer.mini #tDisp{font-size:30px}
+  #timer.mini #tDisp{font-size:24px}
   /* Controles */
   .botones{position:fixed;right:16px;bottom:16px;display:flex;gap:10px;z-index:100000}
   .btn{border:0;border-radius:999px;background:rgba(255,248,238,.92);color:#5a2f12;
@@ -117,7 +118,7 @@
 <div id="capa"></div>
 
 <div id="timer">
-  <div class="tcab"><span>Tiempo</span><button id="tMini" title="Achicar / agrandar">–</button></div>
+  <div class="tcab"><span>⠿ Tiempo</span><button id="tMini" title="Achicar / agrandar">–</button></div>
   <div id="tDisp" title="Iniciar o pausar">10:00</div>
   <div class="tcuerpo">
     <div id="tBarra"><i></i></div>
@@ -466,7 +467,39 @@
       if (resta <= 0) parar();
       pintar();
     };
-    play.onclick = alternar; disp.onclick = alternar;
+    play.onclick = alternar;
+    // Arrastrar el temporizador por la pantalla (tocar los números = iniciar/pausar)
+    let arr = null;
+    const ubicarT = (x, y) => {
+      const r = T.getBoundingClientRect();
+      x = Math.min(Math.max(0, x), innerWidth - r.width); y = Math.min(Math.max(0, y), innerHeight - r.height);
+      T.style.left = x + 'px'; T.style.top = y + 'px';
+    };
+    try { const g = JSON.parse(localStorage.getItem('monedas-timer-pos') || 'null');
+      if (g) requestAnimationFrame(() => ubicarT(g.fx * innerWidth, g.fy * innerHeight)); } catch (e) {}
+    T.addEventListener('pointerdown', e => {
+      if (e.target.closest('button')) return;
+      const r = T.getBoundingClientRect();
+      arr = {id: e.pointerId, dx: e.clientX - r.left, dy: e.clientY - r.top, x0: e.clientX, y0: e.clientY, movido: false, enDisp: !!e.target.closest('#tDisp')};
+      T.setPointerCapture(e.pointerId);
+    });
+    T.addEventListener('pointermove', e => {
+      if (!arr || e.pointerId !== arr.id) return;
+      if (!arr.movido && Math.hypot(e.clientX - arr.x0, e.clientY - arr.y0) < 6) return;
+      arr.movido = true; T.classList.add('moviendo');
+      ubicarT(e.clientX - arr.dx, e.clientY - arr.dy);
+    });
+    const soltarT = e => {
+      if (!arr || e.pointerId !== arr.id) return;
+      T.classList.remove('moviendo');
+      if (arr.movido) {
+        const r = T.getBoundingClientRect();
+        try { localStorage.setItem('monedas-timer-pos', JSON.stringify({fx: r.left / innerWidth, fy: r.top / innerHeight})); } catch (err) {}
+      } else if (e.type === 'pointerup' && arr.enDisp) alternar();
+      arr = null;
+    };
+    T.addEventListener('pointerup', soltarT); T.addEventListener('pointercancel', soltarT);
+    addEventListener('resize', () => { const r = T.getBoundingClientRect(); ubicarT(r.left, r.top); });
     document.getElementById('tReset').onclick = reiniciar;
     document.getElementById('tMas').onclick = () => sumar(60);
     document.getElementById('tMenos').onclick = () => sumar(-60);
