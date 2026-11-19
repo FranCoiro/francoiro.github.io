@@ -25,6 +25,10 @@
         {
           "nombre": "Guía (PDF)",
           "archivo": "guia.pdf"
+        },
+        {
+          "nombre": "Simulador de la balanza (con los ejercicios de la guía)",
+          "archivo": "../../../balanza-numerica/"
         }
       ]
     },

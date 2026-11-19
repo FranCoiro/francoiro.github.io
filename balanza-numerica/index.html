@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Balanza numérica · Simulador</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --azul:#2f6fd6; --azul-o:#1d4f9e; --amarillo:#f7d33a; --amarillo-o:#c9a400;
+    --rojo:#d93a2f; --naranjo:#e8890c; --naranjo-c:#fde7c2; --verde:#1f9d55; --verde-c:#e3f6ea;
+    --tinta:#24324a; --gris:#5b6a86; --linea:#dfe6f3; --fondo:#f6f8fc;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{font-family:Poppins,system-ui,sans-serif;color:var(--tinta);background:var(--fondo);
+       display:flex;flex-direction:column;align-items:center;-webkit-tap-highlight-color:transparent}
+  header{width:100%;max-width:1150px;display:flex;align-items:center;gap:14px;padding:14px 18px 6px;flex-wrap:wrap}
+  .logo{background:var(--azul);color:#fff;font-weight:800;font-size:26px;width:46px;height:46px;border-radius:12px;
+        display:flex;align-items:center;justify-content:center;flex:none}
+  h1{font-size:22px;margin:0;line-height:1.1}
+  h1 small{display:block;font-size:13px;font-weight:600;color:var(--gris)}
+  .modos{margin-left:auto;display:flex;background:#fff;border:2px solid var(--linea);border-radius:999px;padding:4px;gap:4px}
+  .modos button{border:0;background:transparent;font:600 14px Poppins,sans-serif;color:var(--gris);padding:8px 16px;border-radius:999px;cursor:pointer}
+  .modos button.on{background:var(--azul);color:#fff}
+  main{width:100%;max-width:1150px;padding:0 18px 18px;display:flex;flex-direction:column;gap:12px}
+  .panel{background:#fff;border:2px solid var(--linea);border-radius:20px}
+  .reto{display:none;align-items:center;gap:16px;padding:12px 18px;flex-wrap:wrap}
+  .reto.on{display:flex}
+  .reto .etq{font-size:13px;font-weight:700;color:var(--gris);text-transform:uppercase;letter-spacing:.5px}
+  .reto .ec{font-size:34px;font-weight:800;letter-spacing:1px}
+  .reto .pista{font-size:14px;color:var(--gris)}
+  .sq{display:inline-block;width:.72em;height:.72em;border:4px solid var(--naranjo);background:var(--naranjo-c);
+      border-radius:5px;vertical-align:-.04em}
+  .tipo{display:flex;gap:6px;margin-left:auto}
+  .tipo button,.btn{border:2px solid var(--linea);background:#fff;font:600 14px Poppins,sans-serif;color:var(--tinta);
+      padding:8px 14px;border-radius:12px;cursor:pointer}
+  .tipo button.on{border-color:var(--naranjo);background:var(--naranjo-c)}
+  .nav{display:none;align-items:center;gap:10px;margin-left:auto;font-weight:600;color:var(--gris);font-size:14px}
+  .reto.guia .nav{display:flex}
+  .reto.guia .etq{text-transform:none;font-size:15px}
+  .reto.guia .tipo,.reto.guia #nuevo{display:none}
+  .btn:disabled{opacity:.4;cursor:default}
+  .btn.prim{background:var(--azul);border-color:var(--azul);color:#fff}
+  .btn:active,.tipo button:active{transform:translateY(1px)}
+  .escena{position:relative;padding:6px 6px 0}
+  svg{width:100%;height:auto;display:block;touch-action:manipulation;user-select:none}
+  .col{cursor:pointer}
+  .col:hover .hl{opacity:.13}
+  .hl{opacity:0;transition:opacity .15s}
+  .barra{display:flex;align-items:center;justify-content:center;gap:18px;padding:12px 16px 16px;flex-wrap:wrap}
+  .lado{min-width:220px;text-align:center}
+  .lado .t{font-size:12px;font-weight:700;color:var(--gris);text-transform:uppercase;letter-spacing:.5px}
+  .lado .s{font-size:30px;font-weight:800;min-height:44px}
+  .signo{font-size:52px;font-weight:800;width:74px;height:74px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+         background:#fdecea;color:var(--rojo);transition:all .25s}
+  .signo.ok{background:var(--verde-c);color:var(--verde)}
+  .signo.neutro{background:#eef1f7;color:var(--gris)}
+  .msg{text-align:center;font-weight:700;font-size:18px;min-height:30px;padding:0 10px 4px;color:var(--gris)}
+  .msg.ok{color:var(--verde)}
+  .ayuda{display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap;font-size:13px;color:var(--gris);padding:0 10px}
+  .acciones{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+  .ch{display:inline-flex;align-items:center;gap:6px}
+  .mini{display:inline-block;width:12px;height:22px;border-radius:3px;background:var(--azul);vertical-align:middle}
+  .mini.q{background:var(--naranjo-c);border:2px dashed var(--naranjo)}
+  .ocultar .s{filter:blur(9px)}
+  @media (max-width:700px){.reto .ec{font-size:26px}.lado{min-width:120px}.lado .s{font-size:22px}.signo{width:56px;height:56px;font-size:38px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">=</div>
+  <h1>Balanza numérica<small>Simulador · 4.º básico</small></h1>
+  <div class="modos" role="tablist">
+    <button id="mLibre" class="on">Libre</button>
+    <button id="mGuia">Ejercicios de la guía</button>
+    <button id="mReto">Número escondido</button>
+  </div>
+</header>
+
+<main>
+  <section class="panel reto" id="reto">
+    <div>
+      <div class="etq" id="etq">Encuentra el número escondido</div>
+      <div class="ec" id="ecuacion"></div>
+      <div class="pista" id="pista"></div>
+    </div>
+    <div class="tipo" id="tipo">
+      <button data-t="suma" class="on">Suma</button>
+      <button data-t="resta">Resta</button>
+      <button data-t="mezcla">Mezcla</button>
+    </div>
+    <button class="btn prim" id="nuevo">Nuevo desafío ↻</button>
+    <div class="nav" id="nav">
+      <button class="btn" id="ant">← Anterior</button>
+      <span id="cont"></span>
+      <button class="btn prim" id="sig">Siguiente →</button>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="escena"><svg id="svg" viewBox="0 0 1000 400" aria-label="Balanza numérica"></svg></div>
+    <div class="msg" id="msg"></div>
+    <div class="barra" id="barra">
+      <div class="lado"><div class="t">Lado izquierdo</div><div class="s" id="sL">—</div></div>
+      <div class="signo" id="signo">=</div>
+      <div class="lado"><div class="t">Lado derecho</div><div class="s" id="sR">—</div></div>
+    </div>
+  </section>
+
+  <div class="ayuda" id="ayuda"></div>
+  <div class="acciones">
+    <button class="btn" id="ocultar">Ocultar números</button>
+    <button class="btn" id="limpiar">Vaciar balanza</button>
+  </div>
+</main>
+
+<script>
+(() => {
+  const NS = 'http://www.w3.org/2000/svg';
+  const svg = document.getElementById('svg');
+  const CX = 500, BY = 70, BH = 40;              // centro y viga
+  const px = (side, k) => side * (22 + k * 39);   // posición relativa al centro
+  const MAXPILA = 4;
+
+  // estado
+  let modo = 'libre', tipo = 'suma';
+  let pesas = { '-1': {}, '1': {} };   // lado -> {gancho: cantidad}
+  let fijas = { '-1': {}, '1': {} };   // pesas del desafío (no se pueden sacar)
+  let incog = null;                    // {side, k} pesa ? colocada
+  let reto = null;                     // {ladoQ, valor, texto, pista}
+  let ang = 0, vel = 0, objetivo = 0, resuelto = false, ocultos = false;
+
+  const esReto = () => modo === 'reto' || modo === 'guia';
+  const el = (tag, attrs = {}, parent) => {
+    const e = document.createElementNS(NS, tag);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (parent) parent.appendChild(e);
+    return e;
+  };
+
+  // ---------- dibujo estático ----------
+  const base = el('g', {}, svg);
+  el('rect', { x: CX - 11, y: BY, width: 22, height: 255, fill: '#d93a2f' }, base);
+  el('rect', { x: CX - 135, y: 311, width: 105, height: 16, rx: 3, fill: '#2f6fd6' }, base);
+  el('rect', { x: CX + 30, y: 311, width: 105, height: 16, rx: 3, fill: '#2f6fd6' }, base);
+  el('rect', { x: CX - 160, y: 325, width: 320, height: 28, rx: 4, fill: '#d93a2f' }, base);
+
+  const viga = el('g', {}, svg);                 // gira
+  const largo = px(1, 10) + 28;
+  el('rect', { x: CX - largo, y: BY, width: 2 * largo, height: BH, rx: 5, fill: '#f7d33a', stroke: '#c9a400', 'stroke-width': 2 }, viga);
+  const capaNum = el('g', {}, viga);
+  for (const side of [-1, 1]) for (let k = 1; k <= 10; k++) {
+    const x = CX + px(side, k);
+    const t = el('text', { x, y: BY + 21, 'font-family': 'Poppins, sans-serif', 'font-weight': 700, 'font-size': 17, fill: '#333', 'text-anchor': 'middle' }, capaNum);
+    t.textContent = k;
+    el('circle', { cx: x, cy: BY + 31, r: 3.5, fill: '#8a7400' }, viga);
+  }
+  const capaPesas = el('g', {}, viga);
+  const capaCols = el('g', {}, viga);
+  el('rect', { x: CX - 13, y: BY - 7, width: 26, height: BH + 14, rx: 4, fill: '#d93a2f' }, svg);
+  el('circle', { cx: CX, cy: BY + 8, r: 4.5, fill: '#222' }, svg);
+
+  // columnas táctiles (zona del gancho hacia abajo)
+  for (const side of [-1, 1]) for (let k = 1; k <= 10; k++) {
+    const g = el('g', { class: 'col' }, capaCols);
+    const x = CX + px(side, k);
+    el('rect', { class: 'hl', x: x - 19, y: BY, width: 38, height: 330, rx: 8, fill: '#2f6fd6' }, g);
+    el('rect', { x: x - 19, y: BY - 10, width: 38, height: 340, fill: 'transparent' }, g);
+    g.addEventListener('click', () => tocar(side, k));
+  }
+
+  // ---------- pesas ----------
+  function pesaAzul(g, x, y) {
+    el('rect', { x: x - 15, y, width: 30, height: 72, rx: 3, fill: '#2f6fd6', stroke: '#1d4f9e', 'stroke-width': 2 }, g);
+    el('circle', { cx: x, cy: y + 12, r: 6, fill: '#f7d33a', stroke: '#c9a400', 'stroke-width': 1.5 }, g);
+  }
+  function pesaQ(g, x, y, suelta) {
+    el('rect', { x: x - 17, y, width: 34, height: 74, rx: 4, fill: '#fde7c2', stroke: '#e8890c', 'stroke-width': 3, 'stroke-dasharray': '6 4' }, g);
+    if (!suelta) el('circle', { cx: x, cy: y + 12, r: 6, fill: '#f7d33a', stroke: '#c9a400', 'stroke-width': 1.5 }, g);
+    const t = el('text', { x, y: y + (suelta ? 50 : 56), 'font-family': 'Poppins, sans-serif', 'font-weight': 800, 'font-size': 32, fill: '#c46a00', 'text-anchor': 'middle' }, g);
+    t.textContent = '?';
+  }
+  let colgantes = [];   // grupos que deben quedar verticales
+  function dibujarPesas() {
+    capaPesas.innerHTML = ''; colgantes = [];
+    for (const side of [-1, 1]) {
+      const s = String(side);
+      for (let k = 1; k <= 10; k++) {
+        const n = (fijas[s][k] || 0) + (pesas[s][k] || 0) + (incog && incog.side === side && incog.k === k ? 1 : 0);
+        if (!n) continue;
+        const x = CX + px(side, k), y0 = BY + BH - 6;
+        const g = el('g', {}, capaPesas);
+        g.dataset.x = x; g.dataset.y = y0;
+        let i = 0;
+        for (let j = 0; j < (fijas[s][k] || 0); j++, i++) pesaAzul(g, x, y0 + i * 76);
+        for (let j = 0; j < (pesas[s][k] || 0); j++, i++) pesaAzul(g, x, y0 + i * 76);
+        if (incog && incog.side === side && incog.k === k) pesaQ(g, x, y0 + i * 76, false);
+        colgantes.push(g);
+      }
+    }
+    // pesa ? aún sin colgar (flotando bajo su lado)
+    capaSuelta.innerHTML = '';
+    if (esReto() && reto && !incog) {
+      const x = CX + px(reto.ladoQ, 5.5);
+      const g = el('g', { class: 'flota' }, capaSuelta);
+      pesaQ(g, x, 230, true);
+      const t = el('text', { x, y: 330, 'font-family': 'Poppins, sans-serif', 'font-weight': 600, 'font-size': 14, fill: '#c46a00', 'text-anchor': 'middle' }, g);
+      t.textContent = '¿dónde va?';
+    }
+  }
+  const capaSuelta = el('g', {}, svg);
+
+  // ---------- lógica ----------
+  const suma = side => {
+    const s = String(side); let t = 0;
+    for (let k = 1; k <= 10; k++) t += k * ((fijas[s][k] || 0) + (pesas[s][k] || 0));
+    if (incog && incog.side === side) t += incog.k;
+    return t;
+  };
+  const totalPila = (side, k) => (fijas[side][k] || 0) + (pesas[side][k] || 0) + (incog && incog.side === side && incog.k === k ? 1 : 0);
+
+  function tocar(side, k) {
+    const s = String(side);
+    if (esReto()) {
+      if (resuelto) return;
+      if (side !== reto.ladoQ) { avisar('La pesa ? va en el otro lado de la balanza.'); return; }
+      if (incog && incog.k === k) incog = null;           // tocarla de nuevo la saca
+      else incog = { side, k };
+    } else {
+      const n = pesas[s][k] || 0;
+      if (n >= MAXPILA) pesas[s][k] = 0;                  // tras 4 pesas, vuelve a 0
+      else pesas[s][k] = n + 1;
+    }
+    actualizar();
+  }
+
+  function texto(side) {
+    const s = String(side), partes = [];
+    for (let k = 10; k >= 1; k--) for (let j = 0; j < (fijas[s][k] || 0) + (pesas[s][k] || 0); j++) partes.push(k);
+    if (esReto() && reto && reto.ladoQ === side) partes.push(incog ? `<span style="color:#c46a00">${incog.k}</span>` : '<span class="sq"></span>');
+    if (!partes.length) return '—';
+    const tot = suma(side);
+    return partes.join(' + ') + (partes.length > 1 && !(esReto() && !incog && reto.ladoQ === side) ? ` <span style="color:#5b6a86;font-weight:600">= ${tot}</span>` : '');
+  }
+
+  let avisoT;
+  function avisar(t, ok) {
+    const m = document.getElementById('msg');
+    m.innerHTML = t; m.className = 'msg' + (ok ? ' ok' : '');
+    clearTimeout(avisoT);
+    if (!ok) avisoT = setTimeout(() => { m.textContent = ''; }, 2200);
+  }
+
+  function actualizar() {
+    const L = suma(-1), R = suma(1);
+    objetivo = Math.max(-13, Math.min(13, (R - L) * 1.3));   // grados; positivo = baja la derecha
+    dibujarPesas();
+    document.getElementById('sL').innerHTML = texto(-1);
+    document.getElementById('sR').innerHTML = texto(1);
+    const sg = document.getElementById('signo');
+    const vacio = L === 0 && R === 0;
+    const eq = L === R && !vacio && !(esReto() && !incog);
+    sg.textContent = vacio || (esReto() && !incog) ? '?' : L === R ? '=' : L > R ? '>' : '<';
+    sg.classList.toggle('ok', eq);
+    sg.classList.toggle('neutro', sg.textContent === '?');
+
+    if (esReto()) {
+      if (incog && L === R) {
+        resuelto = true;
+        avisar(`¡Equilibrio! <span class="sq"></span> = ${incog.k} &nbsp;✔ &nbsp;${reto.comprueba(incog.k)}`, true);
+        setTimeout(() => { document.getElementById(modo === 'guia' ? 'sig' : 'nuevo').focus(); }, 50);
+      } else if (incog) {
+        avisar(L > R ? 'Baja el lado izquierdo: el izquierdo pesa más. Prueba otro gancho.' : 'Baja el lado derecho: el derecho pesa más. Prueba otro gancho.');
+      } else document.getElementById('msg').textContent = '';
+    } else {
+      document.getElementById('msg').className = 'msg' + (eq ? ' ok' : '');
+      document.getElementById('msg').innerHTML = eq ? '¡La balanza está en equilibrio!' : '';
+    }
+  }
+
+  // ---------- desafíos ----------
+  const azar = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
+  const SQ = '<span class="sq"></span>';
+  function pesasDe(n) { return n <= 10 ? [n] : [10, n - 10]; }   // 12 -> 10 y 2
+
+  function crearReto() {
+    let t = tipo === 'mezcla' ? (Math.random() < .5 ? 'suma' : 'resta') : tipo;
+    let r;
+    if (t === 'suma') {
+      const v = azar(1, 4);
+      const x = azar(1, 10), a = azar(1, 9), b = a + x;
+      if (v === 1) r = { izq: [a], der: pesasDe(b), ladoQ: -1, texto: `${a} + ${SQ} = ${b}`, comprueba: n => `${a} + ${n} = ${b}` };
+      else if (v === 2) r = { izq: [a], der: pesasDe(b), ladoQ: -1, texto: `${SQ} + ${a} = ${b}`, comprueba: n => `${n} + ${a} = ${b}` };
+      else if (v === 3) r = { izq: pesasDe(b), der: [a], ladoQ: 1, texto: `${b} = ${SQ} + ${a}`, comprueba: n => `${b} = ${n} + ${a}` };
+      else r = { izq: [a], der: pesasDe(b), ladoQ: -1, texto: `${a} + ${SQ} = ${b}`, comprueba: n => `${a} + ${n} = ${b}` };
+      r.pista = 'Cuelga la pesa <b style="color:#c46a00">?</b> en distintos ganchos hasta que la balanza quede derecha.';
+      r.valor = x;
+    } else {
+      if (Math.random() < .5) {            // □ − a = b  →  □ = b + a
+        const x = azar(3, 10), a = azar(1, x - 1), b = x - a;
+        r = { izq: [], der: [b, a], ladoQ: -1, texto: `${SQ} − ${a} = ${b}`, comprueba: n => `${n} − ${a} = ${b}`,
+              pista: `En la balanza la escribimos como suma: ${SQ} = ${b} + ${a}` };
+        r.valor = x;
+      } else {                              // c − □ = b  →  b + □ = c
+        const x = azar(1, 9), b = azar(1, 10 - x), c = b + x;
+        r = { izq: [b], der: [c], ladoQ: -1, texto: `${c} − ${SQ} = ${b}`, comprueba: n => `${c} − ${n} = ${b}`,
+              pista: `En la balanza la escribimos como suma: ${b} + ${SQ} = ${c}` };
+        r.valor = x;
+      }
+    }
+    r.etiqueta = 'Encuentra el número escondido';
+    cargar(r);
+  }
+
+  function cargar(r) {
+    reto = r; resuelto = false; incog = null;
+    fijas = { '-1': {}, '1': {} }; pesas = { '-1': {}, '1': {} };
+    for (const k of r.izq) fijas['-1'][k] = (fijas['-1'][k] || 0) + 1;
+    for (const k of r.der) fijas['1'][k] = (fijas['1'][k] || 0) + 1;
+    document.getElementById('etq').textContent = r.etiqueta;
+    document.getElementById('ecuacion').innerHTML = r.texto;
+    document.getElementById('pista').innerHTML = r.pista;
+    document.getElementById('msg').textContent = '';
+    actualizar();
+  }
+
+  // ---------- ejercicios de la guía ----------
+  const PS = 'Cuelga la pesa <b style="color:#c46a00">?</b> en distintos ganchos hasta que la balanza quede derecha.';
+  const G = [];
+  const add = (parte, letra, izq, der, ladoQ, texto, comp, pista) =>
+    G.push({ etiqueta: `Parte ${parte} · ${letra}`, izq, der, ladoQ, texto, comprueba: comp, pista: pista || PS });
+  // Parte 1: ¿dónde va la pesa?
+  add(1, 'Ejemplo', [6, 4], [], 1, `6 + 4 = ${SQ}`, n => `6 + 4 = ${n}`);
+  add(1, 'a)', [2, 5], [], 1, `2 + 5 = ${SQ}`, n => `2 + 5 = ${n}`);
+  add(1, 'b)', [3, 6], [], 1, `3 + 6 = ${SQ}`, n => `3 + 6 = ${n}`);
+  add(1, 'c)', [4, 4], [], 1, `4 + 4 = ${SQ}`, n => `4 + 4 = ${n}`);
+  add(1, 'd)', [7, 3], [5], 1, `7 + 3 = 5 + ${SQ}`, n => `7 + 3 = 5 + ${n}`);
+  add(1, 'e)', [9, 1], [6], 1, `9 + 1 = 6 + ${SQ}`, n => `9 + 1 = 6 + ${n}`);
+  // Parte 2: el número escondido
+  add(2, 'Ejemplo', [4], [9], -1, `4 + ${SQ} = 9`, n => `4 + ${n} = 9`);
+  add(2, 'a)', [3], [10], -1, `3 + ${SQ} = 10`, n => `3 + ${n} = 10`);
+  add(2, 'b)', [2], [8], -1, `${SQ} + 2 = 8`, n => `${n} + 2 = 8`);
+  add(2, 'c)', [5], [10, 2], -1, `5 + ${SQ} = 12`, n => `5 + ${n} = 12`, 'El 12 no está en la balanza: a la derecha hay 10 y 2.');
+  add(2, 'd)', [6], [10, 5], -1, `${SQ} + 6 = 15`, n => `${n} + 6 = 15`, 'El 15 no está en la balanza: a la derecha hay 10 y 5.');
+  add(2, 'e)', [9], [4], 1, `9 = ${SQ} + 4`, n => `9 = ${n} + 4`, 'Ahora el número escondido está en el lado derecho.');
+  add(2, 'f)', [8], [10, 4], -1, `8 + ${SQ} = 14`, n => `8 + ${n} = 14`, '¿Lo pensaste primero sin balanza? Ahora compruébalo.');
+  // Parte 3: ecuaciones con resta
+  const RS = (t) => `En la balanza la escribimos como suma: ${t}`;
+  add(3, 'Ejemplo 1', [], [5, 3], -1, `${SQ} − 3 = 5`, n => `${n} − 3 = 5`, RS(`${SQ} = 5 + 3`));
+  add(3, 'Ejemplo 2', [6], [10], -1, `10 − ${SQ} = 6`, n => `10 − ${n} = 6`, RS(`6 + ${SQ} = 10`));
+  add(3, 'a)', [], [7, 2], -1, `${SQ} − 2 = 7`, n => `${n} − 2 = 7`, RS(`${SQ} = 7 + 2`));
+  add(3, 'b)', [], [4, 4], -1, `${SQ} − 4 = 4`, n => `${n} − 4 = 4`, RS(`${SQ} = 4 + 4`));
+  add(3, 'c)', [], [5, 5], -1, `${SQ} − 5 = 5`, n => `${n} − 5 = 5`, RS(`${SQ} = 5 + 5`));
+  add(3, 'd)', [3], [9], -1, `9 − ${SQ} = 3`, n => `9 − ${n} = 3`, RS(`3 + ${SQ} = 9`));
+  add(3, 'e)', [7], [10], -1, `10 − ${SQ} = 7`, n => `10 − ${n} = 7`, RS(`7 + ${SQ} = 10`));
+  add(3, 'f)', [2], [8], -1, `8 − ${SQ} = 2`, n => `8 − ${n} = 2`, RS(`2 + ${SQ} = 8`));
+  let gi = 0;
+  function irGuia(i) {
+    gi = Math.max(0, Math.min(G.length - 1, i));
+    cargar(G[gi]);
+    document.getElementById('cont').textContent = `${gi + 1} de ${G.length}`;
+    document.getElementById('ant').disabled = gi === 0;
+    document.getElementById('sig').disabled = gi === G.length - 1;
+  }
+  document.getElementById('ant').onclick = () => irGuia(gi - 1);
+  document.getElementById('sig').onclick = () => irGuia(gi + 1);
+
+  // ---------- modos y botones ----------
+  function ponerModo(m) {
+    modo = m;
+    document.getElementById('mLibre').classList.toggle('on', m === 'libre');
+    document.getElementById('mReto').classList.toggle('on', m === 'reto');
+    document.getElementById('mGuia').classList.toggle('on', m === 'guia');
+    document.getElementById('reto').classList.toggle('on', m !== 'libre');
+    document.getElementById('reto').classList.toggle('guia', m === 'guia');
+    document.getElementById('limpiar').textContent = m !== 'libre' ? 'Sacar la pesa ?' : 'Vaciar balanza';
+    document.getElementById('ayuda').innerHTML = m === 'libre'
+      ? '<span class="ch"><span class="mini"></span> Toca un gancho para colgar una pesa. Toca de nuevo para agregar otra (hasta 4); a la quinta se vacía ese gancho.</span>'
+      : '<span class="ch"><span class="mini q"></span> Toca un gancho para colgar la pesa ?. Las pesas azules del desafío no se mueven.</span>';
+    if (m === 'reto') crearReto();
+    else if (m === 'guia') irGuia(gi);
+    else { fijas = { '-1': {}, '1': {} }; incog = null; reto = null; pesas = { '-1': { 6: 1, 4: 1 }, '1': { 2: 1, 8: 1 } }; actualizar(); }
+  }
+  document.getElementById('mLibre').onclick = () => ponerModo('libre');
+  document.getElementById('mReto').onclick = () => ponerModo('reto');
+  document.getElementById('mGuia').onclick = () => ponerModo('guia');
+  document.getElementById('nuevo').onclick = crearReto;
+  document.querySelectorAll('#tipo button').forEach(b => b.onclick = () => {
+    tipo = b.dataset.t;
+    document.querySelectorAll('#tipo button').forEach(o => o.classList.toggle('on', o === b));
+    crearReto();
+  });
+  document.getElementById('limpiar').onclick = () => {
+    if (esReto()) { if (!resuelto) { incog = null; actualizar(); } }
+    else { pesas = { '-1': {}, '1': {} }; actualizar(); }
+  };
+  document.getElementById('ocultar').onclick = e => {
+    ocultos = !ocultos;
+    document.getElementById('barra').classList.toggle('ocultar', ocultos);
+    e.target.textContent = ocultos ? 'Mostrar números' : 'Ocultar números';
+  };
+
+  // ---------- animación (resorte amortiguado) ----------
+  function paso() {
+    vel += (objetivo - ang) * 0.06; vel *= 0.82; ang += vel;
+    viga.setAttribute('transform', `rotate(${ang.toFixed(3)} ${CX} ${BY + 8})`);
+    for (const g of colgantes) g.setAttribute('transform', `rotate(${(-ang).toFixed(3)} ${g.dataset.x} ${g.dataset.y})`);
+    requestAnimationFrame(paso);
+  }
+  ponerModo('libre');
+  requestAnimationFrame(paso);
+})();
+</script>
+</body>
+</html>
