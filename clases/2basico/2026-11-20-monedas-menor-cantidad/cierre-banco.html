@@ -7,7 +7,7 @@
 <style>
   :root {
     --azul: #2b6cb0; --verde: #26890c; --rojo: #e21b3c; --amar: #d89e00; --azulk: #1368ce;
-    --coin: min(7.4vw, 11vh, 110px);
+    --coin: min(7vw, 15vh, 130px);
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; height: 100%; font-family: "Nunito", "DejaVu Sans", Arial, sans-serif; background: #46178f; color: #1a202c; overflow: hidden; }
@@ -15,9 +15,9 @@
 
   .qbar { background: #fff; border-radius: 12px; padding: 1.2vh 2vw; display: flex; align-items: center; gap: 2vw; box-shadow: 0 4px 0 rgba(0,0,0,.25); }
   .qnum { font-size: clamp(14px, 1.5vw, 22px); font-weight: 800; color: #46178f; white-space: nowrap; }
-  .qtext { flex: 1; text-align: center; font-size: clamp(20px, 3vw, 42px); font-weight: 800; line-height: 1.2; }
+  .qtext { flex: 1; text-align: center; font-size: clamp(24px, 3.8vw, 54px); font-weight: 800; line-height: 1.2; }
 
-  .mid { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 2vw; min-height: 0; }
+  .mid { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 2vw; min-height: 0; }
   .timer { width: min(9vw, 120px); height: min(9vw, 120px); border-radius: 50%; background: #864cbf; color: #fff; display: flex; align-items: center; justify-content: center; font-size: clamp(26px, 3.6vw, 52px); font-weight: 800; box-shadow: 0 4px 0 rgba(0,0,0,.25); }
   .timer.off { visibility: hidden; }
   .stats { display: flex; flex-direction: column; gap: 1.2vh; }
@@ -40,19 +40,20 @@
   .msg { position: absolute; left: 50%; bottom: 0; transform: translateX(-50%); background: #fff; border-radius: 12px; padding: .6vh 1.6vw; font-size: clamp(16px, 2vw, 28px); font-weight: 800; color: #46178f; opacity: 0; transition: opacity .4s; white-space: nowrap; }
   .msg.on { opacity: 1; }
 
-  .answers { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2vh 1vw; }
-  .ans { position: relative; display: flex; align-items: center; gap: 1.2vw; padding: 1.4vh 1.4vw; border-radius: 8px; color: #fff; font-size: clamp(18px, 2.4vw, 34px); font-weight: 800; min-height: 9vh; box-shadow: 0 5px 0 rgba(0,0,0,.25); transition: opacity .4s, transform .3s; }
+  .answers { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.2vh 1vw; }
+  .ans { position: relative; display: flex; align-items: center; justify-content: center; gap: 1.2vw; padding: 1.4vh 1.4vw; border-radius: 8px; color: #fff; font-size: clamp(26px, 4vw, 60px); font-weight: 800; min-height: 9vh; box-shadow: 0 5px 0 rgba(0,0,0,.25); transition: opacity .4s, transform .3s; }
   .ans .shape { width: clamp(28px, 3.2vw, 48px); height: clamp(28px, 3.2vw, 48px); flex: none; }
   .ans .n { position: absolute; right: 1vw; top: .6vh; font-size: clamp(14px, 1.6vw, 22px); opacity: .85; }
-  .ans .mini { display: flex; gap: .4vw; flex-wrap: wrap; }
-  .ans .mini svg { width: clamp(30px, 3.6vw, 54px); height: clamp(30px, 3.6vw, 54px); }
+  .ans .mini { display: flex; gap: .25vw; flex-wrap: wrap; justify-content: center; }
+  .ans .mini svg { width: clamp(26px, 3.2vw, 50px); height: clamp(26px, 3.2vw, 50px); }
   .a0 { background: var(--rojo); } .a1 { background: var(--azulk); } .a2 { background: var(--amar); } .a3 { background: var(--verde); }
   .answers.revealed .ans:not(.ok) { opacity: .25; }
   .answers.revealed .ans.ok { transform: scale(1.03); }
   .ans.ok::after { content: "✔"; position: absolute; right: 1.2vw; bottom: .6vh; font-size: clamp(22px, 3vw, 40px); }
   .answers.hide { visibility: hidden; }
+  .answers.one { grid-template-columns: 1fr; }
 
-  .frase { background: #fff; border-radius: 12px; padding: 1.4vh 2vw; font-size: clamp(18px, 2.4vw, 34px); font-weight: 800; color: var(--azul); text-align: center; display: none; }
+  .frase { background: #fff; border-radius: 12px; padding: 1.4vh 2vw; font-size: clamp(22px, 3.2vw, 46px); font-weight: 800; color: var(--azul); text-align: center; display: none; }
   .frase.on { display: block; }
 
   .nav { display: flex; align-items: center; justify-content: space-between; }
@@ -71,10 +72,6 @@
   <div class="mid">
     <div class="timer" id="timer">20</div>
     <div class="stage" id="stage"><div class="bubble" id="bubble"></div><div class="msg" id="msg"></div></div>
-    <div class="stats">
-      <div class="stat" id="statPlata"><div class="lbl">Plata</div><div class="val">?</div></div>
-      <div class="stat" id="statMonedas"><div class="lbl">Monedas</div><div class="val">?</div></div>
-    </div>
   </div>
   <div>
     <div class="answers" id="answers"></div>
@@ -105,37 +102,21 @@ const INICIO = [50, 50, 10, 10, 10, 10, 10, 10, 10, 10];
 const PASO1  = [50, 50, 50, 10, 10, 10];
 const FINAL  = [100, 50, 10, 10, 10];
 
-// show: qué marcadores se ven antes de responder; reveal: animación al mostrar la respuesta
 const Q = [
-  { q: 'Javiera va al banco con 2 monedas de $50 y 8 monedas de $10. ¿Cuánto dinero tiene?',
-    coins: INICIO, show: {}, opts: ['$100', '$130', '$180', '$90'], ok: 2, reveal: 'contar',
-    msg: 'Tiene $180' },
-  { q: '¿Cuántas monedas tiene Javiera?',
-    coins: INICIO, show: { plata: 1 }, opts: ['2', '8', '10', '18'], ok: 2, reveal: 'monedas',
-    msg: '¡Son 10 monedas! Muchas…' },
-  { q: 'El banco hace canjes. ¿Qué canje puede hacer primero?',
-    coins: INICIO, show: { plata: 1, monedas: 1 },
-    opts: ['2 de $10 → 1 de $50', '5 de $10 → 1 de $50', '1 de $50 → 5 de $100', '8 de $10 → 1 de $100'], ok: 1,
-    reveal: 'canje', sel: [5, 6, 7, 8, 9], nuevo: 50, after: PASO1, msg: 'Misma plata… ¡menos monedas!' },
-  { q: 'Ahora tiene 3 de $50 y 3 de $10. ¿Se puede hacer otro canje?',
-    coins: PASO1, show: { plata: 1, monedas: 1 },
-    opts: ['No', 'Sí: 3 de $10 → 1 de $50', 'Sí: 2 de $50 → 1 de $100', 'Sí: 3 de $50 → 1 de $100'], ok: 2,
-    reveal: 'canje', sel: [0, 1], nuevo: 100, after: FINAL, msg: 'Misma plata… ¡menos monedas!' },
-  { q: '¿Qué monedas le entrega el banco?',
-    coins: FINAL, show: { monedas: 0 }, hideStage: true,
-    opts: [mini([50, 50, 50, 10, 10, 10]), mini([100, 50, 10, 10]), mini([100, 50, 10, 10, 10]), mini([100, 100])], ok: 2,
-    reveal: 'contar', msg: '$100 + $50 + $10 + $10 + $10 = $180' },
-  { q: '¿Con cuántas monedas le entrega los $180?',
-    coins: FINAL, show: { plata: 1 }, opts: ['10', '6', '5', '3'], ok: 2, reveal: 'monedas',
-    msg: 'De 10 monedas a 5 monedas' },
-  { q: '¿Por qué al banco le conviene entregar la menor cantidad de monedas?',
-    coins: FINAL, show: { plata: 1, monedas: 1 }, opts: null, open: true,
-    frase: 'Es más fácil de <u>contar</u>, <u>guardar</u> y <u>llevar</u>.<br>Para usar menos monedas, cambio <b>5 de $10</b> por 1 de <b>$50</b> y <b>2 de $50</b> por 1 de <b>$100</b>.' }
+  { q: '¿Cuánta plata tiene Javiera?', coins: INICIO,
+    opts: ['$100', '$180', '$130'], ok: 1,
+    reveal: [['contar']], msg: '¡Tiene $180!' },
+  { q: '¿Qué monedas le da el banco? (las menos posibles)', coins: INICIO,
+    opts: [mini([50, 50, 50, 10, 10, 10]), mini([100, 50, 10, 10, 10]), mini([100, 100])], ok: 1, coinOpts: true,
+    reveal: [['canje', [5, 6, 7, 8, 9], 50], ['canje', [0, 1], 100], ['contar']], after: FINAL,
+    msg: '¡Misma plata, menos monedas!' },
+  { q: '¿Por qué al banco le conviene usar menos monedas?', coins: FINAL, open: true,
+    frase: 'Es más fácil de <u>contar</u> y <u>llevar</u>.<br>Cambio <b>5 de $10</b> por 1 de <b>$50</b>, y <b>2 de $50</b> por 1 de <b>$100</b>.' }
 ];
 
 const $ = id => document.getElementById(id);
 const stage = $('stage'), bubble = $('bubble'), msg = $('msg'), answers = $('answers'), frase = $('frase');
-const statPlata = $('statPlata'), statMonedas = $('statMonedas'), timerEl = $('timer'), mainBtn = $('main'), prevBtn = $('prev');
+const timerEl = $('timer'), mainBtn = $('main'), prevBtn = $('prev');
 let idx = 0, phase = 'ask', busy = false, coinEls = [], tId = null;
 
 Q.forEach(() => { const d = document.createElement('div'); d.className = 'dot'; $('dots').appendChild(d); });
@@ -174,10 +155,7 @@ function render() {
   const s = Q[idx];
   $('qnum').textContent = (idx + 1) + ' / ' + Q.length;
   $('qtext').textContent = s.q;
-  setCoins(s.hideStage && phase === 'ask' ? [] : (phase === 'done' && s.after ? s.after : s.coins));
-  const cur = phase === 'done' && s.after ? s.after : s.coins;
-  stat(statPlata, '$' + sum(cur), s.show.plata || phase === 'done');
-  stat(statMonedas, cur.length, s.show.monedas || phase === 'done');
+  setCoins(phase === 'done' && s.after ? s.after : s.coins);
   msg.classList.toggle('on', phase === 'done' && !!s.msg); msg.textContent = s.msg || '';
   bubble.classList.remove('on');
   answers.innerHTML = '';
@@ -205,10 +183,9 @@ async function animContar() {
     bubble.style.left = (c.el.offsetLeft + c.el.offsetWidth / 2) + 'px';
     bubble.style.top = (c.el.offsetTop - 6) + 'px';
     bubble.classList.add('on');
-    stat(statPlata, '$' + acc, true);
     await sleep(700);
   }
-  bubble.classList.remove('on'); bump(statPlata);
+  bubble.classList.remove('on');
   await sleep(300); coinEls.forEach(c => c.el.classList.remove('lit'));
 }
 async function animMonedas() {
@@ -217,10 +194,10 @@ async function animMonedas() {
     bubble.textContent = i + 1;
     bubble.style.left = (c.el.offsetLeft + c.el.offsetWidth / 2) + 'px';
     bubble.style.top = (c.el.offsetTop - 6) + 'px';
-    bubble.classList.add('on'); stat(statMonedas, i + 1, true);
+    bubble.classList.add('on');
     await sleep(450);
   }
-  bubble.classList.remove('on'); bump(statMonedas);
+  bubble.classList.remove('on');
   await sleep(300); coinEls.forEach(c => c.el.classList.remove('lit'));
 }
 async function animCanje(s) {
@@ -239,7 +216,7 @@ async function animCanje(s) {
   await sleep(550);
   chosen.forEach(c => c.el.remove());
   coinEls = [nueva, ...coinEls.filter(c => !chosen.includes(c))].sort((a, b) => b.v - a.v);
-  layout(); stat(statMonedas, coinEls.length, true); bump(statMonedas);
+  layout();
   await sleep(800); nueva.el.classList.remove('lit');
 }
 
@@ -250,10 +227,10 @@ async function reveal() {
   answers.classList.add('revealed');
   if (s.opts) answers.children[s.ok].classList.add('ok');
   if (s.open) { answers.style.display = 'none'; frase.classList.add('on'); }
-  if (s.hideStage) { setCoins(s.coins); await sleep(500); }
-  if (s.reveal === 'contar') await animContar();
-  if (s.reveal === 'monedas') await animMonedas();
-  if (s.reveal === 'canje') await animCanje(s);
+  for (const r of (s.reveal || [])) {
+    if (r[0] === 'contar') await animContar();
+    if (r[0] === 'canje') await animCanje({ sel: r[1], nuevo: r[2] });
+  }
   msg.textContent = s.msg || ''; msg.classList.toggle('on', !!s.msg);
   busy = false; phase = 'done';
   mainBtn.textContent = idx === Q.length - 1 ? '¡Terminamos!' : 'Siguiente ▶';
