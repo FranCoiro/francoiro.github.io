@@ -15,6 +15,20 @@
   ],
   "clases": [
     {
+      "curso": "2basico",
+      "asignatura": "Matemática",
+      "fecha": "2026-11-18",
+      "titulo": "Monedas en la mesa: $10, $50 y $100",
+      "descripcion": "Material interactivo para la pizarra o tablet grande: tablero con 15 monedas de $10, 6 de $50 y 3 de $100 que se arrastran a la mesa. Al seleccionar monedas se pueden canjear (5 de $10 por una de $50, 2 de $50 por una de $100, o al revés); la moneda nueva baja iluminada. Panel de ajustes para cambiar la cantidad de monedas y mostrar el total.",
+      "carpeta": "2basico/2026-11-18-monedas/",
+      "materiales": [
+        {
+          "nombre": "Monedas en la mesa (interactivo)",
+          "archivo": "../../../monedas/"
+        }
+      ]
+    },
+    {
       "curso": "4basico",
       "asignatura": "Matemática",
       "fecha": "2026-11-17",
