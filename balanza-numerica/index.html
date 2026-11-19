@@ -132,7 +132,6 @@
     </div>
   </section>
 
-  <div class="ayuda" id="ayuda"></div>
   <div class="acciones">
     <button class="btn" id="ocultar">Ocultar números</button>
     <button class="btn" id="limpiar">Vaciar balanza</button>
@@ -328,7 +327,7 @@
       else if (v === 2) r = { izq: [a], der: pesasDe(b), ladoQ: -1, texto: `${SQ} + ${a} = ${b}`, comprueba: n => `${n} + ${a} = ${b}` };
       else if (v === 3) r = { izq: pesasDe(b), der: [a], ladoQ: 1, texto: `${b} = ${SQ} + ${a}`, comprueba: n => `${b} = ${n} + ${a}` };
       else r = { izq: [a], der: pesasDe(b), ladoQ: -1, texto: `${a} + ${SQ} = ${b}`, comprueba: n => `${a} + ${n} = ${b}` };
-      r.pista = 'Cuelga la pesa <b style="color:#c46a00">?</b> en distintos ganchos hasta que la balanza quede derecha.';
+      r.pista = '';
       r.valor = x;
     } else {
       if (Math.random() < .5) {            // □ − a = b  →  □ = b + a
@@ -360,7 +359,7 @@
   }
 
   // ---------- ejercicios de la guía ----------
-  const PS = 'Cuelga la pesa <b style="color:#c46a00">?</b> en distintos ganchos hasta que la balanza quede derecha.';
+  const PS = '';
   const G = [];
   const add = (parte, letra, izq, der, ladoQ, texto, comp, pista) =>
     G.push({ etiqueta: `Parte ${parte} · ${letra}`, izq, der, ladoQ, texto, comprueba: comp, pista: pista || PS });
@@ -409,9 +408,6 @@
     document.getElementById('reto').classList.toggle('on', m !== 'libre');
     document.getElementById('reto').classList.toggle('guia', m === 'guia');
     document.getElementById('limpiar').textContent = m !== 'libre' ? 'Sacar la pesa ?' : 'Vaciar balanza';
-    document.getElementById('ayuda').innerHTML = m === 'libre'
-      ? '<span class="ch"><span class="mini"></span> Toca un gancho para colgar una pesa. Toca de nuevo para agregar otra (hasta 4); a la quinta se vacía ese gancho.</span>'
-      : '<span class="ch"><span class="mini q"></span> Toca un gancho para colgar la pesa ?. Las pesas azules del desafío no se mueven.</span>';
     if (m === 'reto') crearReto();
     else if (m === 'guia') irGuia(gi);
     else { fijas = { '-1': {}, '1': {} }; incog = null; reto = null; pesas = { '-1': { 6: 1, 4: 1 }, '1': { 2: 1, 8: 1 } }; actualizar(); }
