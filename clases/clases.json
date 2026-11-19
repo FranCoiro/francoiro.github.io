@@ -19,7 +19,7 @@
       "asignatura": "Matemática",
       "fecha": "2026-11-20",
       "titulo": "Monedas: formar montos con la menor cantidad de monedas",
-      "descripcion": "Clase observada (90 min). Guía para imprimir (2 páginas) «En el kiosco»: banda de referencia con los canjes (5 de $10 = 1 de $50, 2 de $50 = 1 de $100), 7 montos de $60 a $270 con círculos para escribir 100, 50 o 10, casilla «Usé ___ monedas» y casilla «Revisé ✓», más un desafío de formar montos con solo 3 monedas. Material para la pizarra: 36 monedas de 10 cm (20 de $10, 9 de $50 y 7 de $100) para dejar fijas las equivalencias y trabajar la cadena de canjes y las formas anticipadas, los 7 productos con su precio y dos signos «=». Ticket de salida (4 por hoja): contar 6 monedas de $50 y formar el mismo monto con la menor cantidad de monedas.",
+      "descripcion": "Clase observada (90 min). Guía para imprimir (2 páginas) «En el kiosco»: banda de referencia con los canjes (5 de $10 = 1 de $50, 2 de $50 = 1 de $100), 7 montos de $60 a $270 con círculos para escribir 100, 50 o 10, casilla «Usé ___ monedas» y casilla «Revisé ✓», más un desafío de formar montos con solo 3 monedas. Material para la pizarra: 36 monedas de 10 cm (20 de $10, 9 de $50 y 7 de $100) para dejar fijas las equivalencias y trabajar la cadena de canjes y las formas anticipadas, los 7 productos con su precio y dos signos «=». Ticket de salida (4 por hoja): contar 6 monedas de $50 y formar el mismo monto con la menor cantidad de monedas. Cierre tipo Kahoot para proyectar (7 preguntas, responden con los dedos del 1 al 4): Javiera va al banco con 2 de $50 y 8 de $10; al mostrar cada respuesta se cuentan las monedas o se anima el canje (5 de $10 → $50, 2 de $50 → $100) hasta llegar a 5 monedas, y termina con la frase de la clase.",
       "carpeta": "2basico/2026-11-20-monedas-menor-cantidad/",
       "materiales": [
         {
@@ -29,6 +29,10 @@
         {
           "nombre": "Material para la pizarra: monedas de 10 cm y productos (PDF)",
           "archivo": "material-pizarra.pdf"
+        },
+        {
+          "nombre": "Cierre tipo Kahoot: Javiera va al banco",
+          "archivo": "cierre-banco.html"
         },
         {
           "nombre": "Ticket de salida (PDF)",
