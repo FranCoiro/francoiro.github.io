@@ -19,12 +19,16 @@
       "asignatura": "Matemática",
       "fecha": "2026-11-20",
       "titulo": "Monedas: formar montos con la menor cantidad de monedas",
-      "descripcion": "Clase observada (90 min). Guía para imprimir (2 páginas) «En el kiosco»: banda de referencia con los canjes (5 de $10 = 1 de $50, 2 de $50 = 1 de $100), 7 montos de $60 a $270 con círculos para escribir 100, 50 o 10 y casilla «Usé ___ monedas», más un desafío de formar montos con solo 3 monedas. Ticket de salida (4 por hoja): contar 6 monedas de $50 y formar el mismo monto con la menor cantidad de monedas.",
+      "descripcion": "Clase observada (90 min). Guía para imprimir (2 páginas) «En el kiosco»: banda de referencia con los canjes (5 de $10 = 1 de $50, 2 de $50 = 1 de $100), 7 montos de $60 a $270 con círculos para escribir 100, 50 o 10, casilla «Usé ___ monedas» y casilla «Revisé ✓», más un desafío de formar montos con solo 3 monedas. Material para la pizarra: 36 monedas de 10 cm (20 de $10, 9 de $50 y 7 de $100) para dejar fijas las equivalencias y trabajar la cadena de canjes y las formas anticipadas, los 7 productos con su precio y dos signos «=». Ticket de salida (4 por hoja): contar 6 monedas de $50 y formar el mismo monto con la menor cantidad de monedas.",
       "carpeta": "2basico/2026-11-20-monedas-menor-cantidad/",
       "materiales": [
         {
           "nombre": "Guía (PDF)",
           "archivo": "guia.pdf"
+        },
+        {
+          "nombre": "Material para la pizarra: monedas de 10 cm y productos (PDF)",
+          "archivo": "material-pizarra.pdf"
         },
         {
           "nombre": "Ticket de salida (PDF)",
