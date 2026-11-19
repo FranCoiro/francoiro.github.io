@@ -50,6 +50,23 @@
   .pal:active{transform:translateY(2px);box-shadow:0 2px 0 #5a35a8}
   .pal.usada{visibility:hidden}
 
+  /* Partes de la ecuación */
+  .defc{font-size:clamp(17px,2.1vw,22px);text-align:center;line-height:1.6;margin:0 0 14px}
+  .kv,.kc,.ki{font-weight:800;padding:0 6px;border-radius:6px}
+  .kv{color:#b35f00;background:var(--naranjo-c)} .kc{color:var(--azul-o);background:#e3edff} .ki{color:var(--verde);background:var(--verde-c)}
+  .orden{font-size:clamp(22px,3vw,32px);font-weight:800;text-align:center;margin:6px 0 4px}
+  .ecu{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin:18px 0 6px}
+  .tok{display:flex;flex-direction:column;align-items:center;gap:6px}
+  .tok button{width:clamp(70px,9vw,110px);height:clamp(80px,10vw,120px);border-radius:18px;border:4px solid var(--linea);background:#fff;
+       font:800 clamp(36px,5vw,60px) Poppins,sans-serif;color:var(--tinta);cursor:pointer;box-shadow:0 5px 0 #cfd8e8}
+  .tok button:active{transform:translateY(3px)}
+  .tok button .q{width:.62em;height:.62em}
+  .tok.v button{border-color:var(--naranjo);background:var(--naranjo-c);box-shadow:0 5px 0 #c27206}
+  .tok.c button{border-color:var(--azul);background:#e3edff;box-shadow:0 5px 0 var(--azul-o)}
+  .tok.i button{border-color:var(--verde);background:var(--verde-c);box-shadow:0 5px 0 #157540}
+  .tok .lab{font-size:14px;font-weight:800;min-height:20px;text-transform:uppercase;letter-spacing:.4px}
+  .tok.v .lab{color:#b35f00} .tok.c .lab{color:var(--azul-o)} .tok.i .lab{color:var(--verde)}
+  .tok.sacude button{animation:sacude .4s}
   /* Clasificar */
   .tarros{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:14px;flex:1}
   .tarro{border:3px dashed var(--linea);border-radius:20px;padding:12px;min-height:200px;display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;transition:background .15s}
@@ -219,6 +236,62 @@
         <text x="${x}" y="${y + 50}" font-family="Poppins,sans-serif" font-weight="800" font-size="34" fill="#c46a00" text-anchor="middle">?</text>`;
     }
     return s + '</svg>';
+  }
+
+  // ---------- 1. Partes de la ecuación ----------
+  // v = valor variable, c = valor constante, i = igualdad, o = signo de operación
+  const ECUS = [
+    [['4','c'],['+','o'],[Q,'v'],['=','i'],['9','c']],
+    [['x','v'],['+','o'],['2','c'],['=','i'],['4','c']],
+    [['9','c'],['=','i'],[Q,'v'],['+','o'],['4','c']],
+    [['c','v'],['+','o'],['4','c'],['=','i'],['8','c']],
+    [[Q,'v'],['−','o'],['3','c'],['=','i'],['5','c']],
+    [['10','c'],['−','o'],['p','v'],['=','i'],['6','c']],
+  ];
+  const PASOS = [
+    { k: 'v', t: 'Toca el valor <span class="kv">variable</span>: el que no conocemos.', lab: 'variable' },
+    { k: 'c', t: 'Toca los valores <span class="kc">constantes</span>: los números fijos.', lab: 'constante' },
+    { k: 'i', t: 'Toca la <span class="ki">igualdad</span>.', lab: 'igualdad' },
+  ];
+  function juegoPartes() {
+    cabecera('Partes de una ecuación', true);
+    let e = 0, aciertos = 0;
+    function ronda() {
+      if (e >= ECUS.length) { final(aciertos, ECUS.length, juegoPartes); return; }
+      const toks = ECUS[e], hecho = toks.map(() => false);
+      let paso = 0, errores = 0;
+      hoja.innerHTML = `<div class="barra"><i style="width:${e / ECUS.length * 100}%"></i></div>
+        <p class="defc">Una ecuación es una expresión matemática que relaciona valores <span class="kv">variables</span> y <span class="kc">constantes</span> mediante una <span class="ki">igualdad</span>.</p>
+        <p class="orden" id="orden"></p>
+        <div class="ecu">${toks.map((t, n) => `<div class="tok" data-n="${n}"><button>${t[0]}</button><span class="lab"></span></div>`).join('')}</div>
+        <div class="fb" id="fb"></div>`;
+      const caja = [...hoja.querySelectorAll('.tok')];
+      const pintarPaso = () => { $('orden').innerHTML = paso < PASOS.length ? PASOS[paso].t : '¡Encontraste todas las partes!'; };
+      caja.forEach(c => c.querySelector('button').onclick = () => {
+        if (paso >= PASOS.length) return;
+        const n = +c.dataset.n, k = toks[n][1], P = PASOS[paso], fb = $('fb');
+        if (hecho[n]) return;
+        if (k === P.k) {
+          hecho[n] = true; c.classList.add(k); c.querySelector('.lab').textContent = P.lab; bien(); fb.textContent = '';
+          if (toks.every((t, j) => t[1] !== P.k || hecho[j])) {
+            paso++; pintarPaso();
+            if (paso >= PASOS.length) {
+              if (!errores) { aciertos++; ponerPuntos(aciertos); }
+              caja.forEach((cc, j) => { if (toks[j][1] === 'o') cc.querySelector('.lab').textContent = 'operación'; });
+              fb.className = 'fb ok'; fb.textContent = errores ? '¡Listo!' : '¡Perfecto, sin errores!';
+              setTimeout(() => { e++; ronda(); }, 1800);
+            }
+          }
+        } else {
+          errores++; mal(); c.classList.remove('sacude'); void c.offsetWidth; c.classList.add('sacude');
+          fb.className = 'fb no';
+          fb.textContent = k === 'o' ? 'Ese es un signo de operación (suma o resta).'
+            : k === 'v' ? 'Ese es el valor variable: no lo conocemos.' : k === 'c' ? 'Ese es un número fijo: es una constante.' : 'Esa es la igualdad (=).';
+        }
+      });
+      pintarPaso();
+    }
+    ronda();
   }
 
   // ---------- 2. ¿Es una ecuación? ----------
@@ -408,11 +481,12 @@
     cabecera('Ecuaciones con balanza', false);
     hoja.innerHTML = `<div class="defi"><b>Ecuación:</b> ${DEF.replace('Una ecuación es una', 'una')}</div>
       <div class="menu">
+        <button class="act a1" id="j1"><span class="ico">🔍</span><b>Partes de una ecuación</b><span>Usa la definición: encuentra el valor variable, las constantes y la igualdad.</span></button>
         <button class="act a2" id="j2"><span class="ico">🗂️</span><b>¿Es una ecuación?</b><span>Clasifica 12 tarjetas: ¿es ecuación o no?</span></button>
         <button class="act a3" id="j3"><span class="ico">⚖️</span><b>Quiz de la balanza</b><span>10 preguntas con balanzas: ¿qué ecuación es? ¿cuánto vale el número escondido?</span></button>
         <button class="act a4" id="j4"><span class="ico">🧮</span><b>Trabajo libre</b><span>La profe cuelga pesas donde quiera y la balanza suma sola cada lado.</span></button>
       </div>`;
-    $('j2').onclick = juegoClasificar; $('j3').onclick = juegoQuiz; $('j4').onclick = juegoLibre;
+    $('j1').onclick = juegoPartes; $('j2').onclick = juegoClasificar; $('j3').onclick = juegoQuiz; $('j4').onclick = juegoLibre;
   }
   menu();
 })();
