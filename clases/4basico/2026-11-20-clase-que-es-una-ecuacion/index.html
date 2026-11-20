@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>¿Qué es una ecuación? · Clase guiada 4.º básico</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --azul:#2f6fd6; --azul-o:#1d4f9e; --amarillo:#f7d33a; --rojo:#d93a2f; --naranjo:#e8890c; --naranjo-c:#fde7c2;
+    --verde:#1f9d55; --verde-c:#e3f6ea; --morado:#7a4fd6; --tinta:#24324a; --gris:#5b6a86; --linea:#dfe6f3; --fondo:#f6f8fc;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{font-family:Poppins,system-ui,sans-serif;color:var(--tinta);background:var(--fondo);display:flex;flex-direction:column;
+       -webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+  header{display:flex;align-items:center;gap:12px;padding:10px 18px;background:#fff;border-bottom:2px solid var(--linea)}
+  .logo{background:var(--azul);color:#fff;font-weight:800;font-size:22px;width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex:none}
+  header h1{font-size:18px;margin:0;flex:1;line-height:1.15}
+  header h1 small{display:block;font-size:12px;font-weight:600;color:var(--gris)}
+  .momento{font-weight:800;font-size:14px;padding:6px 14px;border-radius:999px;color:#fff;white-space:nowrap}
+  .m-ini{background:var(--morado)} .m-des{background:var(--azul)} .m-cie{background:var(--verde)}
+  main{flex:1;overflow:auto;display:flex;justify-content:center;padding:18px}
+  .lam{display:none;width:100%;max-width:1100px;flex-direction:column;gap:12px}
+  .lam.on{display:flex;animation:entra .35s ease}
+  .lam>*{flex-shrink:0}
+  .lam{margin:auto 0}
+  @keyframes entra{from{opacity:0;transform:translateY(10px)}}
+  h2{font-size:clamp(26px,3.6vw,40px);margin:0;text-align:center;line-height:1.2}
+  .sub{font-size:clamp(17px,2vw,22px);color:var(--gris);text-align:center;margin:0}
+  .tarj{background:#fff;border:2px solid var(--linea);border-radius:20px;padding:14px 18px}
+  .grande{font-size:clamp(34px,5.5vw,64px);font-weight:800;text-align:center;letter-spacing:1px}
+  .q{display:inline-block;width:.72em;height:.72em;border:4px solid var(--naranjo);background:var(--naranjo-c);border-radius:6px;vertical-align:-.04em}
+  .kv,.kc,.ki{font-weight:800;padding:0 6px;border-radius:6px}
+  .kv{color:#b35f00;background:var(--naranjo-c)} .kc{color:var(--azul-o);background:#e3edff} .ki{color:var(--verde);background:var(--verde-c)}
+  .btn{border:0;border-radius:14px;background:var(--azul);color:#fff;font:800 18px Poppins,sans-serif;padding:12px 22px;cursor:pointer;box-shadow:0 4px 0 var(--azul-o)}
+  .btn.sec{background:#eef1f7;color:var(--tinta);box-shadow:0 4px 0 #cfd8e8}
+  .btn.si{background:var(--verde);box-shadow:0 4px 0 #157540} .btn.no{background:var(--rojo);box-shadow:0 4px 0 #a8271f}
+  .btn:active{transform:translateY(2px)}
+  .fila{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;align-items:center}
+  .paso{opacity:0;transform:translateY(8px);transition:all .35s;pointer-events:none}
+  .paso.ver{opacity:1;transform:none;pointer-events:auto}
+  .revelar{align-self:center}
+  .msg{text-align:center;font-weight:800;font-size:clamp(18px,2.2vw,24px);min-height:34px}
+  .msg.ok{color:var(--verde)} .msg.no{color:var(--rojo)}
+  .bal svg{width:100%;height:auto;display:block;touch-action:manipulation;max-height:40vh}
+  .bal .col{cursor:pointer} .bal .col:hover .hl{opacity:.12} .bal .hl{opacity:0;transition:opacity .15s}
+  .cuentas{display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap}
+  .lado{min-width:200px;text-align:center}
+  .lado .t{font-size:12px;font-weight:700;color:var(--gris);text-transform:uppercase;letter-spacing:.5px}
+  .lado .s{font-size:clamp(22px,3vw,32px);font-weight:800;min-height:44px}
+  .lado .s em{font-style:normal;color:var(--gris);font-weight:700}
+  .signo{font-size:44px;font-weight:800;width:66px;height:66px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#fdecea;color:var(--rojo);flex:none;transition:all .25s}
+  .signo.ok{background:var(--verde-c);color:var(--verde)} .signo.neutro{background:#eef1f7;color:var(--gris)}
+  .obj{background:#fff6d1;border-left:6px solid var(--amarillo);border-radius:12px;padding:14px 18px;font-size:clamp(18px,2.2vw,24px)}
+  .portada{margin:auto;text-align:center;display:flex;flex-direction:column;gap:20px;align-items:center}
+  .portada .ico{font-size:90px;line-height:1}
+  .portada h2{font-size:clamp(36px,6vw,64px)}
+  .ecu{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin:6px 0}
+  .tok{display:flex;flex-direction:column;align-items:center;gap:6px}
+  .tok div{width:clamp(70px,9vw,110px);height:clamp(80px,10vw,120px);border-radius:18px;border:4px solid var(--linea);background:#fff;
+       font:800 clamp(36px,5vw,60px) Poppins,sans-serif;display:flex;align-items:center;justify-content:center;transition:all .3s}
+  .tok div .q{width:.62em;height:.62em;border-color:#b35f00}
+  .tok span{font-size:14px;font-weight:800;min-height:20px;text-transform:uppercase;letter-spacing:.4px;opacity:0;transition:opacity .3s}
+  .tok.v div{border-color:var(--naranjo);background:var(--naranjo-c)} .tok.v span{color:#b35f00;opacity:1}
+  .tok.c div{border-color:var(--azul);background:#e3edff} .tok.c span{color:var(--azul-o);opacity:1}
+  .tok.i div{border-color:var(--verde);background:var(--verde-c)} .tok.i span{color:var(--verde);opacity:1}
+  .tok.o span{color:var(--gris);opacity:1}
+  .items{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+  .item{border:2px solid var(--linea);background:#fff;border-radius:12px;padding:6px 14px;font:800 18px Poppins,sans-serif;color:var(--gris);cursor:pointer}
+  .item.on{border-color:var(--azul);color:var(--azul);background:#eef4ff}
+  .item.hecho::after{content:" ✔";color:var(--verde)}
+  .opciones{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .op{border:0;border-radius:16px;color:#fff;font:800 clamp(22px,2.8vw,32px) Poppins,sans-serif;padding:16px;cursor:pointer;min-height:74px}
+  .op:nth-child(1){background:#d93a2f} .op:nth-child(2){background:#2f6fd6} .op:nth-child(3){background:#e8a316} .op:nth-child(4){background:#1f9d55}
+  .op .q{border-color:#fff;background:rgba(255,255,255,.25)}
+  .op.atenuar{opacity:.3} .op.bien{outline:6px solid #24324a;outline-offset:-6px}
+  .preg{font-size:clamp(20px,2.6vw,30px);font-weight:700;text-align:center;margin:0}
+  .resp{font-size:clamp(18px,2.2vw,24px);color:var(--azul-o);font-weight:600;text-align:center}
+  ol.cierre{font-size:clamp(20px,2.4vw,28px);font-weight:700;margin:0;padding-left:1.4em;display:flex;flex-direction:column;gap:14px}
+  ol.cierre .resp{text-align:left;font-size:clamp(17px,2vw,22px)}
+  footer{display:flex;align-items:center;gap:12px;padding:10px 18px;background:#fff;border-top:2px solid var(--linea)}
+  .puntos{flex:1;display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
+  .punto{width:14px;height:14px;border-radius:50%;background:var(--linea);cursor:pointer;border:0;padding:0}
+  .punto.on{background:var(--azul);transform:scale(1.25)}
+  .punto.visto{background:#9db6e4}
+  @media (max-width:700px){.opciones{grid-template-columns:1fr}.lado{min-width:120px}}
+  /* Temporizador */
+  #timer{position:fixed;left:calc(100vw - 176px);top:calc(100vh - 236px);z-index:100000;width:158px;background:rgba(255,250,243,.95);
+    border-radius:14px;padding:6px 9px 9px;cursor:grab;touch-action:none;box-shadow:0 6px 16px rgba(0,0,0,.3);color:#24324a}
+  #timer.moviendo{cursor:grabbing;box-shadow:0 12px 26px rgba(0,0,0,.4)}
+  #timer .tcab{display:flex;justify-content:space-between;align-items:center;font-weight:800;font-size:12px;color:#5b6a86}
+  #timer .tcab button{border:0;background:none;font:800 18px Poppins,sans-serif;color:#5b6a86;cursor:pointer;padding:0 4px;line-height:1}
+  #tDisp{font-weight:900;font-size:38px;text-align:center;line-height:1.1;font-variant-numeric:tabular-nums;cursor:pointer}
+  #tBarra{height:6px;border-radius:3px;background:#e6ebf4;overflow:hidden;margin:3px 0 7px}
+  #tBarra i{display:block;height:100%;width:100%;background:#1f9d55;transition:width .3s linear}
+  .tfila{display:flex;gap:4px;justify-content:center;margin-top:4px}
+  .tfila button{flex:1;border:0;border-radius:8px;background:#eef1f7;color:#24324a;font:800 13px Poppins,sans-serif;padding:7px 0;cursor:pointer;min-width:0}
+  .tfila button.play{background:#2f6fd6;color:#fff;font-size:16px}
+  .tfila.pre button{font-size:12.5px;padding:5px 0}
+  #timer.poco #tDisp{color:#e8890c} #timer.poco #tBarra i{background:#e8890c}
+  #timer.fin{background:#d93a2f;color:#fff;animation:latido .8s ease-in-out infinite}
+  #timer.fin .tcab,#timer.fin .tcab button{color:#ffe1e1}
+  @keyframes latido{50%{box-shadow:0 0 0 8px rgba(224,64,63,.35),0 6px 16px rgba(0,0,0,.3)}}
+  #timer.mini{width:auto;padding:4px 10px}
+  #timer.mini .tcuerpo,#timer.mini .tcab span{display:none}
+  #timer.mini .tcab{gap:8px}
+  #timer.mini #tDisp{font-size:24px}
+  #timer{border:2px solid #dfe6f3;user-select:none;-webkit-user-select:none}
+  #timer.fin{border-color:#d93a2f}
+
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">=</div>
+  <h1>¿Qué es una ecuación?<small>Clase guiada · 4.º básico</small></h1>
+  <span class="momento m-ini" id="momento">Inicio</span>
+</header>
+<main id="main">
+
+  <!-- 1. Portada -->
+  <section class="lam" data-m="ini">
+    <div class="portada">
+      <div class="ico">⚖️</div>
+      <h2>¿Qué es una ecuación?</h2>
+      <div class="obj"><b>Objetivo:</b> Descubrir qué es una ecuación y encontrar el número escondido usando la balanza.</div>
+      <p class="sub">Escribe el objetivo en tu cuaderno.</p>
+    </div>
+  </section>
+
+  <!-- 2. Conocemos la balanza -->
+  <section class="lam" data-m="ini">
+    <h2>Conocemos la balanza</h2>
+    <p class="sub">Cada pesa vale el número donde se cuelga. Una pesa en el 5 vale 5.</p>
+    <div class="tarj bal" id="b2"></div>
+    <p class="preg">¿Dónde cuelgo una pesa en el lado derecho para que la balanza quede <b>derecha</b>?</p>
+    <div class="msg" id="m2"></div>
+  </section>
+
+  <!-- 3. El signo = -->
+  <section class="lam" data-m="ini">
+    <h2>Cuando la balanza queda derecha…</h2>
+    <div class="tarj bal" id="b3"></div>
+    <div class="paso"><p class="sub">Lado izquierdo: <b>6 + 4</b> &nbsp;·&nbsp; Lado derecho: <b>10</b></p></div>
+    <div class="paso"><div class="grande">6 + 4 = 10</div></div>
+    <div class="paso"><div class="obj">El signo <b>=</b> significa <b>“vale lo mismo que”</b>. Los dos lados de la balanza valen lo mismo.</div></div>
+    <button class="btn revelar">Mostrar ▸</button>
+  </section>
+
+  <!-- 4. ¿Queda derecha? -->
+  <section class="lam" data-m="des">
+    <h2>¿La balanza queda derecha?</h2>
+    <div class="items" id="it4"></div>
+    <div class="grande" id="e4"></div>
+    <p class="sub">Piensen primero: ¿sí o no?</p>
+    <div class="fila"><button class="btn si" id="si4">Sí, queda derecha</button><button class="btn no" id="no4">No, se inclina</button></div>
+    <div class="tarj bal" id="b4" style="min-height:120px"></div>
+    <div class="msg" id="m4"></div>
+  </section>
+
+  <!-- 5. El número escondido -->
+  <section class="lam" data-m="des">
+    <h2>El número escondido</h2>
+    <p class="sub">Hay una pesa <b style="color:#c46a00">?</b> que no sabemos dónde va. ¡Busquémosla!</p>
+    <div class="tarj bal" id="b5"></div>
+    <div class="cuentas" id="c5"></div>
+    <div class="msg" id="m5"></div>
+    <div class="paso"><div class="grande">4 + <span class="q"></span> = 9 &nbsp;→&nbsp; <span class="q"></span> = 5</div></div>
+    <div class="paso"><div class="obj">Una igualdad con un número escondido se llama <b>ecuación</b>. El número escondido lo escribimos con un cuadrado <span class="q"></span> o con una letra.</div></div>
+  </section>
+
+  <!-- 6. Definición y partes -->
+  <section class="lam" data-m="des">
+    <h2>¿Qué es una ecuación?</h2>
+    <div class="obj" style="text-align:center">Una ecuación es una expresión matemática que relaciona valores <span class="kv">variables</span> y <span class="kc">constantes</span> mediante una <span class="ki">igualdad</span>.</div>
+    <div class="ecu" id="ecu6"></div>
+    <div class="fila">
+      <button class="btn sec" data-p="v">Valor variable</button>
+      <button class="btn sec" data-p="c">Valores constantes</button>
+      <button class="btn sec" data-p="i">Igualdad</button>
+      <button class="btn sec" data-p="o">Signo de operación</button>
+    </div>
+    <p class="sub" id="t6">Toca cada botón para mostrar las partes.</p>
+  </section>
+
+  <!-- 7. Practicamos -->
+  <section class="lam" data-m="des">
+    <h2>Practicamos: encuentra <span class="q"></span></h2>
+    <div class="items" id="it7"></div>
+    <div class="grande" id="e7"></div>
+    <div class="tarj bal" id="b7"></div>
+    <div class="msg" id="m7"></div>
+  </section>
+
+  <!-- 8. Desafío -->
+  <section class="lam" data-m="des">
+    <h2>Desafío</h2>
+    <div class="items" id="it8"></div>
+    <p class="preg" id="p8"></p>
+    <div class="grande" id="e8"></div>
+    <div class="opciones" id="o8"></div>
+    <div class="msg" id="m8"></div>
+  </section>
+
+  <!-- 9. Cierre -->
+  <section class="lam" data-m="cie">
+    <h2>Cierre</h2>
+    <ol class="cierre">
+      <li>¿Qué es una ecuación?<div class="paso resp">Una igualdad con un número escondido (un valor variable).</div></li>
+      <li>¿Qué significa el signo = ?<div class="paso resp">Que los dos lados valen lo mismo, como la balanza derecha.</div></li>
+      <li>¿Cómo encontramos el número escondido?<div class="paso resp">Probando con la balanza hasta que queda derecha, y comprobando con la suma.</div></li>
+    </ol>
+    <button class="btn revelar">Mostrar respuesta ▸</button>
+    <div class="obj" style="text-align:center"><b>Ticket de salida (en el cuaderno):</b> &nbsp; 6 + <span class="q"></span> = 10 &nbsp;&nbsp; <span class="q"></span> = ___</div>
+  </section>
+</main>
+
+<footer>
+  <button class="btn sec" id="ant">← Anterior</button>
+  <div class="puntos" id="puntos"></div>
+  <button class="btn" id="sig">Siguiente →</button>
+</footer>
+
+<div id="timer">
+  <div class="tcab"><span>⠿ Tiempo</span><button id="tMini" title="Achicar / agrandar">–</button></div>
+  <div id="tDisp" title="Iniciar o pausar">10:00</div>
+  <div class="tcuerpo">
+    <div id="tBarra"><i></i></div>
+    <div class="tfila"><button id="tMenos" title="Quitar 1 minuto">−1</button><button id="tPlay" class="play" title="Iniciar o pausar">▶</button><button id="tMas" title="Agregar 1 minuto">+1</button><button id="tReset" title="Reiniciar">↺</button></div>
+    <div class="tfila pre"><button data-m="3">3'</button><button data-m="5">5'</button><button data-m="10">10'</button><button data-m="15">15'</button><button data-m="20">20'</button></div>
+  </div>
+</div>
+
+
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const Q = '<span class="q"></span>';
+  const NS = 'http://www.w3.org/2000/svg';
+
+  // ---------- sonido ----------
+  let audio = null;
+  function tono(frecs, dur = .12, tipo = 'sine') {
+    try {
+      audio = audio || new (window.AudioContext || window.webkitAudioContext)(); audio.resume && audio.resume();
+      frecs.forEach((f, i) => {
+        const o = audio.createOscillator(), g = audio.createGain(), t = audio.currentTime + i * dur;
+        o.type = tipo; o.frequency.value = f; o.connect(g); g.connect(audio.destination);
+        g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(.25, t + .02); g.gain.exponentialRampToValueAtTime(.0001, t + dur);
+        o.start(t); o.stop(t + dur + .02);
+      });
+    } catch (e) {}
+  }
+  const bien = () => tono([660, 880], .11), mal = () => tono([220, 180], .16, 'square'), fanfarria = () => tono([523, 659, 784, 1047], .12);
+
+  // ---------- balanza interactiva ----------
+  // opciones: izq, der (pesas fijas), ladoQ (lado de la pesa ?), libre (tocar cuelga pesas azules en el lado 'ladoLibre'), alCambiar(L, R, estado)
+  const balanzas = [];
+  function crearBalanza(host, op = {}) {
+    const CX = 500, BY = 30, BH = 40, px = (sd, k) => sd * (22 + k * 39);
+    host.innerHTML = '';
+    const svg = document.createElementNS(NS, 'svg'); svg.setAttribute('viewBox', '0 0 1000 345'); host.appendChild(svg);
+    const el = (t, a, p) => { const e = document.createElementNS(NS, t); for (const k in a) e.setAttribute(k, a[k]); p.appendChild(e); return e; };
+    el('rect', { x: CX - 11, y: BY, width: 22, height: 255, fill: '#d93a2f' }, svg);
+    el('rect', { x: CX - 135, y: 271, width: 105, height: 16, rx: 3, fill: '#2f6fd6' }, svg);
+    el('rect', { x: CX + 30, y: 271, width: 105, height: 16, rx: 3, fill: '#2f6fd6' }, svg);
+    el('rect', { x: CX - 160, y: 285, width: 320, height: 28, rx: 4, fill: '#d93a2f' }, svg);
+    const viga = el('g', {}, svg), largo = px(1, 10) + 28;
+    el('rect', { x: CX - largo, y: BY, width: 2 * largo, height: BH, rx: 5, fill: '#f7d33a', stroke: '#c9a400', 'stroke-width': 2 }, viga);
+    for (const sd of [-1, 1]) for (let k = 1; k <= 10; k++) {
+      const x = CX + px(sd, k);
+      el('text', { x, y: BY + 21, 'font-family': 'Poppins,sans-serif', 'font-weight': 700, 'font-size': 17, fill: '#333', 'text-anchor': 'middle' }, viga).textContent = k;
+      el('circle', { cx: x, cy: BY + 31, r: 3.5, fill: '#8a7400' }, viga);
+    }
+    const capa = el('g', {}, viga), cols = el('g', {}, viga);
+    el('rect', { x: CX - 13, y: BY - 7, width: 26, height: BH + 14, rx: 4, fill: '#d93a2f' }, svg);
+    el('circle', { cx: CX, cy: BY + 8, r: 4.5, fill: '#222' }, svg);
+    const suelta = el('g', {}, svg);
+    const st = { fijas: { '-1': [...(op.izq || [])], '1': [...(op.der || [])] }, puestas: { '-1': [], '1': [] }, q: null, ang: 0, vel: 0, obj: 0, colg: [] };
+    const interactiva = op.ladoQ || op.libre;
+    if (interactiva) for (const sd of [-1, 1]) for (let k = 1; k <= 10; k++) {
+      const g = el('g', { class: 'col' }, cols), x = CX + px(sd, k);
+      el('rect', { class: 'hl', x: x - 19, y: BY, width: 38, height: 290, rx: 8, fill: '#2f6fd6' }, g);
+      el('rect', { x: x - 19, y: BY - 10, width: 38, height: 300, fill: 'transparent' }, g);
+      g.addEventListener('click', () => tocar(sd, k));
+    }
+    function tocar(sd, k) {
+      if (st.bloq) return;
+      if (op.ladoQ) {
+        if (sd !== op.ladoQ) { op.alCambiar && op.alCambiar(null, null, 'otro'); return; }
+        st.q = st.q === k ? null : k;
+      } else if (op.libre) {
+        if (op.ladoLibre && sd !== op.ladoLibre) { op.alCambiar && op.alCambiar(null, null, 'otro'); return; }
+        const arr = st.puestas[sd]; const i = arr.indexOf(k);
+        if (i >= 0) arr.splice(i, 1); else { if (op.unaSola) arr.length = 0; arr.push(k); }
+      }
+      tono([520 + k * 25], .07); pintar();
+    }
+    const total = sd => st.fijas[sd].concat(st.puestas[sd]).reduce((a, b) => a + b, 0) + (op.ladoQ === sd && st.q ? st.q : 0);
+    function pesa(g, x, y, esQ) {
+      if (esQ) {
+        el('rect', { x: x - 17, y, width: 34, height: 74, rx: 4, fill: '#fde7c2', stroke: '#e8890c', 'stroke-width': 3, 'stroke-dasharray': '6 4' }, g);
+        el('text', { x, y: y + 54, 'font-family': 'Poppins,sans-serif', 'font-weight': 800, 'font-size': 32, fill: '#c46a00', 'text-anchor': 'middle' }, g).textContent = '?';
+      } else {
+        el('rect', { x: x - 15, y, width: 30, height: 72, rx: 3, fill: '#2f6fd6', stroke: '#1d4f9e', 'stroke-width': 2 }, g);
+        el('circle', { cx: x, cy: y + 12, r: 6, fill: '#f7d33a', stroke: '#c9a400', 'stroke-width': 1.5 }, g);
+      }
+    }
+    function pintar() {
+      capa.innerHTML = ''; suelta.innerHTML = ''; st.colg = [];
+      for (const sd of [-1, 1]) {
+        const lista = st.fijas[sd].concat(st.puestas[sd]).map(k => [k, false]);
+        if (op.ladoQ === sd && st.q) lista.push([st.q, true]);
+        const porK = {};
+        lista.forEach(([k, esQ]) => (porK[k] = porK[k] || []).push(esQ));
+        for (const k in porK) {
+          const x = CX + px(sd, +k), y0 = BY + BH - 6, g = el('g', {}, capa);
+          g.dataset.x = x; g.dataset.y = y0;
+          porK[k].forEach((esQ, j) => pesa(g, x, y0 + j * 76, esQ));
+          st.colg.push(g);
+        }
+      }
+      if (op.ladoQ && !st.q) { const x = CX + px(op.ladoQ, 5.5); pesa(suelta, x, 170, true); }
+      const L = total(-1), R = total(1);
+      const listo = op.ladoQ ? !!st.q : true;
+      st.obj = Math.max(-13, Math.min(13, (R - L) * 1.3));
+      op.alCambiar && op.alCambiar(L, R, listo ? (L === R ? 'eq' : 'des') : 'falta', st);
+    }
+    const b = { st, pintar, svg, viga, bloquear: v => st.bloq = v, total };
+    balanzas.push(b); pintar();
+    return b;
+  }
+  (function animar() {
+    for (const b of balanzas) {
+      if (!b.svg.isConnected) continue;
+      const s = b.st; s.vel += (s.obj - s.ang) * 0.06; s.vel *= 0.82; s.ang += s.vel;
+      b.viga.setAttribute('transform', `rotate(${s.ang.toFixed(3)} 500 38)`);
+      for (const g of s.colg) g.setAttribute('transform', `rotate(${(-s.ang).toFixed(3)} ${g.dataset.x} ${g.dataset.y})`);
+    }
+    requestAnimationFrame(animar);
+  })();
+  const avisar = (id, t, ok) => { const m = $(id); m.className = 'msg' + (ok === true ? ' ok' : ok === false ? ' no' : ''); m.innerHTML = t; };
+
+  // ---------- lámina 2: conocemos la balanza ----------
+  crearBalanza($('b2'), { izq: [5], libre: true, ladoLibre: 1, unaSola: true, alCambiar: (L, R, e) => {
+    if (e === 'otro') return avisar('m2', 'Cuelga la pesa en el lado derecho.', false);
+    if (!R) return avisar('m2', '');
+    if (L === R) { avisar('m2', '¡Quedó derecha! 5 vale lo mismo que 5.', true); fanfarria(); }
+    else avisar('m2', R > L ? `Con ${R} baja el lado derecho: ${R} es más que 5.` : `Con ${R} baja el lado izquierdo: ${R} es menos que 5.`, false);
+  } });
+
+  // ---------- lámina 3: el signo = ----------
+  crearBalanza($('b3'), { izq: [6, 4], der: [10] });
+
+  // ---------- lámina 4: ¿queda derecha? ----------
+  const P4 = [{ i: [3, 5], d: [8] }, { i: [4, 4], d: [9] }, { i: [7, 3], d: [6, 4] }, { i: [2, 6], d: [7] }];
+  let i4 = 0;
+  const suma = a => a.join(' + ');
+  function cargar4(n) {
+    i4 = n; const p = P4[n];
+    $('e4').innerHTML = `${suma(p.i)} &nbsp;<span style="color:#5b6a86">¿?</span>&nbsp; ${suma(p.d)}`;
+    $('b4').innerHTML = '<p class="sub" style="padding:30px 0">Elijan su respuesta y luego comprobamos en la balanza.</p>';
+    avisar('m4', ''); marcar('it4', n);
+  }
+  function resp4(dijoSi) {
+    const p = P4[i4], L = p.i.reduce((a, b) => a + b), R = p.d.reduce((a, b) => a + b), eq = L === R;
+    const b = crearBalanza($('b4'), { izq: p.i, der: p.d });
+    const ok = dijoSi === eq;
+    setTimeout(() => {
+      avisar('m4', (ok ? '¡Bien! ' : 'Mira la balanza: ') + (eq ? `Queda derecha: ${suma(p.i)} = ${suma(p.d)} (${L} = ${R}).` : `Se inclina: ${L} no es igual a ${R}.`), ok);
+      ok ? bien() : mal();
+      $('it4').children[i4].classList.add('hecho');
+    }, 700);
+  }
+  $('si4').onclick = () => resp4(true); $('no4').onclick = () => resp4(false);
+  hacerItems('it4', P4.length, cargar4);
+
+  // ---------- lámina 5: número escondido ----------
+  crearBalanza($('b5'), { izq: [4], der: [9], ladoQ: -1, alCambiar: (L, R, e, st) => {
+    if (e === 'otro') return avisar('m5', 'La pesa ? va en el lado izquierdo.', false);
+    $('c5').innerHTML = `<div class="lado"><div class="t">Izquierda</div><div class="s">4 + ${st.q ? `<span style="color:#c46a00">${st.q}</span> <em>= ${L}</em>` : Q}</div></div>
+      <div class="signo ${e === 'eq' ? 'ok' : e === 'falta' ? 'neutro' : ''}">${e === 'eq' ? '=' : e === 'falta' ? '?' : L > R ? '>' : '<'}</div>
+      <div class="lado"><div class="t">Derecha</div><div class="s">9</div></div>`;
+    if (e === 'eq') { avisar('m5', '¡Encontramos el número escondido! Es el 5.', true); fanfarria(); }
+    else if (e === 'des') avisar('m5', 'Todavía no queda derecha. Prueba otro número.', false);
+    else avisar('m5', 'Toca un número del lado izquierdo para colgar la pesa ?');
+  } });
+
+  // ---------- lámina 6: partes ----------
+  const T6 = [['4', 'c'], ['+', 'o'], [Q, 'v'], ['=', 'i'], ['9', 'c']];
+  const NOM = { v: 'variable', c: 'constante', i: 'igualdad', o: 'operación' };
+  const EXP = { v: 'El <span class="kv">valor variable</span> es el número escondido: no lo conocemos.', c: 'Los <span class="kc">valores constantes</span> son los números fijos que sí conocemos.', i: 'La <span class="ki">igualdad</span> es el signo =: los dos lados valen lo mismo.', o: 'El signo + o − nos dice qué operación hacemos.' };
+  $('ecu6').innerHTML = T6.map(t => `<div class="tok" data-k="${t[1]}"><div>${t[0]}</div><span>${NOM[t[1]]}</span></div>`).join('');
+  document.querySelectorAll('[data-p]').forEach(b => b.onclick = () => {
+    const k = b.dataset.p;
+    document.querySelectorAll('#ecu6 .tok').forEach(t => { if (t.dataset.k === k) t.classList.add(k); });
+    $('t6').innerHTML = EXP[k]; bien();
+  });
+
+  // ---------- lámina 7: practicamos ----------
+  const P7 = [
+    { t: `3 + ${Q} = 10`, izq: [3], der: [10], lado: -1, v: 7 },
+    { t: `${Q} + 2 = 8`, izq: [2], der: [8], lado: -1, v: 6 },
+    { t: `9 = ${Q} + 4`, izq: [9], der: [4], lado: 1, v: 5 },
+  ];
+  function cargar7(n) {
+    const p = P7[n]; marcar('it7', n);
+    $('e7').innerHTML = p.t; avisar('m7', 'Primero piensen: ¿qué número es? Luego lo comprobamos con la balanza.');
+    crearBalanza($('b7'), { izq: p.izq, der: p.der, ladoQ: p.lado, alCambiar: (L, R, e, st) => {
+      if (e === 'otro') return avisar('m7', `La pesa ? va en el lado ${p.lado < 0 ? 'izquierdo' : 'derecho'}.`, false);
+      if (e === 'eq') { avisar('m7', `¡Sí! ${Q} = ${st.q}. Comprobamos: ${p.t.replace(Q, st.q)} ✔`, true); fanfarria(); $('it7').children[n].classList.add('hecho'); }
+      else if (e === 'des') avisar('m7', 'Todavía no queda derecha. Prueba otro número.', false);
+    } });
+  }
+  hacerItems('it7', P7.length, cargar7);
+
+  // ---------- lámina 8: desafío ----------
+  const P8 = [
+    { p: '¿Cuál es una ecuación?', ops: [`5 + ${Q} = 8`, '5 + 3', '5 + 3 = 8', '8'] },
+    { p: `¿Cuánto vale ${Q}?`, e: `${Q} + 5 = 9`, ops: ['4', '14', '9', '5'] },
+    { p: 'En 7 + x = 10, ¿cuál es el valor variable?', ops: ['x', '7', '10', '='] },
+    { p: `¿Cuánto vale ${Q}?`, e: `10 = 6 + ${Q}`, ops: ['4', '16', '6', '10'] },
+  ];
+  const mezclar = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+  function cargar8(n) {
+    const p = P8[n], ok = p.ops[0], ops = mezclar(p.ops); marcar('it8', n);
+    $('p8').innerHTML = p.p; $('e8').innerHTML = p.e || ''; avisar('m8', '');
+    $('o8').innerHTML = ops.map((o, j) => `<button class="op" data-j="${j}">${o}</button>`).join('');
+    let listo = false;
+    $('o8').querySelectorAll('.op').forEach(b => b.onclick = () => {
+      if (listo) return; listo = true;
+      const bueno = ops[+b.dataset.j] === ok;
+      $('o8').querySelectorAll('.op').forEach(x => { const es = ops[+x.dataset.j] === ok; x.classList.toggle('bien', es); x.classList.toggle('atenuar', !es && x !== b); });
+      bueno ? (bien(), avisar('m8', '¡Correcto!', true)) : (mal(), avisar('m8', 'La respuesta era: ' + ok, false));
+      if (bueno) $('it8').children[n].classList.add('hecho');
+    });
+  }
+  hacerItems('it8', P8.length, cargar8);
+
+  function hacerItems(id, n, fn) {
+    $(id).innerHTML = Array.from({ length: n }, (_, i) => `<button class="item">${String.fromCharCode(97 + i)})</button>`).join('');
+    [...$(id).children].forEach((b, i) => b.onclick = () => fn(i));
+    fn(0);
+  }
+  function marcar(id, n) { [...$(id).children].forEach((b, i) => b.classList.toggle('on', i === n)); }
+
+  // ---------- revelar de a poco ----------
+  document.querySelectorAll('.revelar').forEach(b => b.onclick = () => {
+    const sig = [...b.closest('.lam').querySelectorAll('.paso')].find(p => !p.classList.contains('ver'));
+    if (sig) { sig.classList.add('ver'); tono([700], .06); }
+    if (![...b.closest('.lam').querySelectorAll('.paso')].some(p => !p.classList.contains('ver'))) b.style.visibility = 'hidden';
+  });
+  // lámina 5: al encontrar el 5 se muestran los pasos
+  const obs5 = new MutationObserver(() => { if ($('m5').classList.contains('ok')) document.querySelectorAll('.lam')[4].querySelectorAll('.paso').forEach((p, i) => setTimeout(() => p.classList.add('ver'), 700 + i * 1200)); });
+  obs5.observe($('m5'), { attributes: true, attributeFilter: ['class'] });
+
+  // ---------- navegación ----------
+  const lams = [...document.querySelectorAll('.lam')];
+  const MOM = { ini: ['Inicio', 'm-ini'], des: ['Desarrollo', 'm-des'], cie: ['Cierre', 'm-cie'] };
+  let actual = 0;
+  $('puntos').innerHTML = lams.map((_, i) => `<button class="punto" title="Lámina ${i + 1}"></button>`).join('');
+  const puntos = [...$('puntos').children];
+  puntos.forEach((p, i) => p.onclick = () => ir(i));
+  function ir(n) {
+    actual = Math.max(0, Math.min(lams.length - 1, n));
+    lams.forEach((l, i) => l.classList.toggle('on', i === actual));
+    puntos.forEach((p, i) => { p.classList.toggle('on', i === actual); if (i < actual) p.classList.add('visto'); });
+    const m = MOM[lams[actual].dataset.m]; $('momento').textContent = m[0]; $('momento').className = 'momento ' + m[1];
+    $('ant').disabled = actual === 0; $('sig').style.visibility = actual === lams.length - 1 ? 'hidden' : 'visible';
+    $('main').scrollTop = 0;
+  }
+  $('ant').onclick = () => ir(actual - 1); $('sig').onclick = () => ir(actual + 1);
+  addEventListener('keydown', e => {
+    if (e.target.closest && e.target.closest('input,textarea')) return;
+    if (e.key === 'ArrowRight' || e.key === 'PageDown') ir(actual + 1);
+    if (e.key === 'ArrowLeft' || e.key === 'PageUp') ir(actual - 1);
+  });
+  ir(0);
+})();
+</script>
+<script>
+  // ---------- Temporizador ----------
+  (() => {
+    const T = document.getElementById('timer'), disp = document.getElementById('tDisp'),
+          barra = document.querySelector('#tBarra i'), play = document.getElementById('tPlay');
+    let dur = 600, resta = 600, corriendo = false, fin = 0, tick = null, audio = null;
+    try { const g = +localStorage.getItem('clase-ecuaciones-timer'); if (g > 0) dur = resta = g; } catch (e) {}
+    const pintar = () => {
+      const s = Math.max(0, Math.ceil(resta));
+      disp.textContent = Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
+      barra.style.width = (dur ? Math.max(0, resta / dur) * 100 : 0) + '%';
+      T.classList.toggle('poco', s > 0 && s <= 60);
+      play.textContent = corriendo ? '❚❚' : '▶';
+    };
+    const pitar = () => {
+      try {
+        audio = audio || new (window.AudioContext || window.webkitAudioContext)();
+        [0, .35, .7].forEach(t => {
+          const o = audio.createOscillator(), g = audio.createGain();
+          o.frequency.value = 880; o.connect(g); g.connect(audio.destination);
+          g.gain.setValueAtTime(.0001, audio.currentTime + t);
+          g.gain.exponentialRampToValueAtTime(.4, audio.currentTime + t + .02);
+          g.gain.exponentialRampToValueAtTime(.0001, audio.currentTime + t + .28);
+          o.start(audio.currentTime + t); o.stop(audio.currentTime + t + .3);
+        });
+      } catch (e) {}
+    };
+    const parar = () => { corriendo = false; clearInterval(tick); pintar(); };
+    const iniciar = () => {
+      if (resta <= 0) return;
+      try { audio = audio || new (window.AudioContext || window.webkitAudioContext)(); audio.resume && audio.resume(); } catch (e) {}
+      corriendo = true; fin = Date.now() + resta * 1000;
+      clearInterval(tick);
+      tick = setInterval(() => {
+        resta = (fin - Date.now()) / 1000;
+        if (resta <= 0) { resta = 0; parar(); T.classList.add('fin'); pitar(); return; }
+        pintar();
+      }, 250);
+      pintar();
+    };
+    const alternar = () => { if (T.classList.contains('fin')) { reiniciar(); return; } corriendo ? parar() : iniciar(); };
+    const reiniciar = () => { parar(); T.classList.remove('fin'); resta = dur; pintar(); };
+    const fijar = m => { parar(); T.classList.remove('fin'); dur = resta = m * 60;
+      try { localStorage.setItem('clase-ecuaciones-timer', dur); } catch (e) {} pintar(); };
+    const sumar = d => {
+      T.classList.remove('fin');
+      resta = Math.max(0, resta + d); dur = Math.max(dur + d, resta, 60);
+      if (corriendo) fin = Date.now() + resta * 1000;
+      if (resta <= 0) parar();
+      pintar();
+    };
+    play.onclick = alternar;
+    // Arrastrar el temporizador por la pantalla (tocar los números = iniciar/pausar)
+    let arr = null;
+    const ubicarT = (x, y) => {
+      const r = T.getBoundingClientRect();
+      x = Math.min(Math.max(0, x), innerWidth - r.width); y = Math.min(Math.max(0, y), innerHeight - r.height);
+      T.style.left = x + 'px'; T.style.top = y + 'px';
+    };
+    try { const g = JSON.parse(localStorage.getItem('clase-ecuaciones-timer-pos') || 'null');
+      if (g) requestAnimationFrame(() => ubicarT(g.fx * innerWidth, g.fy * innerHeight)); } catch (e) {}
+    T.addEventListener('pointerdown', e => {
+      if (e.target.closest('button')) return;
+      const r = T.getBoundingClientRect();
+      arr = {id: e.pointerId, dx: e.clientX - r.left, dy: e.clientY - r.top, x0: e.clientX, y0: e.clientY, movido: false, enDisp: !!e.target.closest('#tDisp')};
+      T.setPointerCapture(e.pointerId);
+    });
+    T.addEventListener('pointermove', e => {
+      if (!arr || e.pointerId !== arr.id) return;
+      if (!arr.movido && Math.hypot(e.clientX - arr.x0, e.clientY - arr.y0) < 6) return;
+      arr.movido = true; T.classList.add('moviendo');
+      ubicarT(e.clientX - arr.dx, e.clientY - arr.dy);
+    });
+    const soltarT = e => {
+      if (!arr || e.pointerId !== arr.id) return;
+      T.classList.remove('moviendo');
+      if (arr.movido) {
+        const r = T.getBoundingClientRect();
+        try { localStorage.setItem('clase-ecuaciones-timer-pos', JSON.stringify({fx: r.left / innerWidth, fy: r.top / innerHeight})); } catch (err) {}
+      } else if (e.type === 'pointerup' && arr.enDisp) alternar();
+      arr = null;
+    };
+    T.addEventListener('pointerup', soltarT); T.addEventListener('pointercancel', soltarT);
+    addEventListener('resize', () => { const r = T.getBoundingClientRect(); ubicarT(r.left, r.top); });
+    document.getElementById('tReset').onclick = reiniciar;
+    document.getElementById('tMas').onclick = () => sumar(60);
+    document.getElementById('tMenos').onclick = () => sumar(-60);
+    T.querySelectorAll('.pre button').forEach(b => b.onclick = () => fijar(+b.dataset.m));
+    document.getElementById('tMini').onclick = () => {
+      const mini = T.classList.toggle('mini');
+      document.getElementById('tMini').textContent = mini ? '+' : '–';
+    };
+    pintar();
+  })();
+
+</script>
+</body>
+</html>
