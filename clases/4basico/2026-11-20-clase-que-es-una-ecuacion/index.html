@@ -146,7 +146,7 @@
     <div class="tarj bal" id="bL"></div>
     <div class="cuentas" id="cL"></div>
     <div class="msg" id="mL"></div>
-    <div class="fila"><button class="btn sec" id="qL">↶ Quitar la última</button><button class="btn sec" id="vL">Vaciar</button></div>
+    <div class="fila"><button class="btn sec" id="qL">↶ Deshacer</button><button class="btn sec" id="rL">↷ Rehacer</button><button class="btn sec" id="vL">Vaciar</button></div>
   </section>
 
   <!-- 3. El signo = -->
@@ -159,17 +159,6 @@
     <button class="btn revelar">Mostrar ▸</button>
   </section>
 
-  <!-- 4. ¿Queda derecha? -->
-  <section class="lam" data-m="des">
-    <h2>¿La balanza queda derecha?</h2>
-    <div class="items" id="it4"></div>
-    <div class="grande" id="e4"></div>
-    <p class="sub">Piensen primero: ¿sí o no?</p>
-    <div class="fila"><button class="btn si" id="si4">Sí, queda derecha</button><button class="btn no" id="no4">No, se inclina</button></div>
-    <div class="tarj bal" id="b4" style="min-height:120px"></div>
-    <div class="msg" id="m4"></div>
-  </section>
-
   <!-- 4b. Completa para equilibrar -->
   <section class="lam" data-m="des">
     <h2>Completa para equilibrar</h2>
@@ -177,19 +166,8 @@
     <div class="grande" id="eC"></div>
     <div class="tarj bal" id="bC"></div>
     <div class="msg" id="mC"></div>
-    <div class="fila"><button class="btn sec" id="qC">↶ Quitar la última</button><button class="btn sec" id="vC">Vaciar</button></div>
+    <div class="fila"><button class="btn sec" id="qC">↶ Deshacer</button><button class="btn sec" id="rC">↷ Rehacer</button><button class="btn sec" id="vC">Vaciar</button></div>
     <p class="sub" id="solC"></p>
-  </section>
-
-  <!-- 5. El número escondido -->
-  <section class="lam" data-m="des">
-    <h2>El número escondido</h2>
-    <p class="sub">Hay una pesa <b style="color:#c46a00">?</b> que no sabemos dónde va. ¡Busquémosla!</p>
-    <div class="tarj bal" id="b5"></div>
-    <div class="cuentas" id="c5"></div>
-    <div class="msg" id="m5"></div>
-    <div class="paso"><div class="grande">4 + <span class="q"></span> = 9 &nbsp;→&nbsp; <span class="q"></span> = 5</div></div>
-    <div class="paso"><div class="obj">Una igualdad con un número escondido se llama <b>ecuación</b>. El número escondido lo escribimos con un cuadrado <span class="q"></span> o con una letra.</div></div>
   </section>
 
   <!-- 6. Definición y partes -->
@@ -299,7 +277,7 @@
     el('rect', { x: CX - 13, y: BY - 7, width: 26, height: BH + 14, rx: 4, fill: '#d93a2f' }, svg);
     el('circle', { cx: CX, cy: BY + 8, r: 4.5, fill: '#222' }, svg);
     const suelta = el('g', {}, svg);
-    const st = { fijas: { '-1': [...(op.izq || [])], '1': [...(op.der || [])] }, puestas: { '-1': [], '1': [] }, q: null, ang: 0, vel: 0, obj: 0, colg: [], hist: [] };
+    const st = { fijas: { '-1': [...(op.izq || [])], '1': [...(op.der || [])] }, puestas: { '-1': [], '1': [] }, q: null, ang: 0, vel: 0, obj: 0, colg: [], hist: [], rehacer: [] };
     const interactiva = op.ladoQ || op.libre;
     if (interactiva) for (const sd of [-1, 1]) for (let k = 1; k <= 10; k++) {
       const g = el('g', { class: 'col' }, cols), x = CX + px(sd, k);
@@ -317,7 +295,7 @@
         const enK = st.fijas[sd].concat(st.puestas[sd]).filter(x => x === k).length;
         if (enK >= 4) { op.alCambiar && op.alCambiar(null, null, 'lleno'); return; }
         if (op.max && st.puestas[sd].length >= op.max) { op.alCambiar && op.alCambiar(null, null, 'max'); return; }
-        st.puestas[sd].push(k); st.hist.push(sd);
+        st.puestas[sd].push(k); st.hist.push(sd); st.rehacer = [];
       } else if (op.libre) {
         if (op.ladoLibre && sd !== op.ladoLibre) { op.alCambiar && op.alCambiar(null, null, 'otro'); return; }
         const arr = st.puestas[sd]; const i = arr.indexOf(k);
@@ -355,9 +333,10 @@
       st.obj = Math.max(-13, Math.min(13, (R - L) * 1.3));
       op.alCambiar && op.alCambiar(L, R, listo ? (L === R ? 'eq' : 'des') : 'falta', st);
     }
-    const quitar = () => { const sd = st.hist.pop(); if (sd == null) return; st.puestas[sd].pop(); pintar(); };
-    const vaciar = () => { st.puestas = { '-1': [], '1': [] }; st.hist = []; pintar(); };
-    const b = { st, pintar, svg, viga, bloquear: v => st.bloq = v, total, quitar, vaciar };
+    const quitar = () => { const sd = st.hist.pop(); if (sd == null) return; st.rehacer.push([sd, st.puestas[sd].pop()]); pintar(); };
+    const rehacer = () => { const r = st.rehacer.pop(); if (!r) return; st.puestas[r[0]].push(r[1]); st.hist.push(r[0]); pintar(); };
+    const vaciar = () => { const todo = []; while (st.hist.length) { const sd = st.hist.pop(); todo.push([sd, st.puestas[sd].pop()]); } st.rehacer = st.rehacer.concat(todo); pintar(); };
+    const b = { st, pintar, svg, viga, bloquear: v => st.bloq = v, total, quitar, rehacer, vaciar };
     balanzas.push(b); pintar();
     return b;
   }
@@ -397,7 +376,7 @@
     if (eq && !eqL) { avisar('mL', '¡La balanza está en equilibrio!', true); fanfarria(); } else if (!eq) avisar('mL', '');
     eqL = eq;
   } });
-  $('qL').onclick = bL.quitar; $('vL').onclick = bL.vaciar;
+  $('qL').onclick = bL.quitar; $('rL').onclick = bL.rehacer; $('vL').onclick = bL.vaciar;
 
   // ---------- completa para equilibrar ----------
   const PC = [
@@ -429,45 +408,12 @@
       } else avisar('mC', L > R ? 'Se pasó: el lado izquierdo pesa más. Quita y prueba un número menor.' : 'Todavía falta: el lado derecho pesa más.', false);
     } });
   }
-  $('qC').onclick = () => bC && bC.quitar(); $('vC').onclick = () => bC && bC.vaciar();
+  $('qC').onclick = () => bC && bC.quitar(); $('rC').onclick = () => bC && bC.rehacer(); $('vC').onclick = () => bC && bC.vaciar();
 
   // ---------- lámina 3: el signo = ----------
   crearBalanza($('b3'), { izq: [6, 4], der: [10] });
 
-  // ---------- lámina 4: ¿queda derecha? ----------
-  const P4 = [{ i: [3, 5], d: [8] }, { i: [4, 4], d: [9] }, { i: [7, 3], d: [6, 4] }, { i: [2, 6], d: [7] }];
-  let i4 = 0;
-  const suma = a => a.join(' + ');
-  function cargar4(n) {
-    i4 = n; const p = P4[n];
-    $('e4').innerHTML = `${suma(p.i)} &nbsp;<span style="color:#5b6a86">¿?</span>&nbsp; ${suma(p.d)}`;
-    $('b4').innerHTML = '<p class="sub" style="padding:30px 0">Elijan su respuesta y luego comprobamos en la balanza.</p>';
-    avisar('m4', ''); marcar('it4', n);
-  }
-  function resp4(dijoSi) {
-    const p = P4[i4], L = p.i.reduce((a, b) => a + b), R = p.d.reduce((a, b) => a + b), eq = L === R;
-    const b = crearBalanza($('b4'), { izq: p.i, der: p.d });
-    const ok = dijoSi === eq;
-    setTimeout(() => {
-      avisar('m4', (ok ? '¡Bien! ' : 'Mira la balanza: ') + (eq ? `Queda derecha: ${suma(p.i)} = ${suma(p.d)} (${L} = ${R}).` : `Se inclina: ${L} no es igual a ${R}.`), ok);
-      ok ? bien() : mal();
-      $('it4').children[i4].classList.add('hecho');
-    }, 700);
-  }
-  $('si4').onclick = () => resp4(true); $('no4').onclick = () => resp4(false);
-  hacerItems('it4', P4.length, cargar4);
   hacerItems('itC', PC.length, cargarC);
-
-  // ---------- lámina 5: número escondido ----------
-  crearBalanza($('b5'), { izq: [4], der: [9], ladoQ: -1, alCambiar: (L, R, e, st) => {
-    if (e === 'otro') return avisar('m5', 'La pesa ? va en el lado izquierdo.', false);
-    $('c5').innerHTML = `<div class="lado"><div class="t">Izquierda</div><div class="s">4 + ${st.q ? `<span style="color:#c46a00">${st.q}</span> <em>= ${L}</em>` : Q}</div></div>
-      <div class="signo ${e === 'eq' ? 'ok' : e === 'falta' ? 'neutro' : ''}">${e === 'eq' ? '=' : e === 'falta' ? '?' : L > R ? '>' : '<'}</div>
-      <div class="lado"><div class="t">Derecha</div><div class="s">9</div></div>`;
-    if (e === 'eq') { avisar('m5', '¡Encontramos el número escondido! Es el 5.', true); fanfarria(); }
-    else if (e === 'des') avisar('m5', 'Todavía no queda derecha. Prueba otro número.', false);
-    else avisar('m5', 'Toca un número del lado izquierdo para colgar la pesa ?');
-  } });
 
   // ---------- lámina 6: partes ----------
   const T6 = [['4', 'c'], ['+', 'o'], [Q, 'v'], ['=', 'i'], ['9', 'c']];
@@ -485,6 +431,9 @@
     { t: `3 + ${Q} = 10`, izq: [3], der: [10], lado: -1, v: 7 },
     { t: `${Q} + 2 = 8`, izq: [2], der: [8], lado: -1, v: 6 },
     { t: `9 = ${Q} + 4`, izq: [9], der: [4], lado: 1, v: 5 },
+    { t: `5 + ${Q} = 9`, izq: [5], der: [9], lado: -1, v: 4 },
+    { t: `${Q} + 3 = 10`, izq: [3], der: [10], lado: -1, v: 7 },
+    { t: `8 = 2 + ${Q}`, izq: [8], der: [2], lado: 1, v: 6 },
   ];
   function cargar7(n) {
     const p = P7[n]; marcar('it7', n);
@@ -533,9 +482,6 @@
     if (sig) { sig.classList.add('ver'); tono([700], .06); }
     if (![...b.closest('.lam').querySelectorAll('.paso')].some(p => !p.classList.contains('ver'))) b.style.visibility = 'hidden';
   });
-  // lámina 5: al encontrar el 5 se muestran los pasos
-  const obs5 = new MutationObserver(() => { if ($('m5').classList.contains('ok')) $('m5').closest('.lam').querySelectorAll('.paso').forEach((p, i) => setTimeout(() => p.classList.add('ver'), 700 + i * 1200)); });
-  obs5.observe($('m5'), { attributes: true, attributeFilter: ['class'] });
 
   // ---------- navegación ----------
   const lams = [...document.querySelectorAll('.lam')];
