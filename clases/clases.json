@@ -17,6 +17,20 @@
     {
       "curso": "4basico",
       "asignatura": "Matemática",
+      "fecha": "2026-11-24",
+      "titulo": "Guía: inverso aditivo y propiedad de la igualdad",
+      "descripcion": "Guía individual para imprimir (4 páginas), continuación de la guía de balanzas: 1) el inverso aditivo (tabla de 6 números y 3 balanzas inclinadas para volver a equilibrar), 2) la propiedad de la igualdad (4 balanzas para completar y una para decidir si sigue derecha), 3) resolver 8 ecuaciones usando el inverso aditivo en los dos lados y comprobando, 4) tres problemas y 5) cierre. Cada ejercicio trae su balanza de platillos de referencia y recuadros para responder.",
+      "carpeta": "4basico/2026-11-24-guia-inverso-aditivo/",
+      "materiales": [
+        {
+          "nombre": "Guía (PDF)",
+          "archivo": "guia.pdf"
+        }
+      ]
+    },
+    {
+      "curso": "4basico",
+      "asignatura": "Matemática",
       "fecha": "2026-11-23",
       "titulo": "Inverso aditivo y propiedad de la igualdad: lo que hago en un lado, lo hago en el otro",
       "descripcion": "Clase para proyectar, paso a paso (OA 14), todo con la balanza. Objetivo para copiar en el cuaderno. Parte 1, inverso aditivo: definición (+5 − 5 = 0, −3 + 3 = 0) y 3 ejercicios con corrección. Parte 2, propiedad de la igualdad: definición (lo que hago en un lado, lo hago en el otro) y 3 ejercicios con corrección. Parte 3, resolver ecuaciones: lámina que junta las dos ideas, dos ejemplos (▢ + 5 = 12 y ▢ − 4 = 10) con comprobación, «¡Recuerda!» y 8 ecuaciones para el cuaderno con corrección paso a paso. Se avanza con botones o flechas; incluye pantalla completa.",
