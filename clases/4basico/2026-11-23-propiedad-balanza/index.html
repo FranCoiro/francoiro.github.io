@@ -37,6 +37,18 @@ h1{font:800 clamp(28px,4.2vw,46px)/1.05 "Baloo 2",sans-serif;margin:0;text-wrap:
 .final{display:grid;gap:10px}
 .final p{margin:0;font:800 clamp(22px,3.4vw,38px)/1.2 "Baloo 2",sans-serif}
 .final .big{font-size:clamp(30px,5vw,56px)}
+.cubes{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font:800 clamp(22px,3vw,34px) "Baloo 2",sans-serif}
+.cb{display:inline-block;width:clamp(26px,3.4vw,40px);aspect-ratio:1;border-radius:7px;background:var(--cube);box-shadow:inset 0 -6px 0 var(--cubeD);position:relative}
+.cb.n{background:var(--green);box-shadow:inset 0 -6px 0 #0c7a43}
+.cb.h{background:none;box-shadow:none;border:3px dashed var(--soft)}
+.cb.x{opacity:.4}.cb.x::after{content:"✕";position:absolute;inset:0;display:grid;place-items:center;color:var(--red);font:900 clamp(22px,3vw,34px)/1 Nunito,sans-serif}
+.def{font:800 clamp(22px,3.2vw,36px)/1.25 "Baloo 2",sans-serif;margin:0;text-wrap:balance}
+.def .k{background:var(--box);color:#fff;border-radius:.2em;padding:0 .2em}
+.items{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:10px 28px;margin:6px 0 0;padding:0;list-style:none;counter-reset:it}
+.items li{font:800 clamp(22px,3vw,34px)/1.3 "Baloo 2",sans-serif;counter-increment:it}
+.items li::before{content:counter(it) ") ";color:var(--soft)}
+.items .ans{color:var(--green)}
+.obj{font:800 clamp(28px,4.4vw,50px)/1.15 "Baloo 2",sans-serif;margin:0;text-wrap:balance}
 nav{display:flex;justify-content:center;gap:14px;padding:14px 16px 18px}
 button{font:800 18px Nunito,sans-serif;min-height:52px;padding:0 26px;border-radius:999px;border:2px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer}
 button.main{background:var(--cube);border-color:var(--cube);color:#fff}
@@ -69,18 +81,27 @@ const C=(n,st)=>Array.from({length:n},()=>({k:'c',st:st||''}));
 const BOX=(v)=>({k:'b',v:v??'?'});
 const H=(n,st)=>Array.from({length:n},()=>({k:'h',st:st||''}));
 const bx=s=>`<span class="bx">${s}</span>`;
+const cb=(n,c)=>`<span class="cb ${c||''}"></span>`.repeat(n);
 const steps=[
- {tag:'Ejemplo 1',t:'Una balanza equilibrada',x:'Los dos platillos pesan lo mismo. Eso es una <b>igualdad</b>.',L:[BOX(),...C(5)],R:C(12),tilt:0,eq:''},
- {tag:'Ejemplo 1',t:'La escribimos con números',x:'La caja vale un número que no conocemos.',L:[BOX(),...C(5)],R:C(12),tilt:0,eq:`${bx('?')} + 5 = 12`},
- {tag:'Ejemplo 1',t:'¿Y si saco 5 cubos solo de un lado?',x:'¡Se desequilibra! Ya no es una igualdad.',L:[BOX(),...C(5,'x')],R:C(12),tilt:1,eq:`${bx('?')} + 5 <span class="r">− 5</span> ≠ 12`},
- {tag:'Ejemplo 1',t:'Saco 5 del otro lado también',x:'<b>Lo que hago en un lado, lo hago en el otro.</b> ¡Equilibrada otra vez!',L:[BOX(),...C(5,'x')],R:[...C(7),...C(5,'x')],tilt:0,eq:`${bx('?')} + 5 <span class="r">− 5</span> = 12 <span class="r">− 5</span>`},
- {tag:'Ejemplo 1',t:'La caja queda sola',x:'Al otro lado quedaron 7 cubos.',L:[BOX()],R:C(7),tilt:0,eq:`${bx('?')} = 7`},
- {tag:'Ejemplo 1',t:'Compruebo',x:'Pongo 7 en la caja y reviso si la igualdad se cumple.',L:[BOX(7),...C(5)],R:C(12),tilt:0,eq:`7 + 5 = 12 <span class="ok">✓</span>`},
- {tag:'Ejemplo 2',t:'Ahora con resta',x:'A la caja le <b>quitaron 4</b>. Los cuadrados punteados son lo que le falta.',L:[BOX(),...H(4)],R:C(10),tilt:0,eq:`${bx('?')} − 4 = 10`},
- {tag:'Ejemplo 2',t:'Le devuelvo los 4',x:'Si hay <b>−</b>, hago <b>+</b>. Pero ahora el lado izquierdo pesa más…',L:[BOX(),...H(4,'f')],R:C(10),tilt:-1,eq:`${bx('?')} − 4 <span class="g">+ 4</span> ≠ 10`},
- {tag:'Ejemplo 2',t:'…y agrego 4 al otro lado',x:'<b>Lo que hago en un lado, lo hago en el otro.</b>',L:[BOX(),...H(4,'f')],R:[...C(10),...C(4,'n')],tilt:0,eq:`${bx('?')} − 4 <span class="g">+ 4</span> = 10 <span class="g">+ 4</span>`},
- {tag:'Ejemplo 2',t:'La caja queda sola',x:'Al otro lado hay 14 cubos.',L:[BOX()],R:C(14),tilt:0,eq:`${bx('?')} = 14`},
- {tag:'Ejemplo 2',t:'Compruebo',x:'Pongo 14 en la caja: si le quito 4, ¿quedan 10?',L:[BOX(14),...H(4)],R:C(10),tilt:0,eq:`14 − 4 = 10 <span class="ok">✓</span>`},
+ {tag:'Objetivo',html:`<p class="txt">Copia el objetivo en tu cuaderno:</p><p class="obj">Resolver ecuaciones de un paso usando el <span style="color:var(--box)">inverso aditivo</span> y la <span style="color:var(--cube)">propiedad de la igualdad</span>.</p>`},
+ {tag:'Parte 1 · Inverso aditivo',html:`<h1>Tengo 7 cubos y agrego 5</h1><div class="cubes">${cb(7)}<span>+</span>${cb(5,'n')}</div><p class="eq">7 <span class="g">+ 5</span> = 12</p>`},
+ {tag:'Parte 1 · Inverso aditivo',html:`<h1>Ahora quito esos 5</h1><div class="cubes">${cb(7)}<span>+</span>${cb(5,'n x')}</div><p class="eq">7 <span class="g">+ 5</span> <span class="r">− 5</span> = 7</p><p class="txt">¡Volví a tener 7! Agregar 5 y quitar 5 <b>se anulan</b>: <b>+5 − 5 = 0</b>.</p>`},
+ {tag:'Parte 1 · Inverso aditivo',html:`<h1>También al revés</h1><div class="cubes">${cb(6)}${cb(3,'h')}</div><p class="txt">A 9 cubos le quitaron 3: quedan 6. Si le devuelvo 3, vuelvo a tener 9.</p><p class="eq">9 <span class="r">− 3</span> <span class="g">+ 3</span> = 9</p><p class="txt"><b>−3 + 3 = 0</b></p>`},
+ {tag:'Parte 1 · Inverso aditivo',html:`<p class="def">El <span class="k">inverso aditivo</span> de un número es el que, sumado con él, da <b>0</b>.</p><ul class="items" style="counter-reset:none"><li style="counter-increment:none">El inverso aditivo de <span class="g" style="color:var(--green)">+5</span> es <span style="color:var(--red)">−5</span> → +5 − 5 = 0</li><li style="counter-increment:none">El inverso aditivo de <span style="color:var(--red)">−3</span> es <span style="color:var(--green)">+3</span> → −3 + 3 = 0</li><li style="counter-increment:none">El inverso aditivo de <span style="color:var(--green)">+12</span> es <span style="color:var(--red)">−12</span> → +12 − 12 = 0</li></ul>`},
+ ...[false,true].map(sol=>{const q=[['El inverso aditivo de +8 es','−8'],['El inverso aditivo de −6 es','+6'],['+9 ___ = 0','−9'],['15 + 4 − 4 =','15'],['20 − 7 + 7 =','20'],['x + 3 − 3 =','x']];
+   return {tag:'Parte 1 · Ahora tú',html:`<h1>${sol?'Corregimos':'Resuelve en tu cuaderno'}</h1><ol class="items">${q.map(([a,b])=>a.includes('___')?`<li>${sol?a.replace('___',`<span class="ans">${b}</span>`):a}</li>`:`<li>${a} ${sol?`<span class="ans">${b}</span>`:'___'}</li>`).join('')}</ol>`}}),
+ {tag:'Parte 1 · Inverso aditivo',html:`<h1>¿Para qué me sirve?</h1><p class="txt">Para <b>dejar sola la x</b>: uso el inverso aditivo de lo que acompaña a la x.</p><p class="eq">x <span class="g">+ 5</span> <span class="r">− 5</span> = x</p><p class="eq">x <span class="r">− 4</span> <span class="g">+ 4</span> = x</p><p class="txt">Pero en una ecuación hay <b>dos lados</b>… ¡veamos qué pasa con la balanza!</p>`},
+ {tag:'Parte 2 · Propiedad de la igualdad · ejemplo 1',t:'Una balanza equilibrada',x:'Los dos platillos pesan lo mismo. Eso es una <b>igualdad</b>. Si cambio algo en un lado, tengo que hacer lo mismo en el otro.',L:[BOX(),...C(5)],R:C(12),tilt:0,eq:''},
+ {tag:'Parte 2 · Propiedad de la igualdad · ejemplo 1',t:'La escribimos con números',x:'Para dejar sola la caja, uso el inverso aditivo de +5, que es <b>−5</b>.',L:[BOX(),...C(5)],R:C(12),tilt:0,eq:`${bx('?')} + 5 = 12`},
+ {tag:'Parte 2 · Propiedad de la igualdad · ejemplo 1',t:'¿Y si saco 5 cubos solo de un lado?',x:'¡Se desequilibra! Ya no es una igualdad.',L:[BOX(),...C(5,'x')],R:C(12),tilt:1,eq:`${bx('?')} + 5 <span class="r">− 5</span> ≠ 12`},
+ {tag:'Parte 2 · Propiedad de la igualdad · ejemplo 1',t:'Saco 5 del otro lado también',x:'<b>Lo que hago en un lado, lo hago en el otro.</b> ¡Equilibrada otra vez!',L:[BOX(),...C(5,'x')],R:[...C(7),...C(5,'x')],tilt:0,eq:`${bx('?')} + 5 <span class="r">− 5</span> = 12 <span class="r">− 5</span>`},
+ {tag:'Parte 2 · Propiedad de la igualdad · ejemplo 1',t:'La caja queda sola',x:'Al otro lado quedaron 7 cubos.',L:[BOX()],R:C(7),tilt:0,eq:`${bx('?')} = 7`},
+ {tag:'Parte 2 · Propiedad de la igualdad · ejemplo 1',t:'Compruebo',x:'Pongo 7 en la caja y reviso si la igualdad se cumple.',L:[BOX(7),...C(5)],R:C(12),tilt:0,eq:`7 + 5 = 12 <span class="ok">✓</span>`},
+ {tag:'Parte 2 · Propiedad de la igualdad · ejemplo 2',t:'Ahora con resta',x:'A la caja le <b>quitaron 4</b>. Los cuadrados punteados son lo que le falta.',L:[BOX(),...H(4)],R:C(10),tilt:0,eq:`${bx('?')} − 4 = 10`},
+ {tag:'Parte 2 · Propiedad de la igualdad · ejemplo 2',t:'Le devuelvo los 4',x:'El inverso aditivo de −4 es <b>+4</b>. Pero ahora el lado izquierdo pesa más…',L:[BOX(),...H(4,'f')],R:C(10),tilt:-1,eq:`${bx('?')} − 4 <span class="g">+ 4</span> ≠ 10`},
+ {tag:'Parte 2 · Propiedad de la igualdad · ejemplo 2',t:'…y agrego 4 al otro lado',x:'<b>Lo que hago en un lado, lo hago en el otro.</b>',L:[BOX(),...H(4,'f')],R:[...C(10),...C(4,'n')],tilt:0,eq:`${bx('?')} − 4 <span class="g">+ 4</span> = 10 <span class="g">+ 4</span>`},
+ {tag:'Parte 2 · Propiedad de la igualdad · ejemplo 2',t:'La caja queda sola',x:'Al otro lado hay 14 cubos.',L:[BOX()],R:C(14),tilt:0,eq:`${bx('?')} = 14`},
+ {tag:'Parte 2 · Propiedad de la igualdad · ejemplo 2',t:'Compruebo',x:'Pongo 14 en la caja: si le quito 4, ¿quedan 10?',L:[BOX(14),...H(4)],R:C(10),tilt:0,eq:`14 − 4 = 10 <span class="ok">✓</span>`},
  {tag:'¡Recuerda!',fin:true,L:[BOX()],R:C(0),tilt:0}
 ];
 const T=(v,st)=>({k:'t',v,st:st||''});
@@ -148,16 +169,16 @@ function pan(items){
 let i=0;
 dots.innerHTML=steps.map(()=>'<i></i>').join('');
 function render(){
-  const st=steps[i],a=st.tilt*ANG,r=a*Math.PI/180;
+  const st=steps[i],a=(st.tilt||0)*ANG,r=a*Math.PI/180;
   beam.style.transform=`rotate(${a}deg)`;
   const lx=PX-ARM*Math.cos(r),ly=PY-ARM*Math.sin(r),rx=PX+ARM*Math.cos(r),ry=PY+ARM*Math.sin(r);
   panL.style.transform=`translate(${lx}px,${ly}px)`;panR.style.transform=`translate(${rx}px,${ry}px)`;
-  panL.innerHTML=pan(st.L);panR.innerHTML=pan(st.R);
+  panL.innerHTML=pan(st.L||[]);panR.innerHTML=pan(st.R||[]);
   tag.innerHTML=`<b>${st.tag}</b> · paso ${i+1} de ${steps.length}`;
   [...dots.children].forEach((d,k)=>d.className=k===i?'on':k<i?'done':'');
-  board.innerHTML=st.fin?`<div class="final pop"><p class="big">Lo que hago en un lado, lo hago en el otro.</p><p>Si hay <span style="color:var(--green)">+</span>, hago <span style="color:var(--red)">−</span>. &nbsp; Si hay <span style="color:var(--red)">−</span>, hago <span style="color:var(--green)">+</span>.</p><p>Y siempre compruebo <span style="color:var(--green)">✓</span></p></div>`
+  board.innerHTML=st.html?`<div class="pop" style="display:grid;gap:12px">${st.html}</div>`:st.fin?`<div class="final pop"><p>Para dejar sola la <b>x</b>, uso el <b>inverso aditivo</b>.</p><p class="big">Lo que hago en un lado, lo hago en el otro.</p><p>Si hay <span style="color:var(--green)">+</span>, hago <span style="color:var(--red)">−</span>. &nbsp; Si hay <span style="color:var(--red)">−</span>, hago <span style="color:var(--green)">+</span>.</p><p>Y siempre compruebo <span style="color:var(--green)">✓</span></p></div>`
    :`<h1 class="pop">${st.t}</h1><p class="txt pop">${st.x}</p><div class="eq pop">${st.eq||'&nbsp;'}</div>`;
-  document.getElementById('fig').style.display=st.fin?'none':'';
+  document.getElementById('fig').style.display=(st.fin||st.html)?'none':'';
   prev.disabled=i===0;next.disabled=i===steps.length-1;
 }
 prev.addEventListener('click',()=>{if(i>0){i--;render()}});
