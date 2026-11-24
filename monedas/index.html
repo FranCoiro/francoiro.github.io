@@ -22,9 +22,10 @@
     border:1px solid #d6dbe3;box-shadow:0 6px 14px rgba(40,20,5,.35);
     padding:3.2% 1.2% 1.2% 1.2%;display:flex;gap:.5%}
   .zona{height:100%;position:relative}
-  #z10{background:#eaa985;flex:58}
-  #z50{background:#f3df0b;flex:24}
-  #z100{background:#a9cdec;flex:18}
+  #z10{background:#eaa985;flex:46}
+  #z50{background:#f3df0b;flex:19}
+  #z100{background:#a9cdec;flex:15}
+  #z500{background:#b9dca0;flex:20}
   /* Monedas */
   #capa{position:fixed;inset:0;pointer-events:none}
   .moneda{position:absolute;pointer-events:auto;touch-action:none;cursor:grab;
@@ -114,6 +115,7 @@
   <div class="zona" id="z10"></div>
   <div class="zona" id="z50"></div>
   <div class="zona" id="z100"></div>
+  <div class="zona" id="z500"></div>
 </div>
 <div id="capa"></div>
 
@@ -146,9 +148,11 @@
     <div class="paso"><button data-d="50" data-s="-1">−</button><input id="n50" type="number" min="0" max="40"><button data-d="50" data-s="1">+</button></div></div>
   <div class="fila"><div class="eti"><span class="dot" style="background:#f7da1f;border-color:#9cc3e6"></span>$100</div>
     <div class="paso"><button data-d="100" data-s="-1">−</button><input id="n100" type="number" min="0" max="40"><button data-d="100" data-s="1">+</button></div></div>
+  <div class="fila"><div class="eti"><span class="dot" style="background:#e9a85a;border-color:#d9b23a"></span>$500</div>
+    <div class="paso"><button data-d="500" data-s="-1">−</button><input id="n500" type="number" min="0" max="40"><button data-d="500" data-s="1">+</button></div></div>
   <label class="check"><input type="checkbox" id="cTotal"> Mostrar el total que hay en la mesa</label>
   <div class="acciones">
-    <button class="sec" id="bOriginal">15 · 6 · 3</button>
+    <button class="sec" id="bOriginal">15 · 6 · 3 · 4</button>
     <button class="prim" id="bAplicar">Aplicar</button>
   </div>
   <div class="nota">Arrastra monedas a la mesa. Toca las monedas de la mesa para seleccionarlas y cambiarlas por otra moneda. Para devolver una, arrástrala a su zona.</div>
@@ -163,9 +167,9 @@
 
 <script>
 (() => {
-  const DENOMS = [10, 50, 100];
-  const ORIGINAL = {10: 15, 50: 6, 100: 3};
-  const zonas = {10: document.getElementById('z10'), 50: document.getElementById('z50'), 100: document.getElementById('z100')};
+  const DENOMS = [10, 50, 100, 500];
+  const ORIGINAL = {10: 15, 50: 6, 100: 3, 500: 4};
+  const zonas = {10: document.getElementById('z10'), 50: document.getElementById('z50'), 100: document.getElementById('z100'), 500: document.getElementById('z500')};
   const capa = document.getElementById('capa');
   let cfg = Object.assign({}, ORIGINAL, {total: false});
   try { const g = JSON.parse(localStorage.getItem('monedas-cfg') || 'null'); if (g) cfg = Object.assign(cfg, g); } catch (e) {}
@@ -187,6 +191,11 @@
       <circle r="49" fill="#e8c21a"/><circle r="44.5" fill="none" stroke="#a9810a" stroke-width="2.4" stroke-dasharray="0 5.3" stroke-linecap="round"/>
       <circle r="40" fill="#f8e352"/><circle r="38" fill="none" stroke="#d1ad18" stroke-width="1.2"/>
       ${t}<text y="9" text-anchor="middle" font-family="Nunito" font-weight="900" font-size="27" fill="#4a3208">$50</text>${deco}</g></svg>`;
+    if (d === 500) return `<svg viewBox="-54 -54 110 110"><circle cx="2" cy="4" r="49" fill="#3f8ed1"/>
+      <circle r="49" fill="#e8c35a"/><circle r="44.5" fill="none" stroke="#9a7416" stroke-width="2.4" stroke-dasharray="0 5.3" stroke-linecap="round"/>
+      <circle r="34" fill="#e3a062"/><circle r="32" fill="none" stroke="#b8743a" stroke-width="1.2"/>
+      ${t}<text y="8" text-anchor="middle" font-family="Nunito" font-weight="900" font-size="23" fill="#3d1f08">$500</text>
+      <path d="M12 26 l10 -6" stroke="#7a5a3a" stroke-width="2" stroke-linecap="round"/></g></svg>`;
     return `<svg viewBox="-54 -54 110 110"><circle cx="2" cy="4" r="49" fill="#3f8ed1"/>
       <circle r="49" fill="#e7f1fa"/><circle r="44.5" fill="none" stroke="#2c4f7c" stroke-width="2.4" stroke-dasharray="0 5.3" stroke-linecap="round"/>
       <circle r="34" fill="#f7da1f"/>
