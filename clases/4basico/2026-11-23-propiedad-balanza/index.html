@@ -94,19 +94,28 @@ const steps=[
  {tag:'Parte 1 · Ahora tú · ejercicio 2',t:'Corregimos',x:'El inverso aditivo de −6 es <b>+6</b>.',L:[...C(4),...H(6,'f')],R:C(10),tilt:0,eq:hl(`10 <span class="r">− 6</span> <span class="g">+ 6</span> = 10`)},
  {tag:'Parte 1 · Ahora tú · ejercicio 3',t:'Resuelve en tu cuaderno',x:'Le agregaron 9. ¿Qué hago para volver a equilibrar?',L:[T(20),T('+9','n')],R:[T(20)],tilt:-1,eq:hl(`20 <span class="g">+ 9</span> ___ = 20`)},
  {tag:'Parte 1 · Ahora tú · ejercicio 3',t:'Corregimos',x:'+9 − 9 = 0: el inverso aditivo de +9 es <b>−9</b>.',L:[T(20),T('+9','x')],R:[T(20)],tilt:0,eq:hl(`20 <span class="g">+ 9</span> <span class="r">− 9</span> = 20`)},
- {tag:'Parte 1 · Inverso aditivo',html:`<h1>¿Para qué me sirve?</h1><p class="txt">Para <b>dejar sola la x</b>: uso el inverso aditivo de lo que acompaña a la x.</p><p class="eq">x <span class="g">+ 5</span> <span class="r">− 5</span> = x</p><p class="eq">x <span class="r">− 4</span> <span class="g">+ 4</span> = x</p><p class="txt">Pero en una ecuación hay <b>dos lados</b>… ¡veamos qué pasa con la balanza!</p>`},
- {tag:'Parte 2 · Propiedad de la igualdad · ejemplo 1',t:'Una balanza equilibrada',x:'Los dos platillos pesan lo mismo. Eso es una <b>igualdad</b>. Si cambio algo en un lado, tengo que hacer lo mismo en el otro.',L:[BOX(),...C(5)],R:C(12),tilt:0,eq:''},
- {tag:'Parte 2 · Propiedad de la igualdad · ejemplo 1',t:'La escribimos con números',x:'Para dejar sola la caja, uso el inverso aditivo de +5, que es <b>−5</b>.',L:[BOX(),...C(5)],R:C(12),tilt:0,eq:`${bx('?')} + 5 = 12`},
- {tag:'Parte 2 · Propiedad de la igualdad · ejemplo 1',t:'¿Y si saco 5 cubos solo de un lado?',x:'¡Se desequilibra! Ya no es una igualdad.',L:[BOX(),...C(5,'x')],R:C(12),tilt:1,eq:`${bx('?')} + 5 <span class="r">− 5</span> ≠ 12`},
- {tag:'Parte 2 · Propiedad de la igualdad · ejemplo 1',t:'Saco 5 del otro lado también',x:'<b>Lo que hago en un lado, lo hago en el otro.</b> ¡Equilibrada otra vez!',L:[BOX(),...C(5,'x')],R:[...C(7),...C(5,'x')],tilt:0,eq:`${bx('?')} + 5 <span class="r">− 5</span> = 12 <span class="r">− 5</span>`},
- {tag:'Parte 2 · Propiedad de la igualdad · ejemplo 1',t:'La caja queda sola',x:'Al otro lado quedaron 7 cubos.',L:[BOX()],R:C(7),tilt:0,eq:`${bx('?')} = 7`},
- {tag:'Parte 2 · Propiedad de la igualdad · ejemplo 1',t:'Compruebo',x:'Pongo 7 en la caja y reviso si la igualdad se cumple.',L:[BOX(7),...C(5)],R:C(12),tilt:0,eq:`7 + 5 = 12 <span class="ok">✓</span>`},
- {tag:'Parte 2 · Propiedad de la igualdad · ejemplo 2',t:'Ahora con resta',x:'A la caja le <b>quitaron 4</b>. Los cuadrados punteados son lo que le falta.',L:[BOX(),...H(4)],R:C(10),tilt:0,eq:`${bx('?')} − 4 = 10`},
- {tag:'Parte 2 · Propiedad de la igualdad · ejemplo 2',t:'Le devuelvo los 4',x:'El inverso aditivo de −4 es <b>+4</b>. Pero ahora el lado izquierdo pesa más…',L:[BOX(),...H(4,'f')],R:C(10),tilt:-1,eq:`${bx('?')} − 4 <span class="g">+ 4</span> ≠ 10`},
- {tag:'Parte 2 · Propiedad de la igualdad · ejemplo 2',t:'…y agrego 4 al otro lado',x:'<b>Lo que hago en un lado, lo hago en el otro.</b>',L:[BOX(),...H(4,'f')],R:[...C(10),...C(4,'n')],tilt:0,eq:`${bx('?')} − 4 <span class="g">+ 4</span> = 10 <span class="g">+ 4</span>`},
- {tag:'Parte 2 · Propiedad de la igualdad · ejemplo 2',t:'La caja queda sola',x:'Al otro lado hay 14 cubos.',L:[BOX()],R:C(14),tilt:0,eq:`${bx('?')} = 14`},
- {tag:'Parte 2 · Propiedad de la igualdad · ejemplo 2',t:'Compruebo',x:'Pongo 14 en la caja: si le quito 4, ¿quedan 10?',L:[BOX(14),...H(4)],R:C(10),tilt:0,eq:`14 − 4 = 10 <span class="ok">✓</span>`},
- {tag:'¡Recuerda!',fin:true,L:[BOX()],R:C(0),tilt:0}
+ {tag:'Parte 2 · Propiedad de la igualdad',t:'Propiedad de la igualdad',x:'Si a los <b>dos lados</b> de una igualdad sumo o resto <b>el mismo número</b>, la igualdad se mantiene. <b>Lo que hago en un lado, lo hago en el otro.</b>',L:C(7),R:C(7),tilt:0,eq:'7 = 7'},
+ {tag:'Parte 2 · Propiedad de la igualdad',t:'Propiedad de la igualdad',x:'Agrego 3 en los dos lados: sigue equilibrada.',L:[...C(7),...C(3,'n')],R:[...C(7),...C(3,'n')],tilt:0,eq:'7 <span class="g">+ 3</span> = 7 <span class="g">+ 3</span>'},
+ {tag:'Parte 2 · Propiedad de la igualdad',t:'Propiedad de la igualdad',x:'Quito 2 en los dos lados: sigue equilibrada.',L:[...C(5),...C(2,'x')],R:[...C(5),...C(2,'x')],tilt:0,eq:'7 <span class="r">− 2</span> = 7 <span class="r">− 2</span>'},
+ {tag:'Parte 2 · Ahora tú · ejercicio 1',t:'Resuelve en tu cuaderno',x:'Agregué 4 a la izquierda. ¿Qué hago a la derecha para que siga equilibrada?',L:[...C(8),...C(4,'n')],R:C(8),tilt:-1,eq:'8 <span class="g">+ 4</span> = 8 ___'},
+ {tag:'Parte 2 · Ahora tú · ejercicio 1',t:'Corregimos',x:'Agrego <b>4</b> también a la derecha.',L:[...C(8),...C(4,'n')],R:[...C(8),...C(4,'n')],tilt:0,eq:'8 <span class="g">+ 4</span> = 8 <span class="g">+ 4</span>'},
+ {tag:'Parte 2 · Ahora tú · ejercicio 2',t:'Resuelve en tu cuaderno',x:'Quité 3 a la derecha. ¿Qué hago a la izquierda para que siga equilibrada?',L:C(10),R:[...C(7),...C(3,'x')],tilt:-1,eq:'10 ___ = 10 <span class="r">− 3</span>'},
+ {tag:'Parte 2 · Ahora tú · ejercicio 2',t:'Corregimos',x:'Quito <b>3</b> también a la izquierda.',L:[...C(7),...C(3,'x')],R:[...C(7),...C(3,'x')],tilt:0,eq:'10 <span class="r">− 3</span> = 10 <span class="r">− 3</span>'},
+ {tag:'Parte 2 · Ahora tú · ejercicio 3',t:'Resuelve en tu cuaderno',x:'Agregué 10 a la derecha. ¿Qué hago a la izquierda para que siga equilibrada?',L:[T(25)],R:[T(25),T('+10','n')],tilt:1,eq:'25 ___ = 25 <span class="g">+ 10</span>'},
+ {tag:'Parte 2 · Ahora tú · ejercicio 3',t:'Corregimos',x:'Agrego <b>10</b> también a la izquierda.',L:[T(25),T('+10','n')],R:[T(25),T('+10','n')],tilt:0,eq:'25 <span class="g">+ 10</span> = 25 <span class="g">+ 10</span>'},
+ {tag:'Parte 3 · Resolver ecuaciones',html:`<h1>¡Juntemos las dos ideas!</h1><p class="txt">1) Con el <b>inverso aditivo</b> dejo sola la x: x <span style="color:var(--green)">+ 5</span> <span style="color:var(--red)">− 5</span> = x</p><p class="txt">2) Con la <b>propiedad de la igualdad</b>: lo que hago en un lado, lo hago en el otro.</p><p class="txt">Veamos cómo se resuelve una ecuación en la balanza.</p>`},
+ {tag:'Parte 3 · Resolver ecuaciones · ejemplo 1',t:'Una balanza equilibrada',x:'Los dos platillos pesan lo mismo. Eso es una <b>igualdad</b>. Si cambio algo en un lado, tengo que hacer lo mismo en el otro.',L:[BOX(),...C(5)],R:C(12),tilt:0,eq:''},
+ {tag:'Parte 3 · Resolver ecuaciones · ejemplo 1',t:'La escribimos con números',x:'Para dejar sola la caja, uso el inverso aditivo de +5, que es <b>−5</b>.',L:[BOX(),...C(5)],R:C(12),tilt:0,eq:`${bx('?')} + 5 = 12`},
+ {tag:'Parte 3 · Resolver ecuaciones · ejemplo 1',t:'¿Y si saco 5 cubos solo de un lado?',x:'¡Se desequilibra! Ya no es una igualdad.',L:[BOX(),...C(5,'x')],R:C(12),tilt:1,eq:`${bx('?')} + 5 <span class="r">− 5</span> ≠ 12`},
+ {tag:'Parte 3 · Resolver ecuaciones · ejemplo 1',t:'Saco 5 del otro lado también',x:'<b>Lo que hago en un lado, lo hago en el otro.</b> ¡Equilibrada otra vez!',L:[BOX(),...C(5,'x')],R:[...C(7),...C(5,'x')],tilt:0,eq:`${bx('?')} + 5 <span class="r">− 5</span> = 12 <span class="r">− 5</span>`},
+ {tag:'Parte 3 · Resolver ecuaciones · ejemplo 1',t:'La caja queda sola',x:'Al otro lado quedaron 7 cubos.',L:[BOX()],R:C(7),tilt:0,eq:`${bx('?')} = 7`},
+ {tag:'Parte 3 · Resolver ecuaciones · ejemplo 1',t:'Compruebo',x:'Pongo 7 en la caja y reviso si la igualdad se cumple.',L:[BOX(7),...C(5)],R:C(12),tilt:0,eq:`7 + 5 = 12 <span class="ok">✓</span>`},
+ {tag:'Parte 3 · Resolver ecuaciones · ejemplo 2',t:'Ahora con resta',x:'A la caja le <b>quitaron 4</b>. Los cuadrados punteados son lo que le falta.',L:[BOX(),...H(4)],R:C(10),tilt:0,eq:`${bx('?')} − 4 = 10`},
+ {tag:'Parte 3 · Resolver ecuaciones · ejemplo 2',t:'Le devuelvo los 4',x:'El inverso aditivo de −4 es <b>+4</b>. Pero ahora el lado izquierdo pesa más…',L:[BOX(),...H(4,'f')],R:C(10),tilt:-1,eq:`${bx('?')} − 4 <span class="g">+ 4</span> ≠ 10`},
+ {tag:'Parte 3 · Resolver ecuaciones · ejemplo 2',t:'…y agrego 4 al otro lado',x:'<b>Lo que hago en un lado, lo hago en el otro.</b>',L:[BOX(),...H(4,'f')],R:[...C(10),...C(4,'n')],tilt:0,eq:`${bx('?')} − 4 <span class="g">+ 4</span> = 10 <span class="g">+ 4</span>`},
+ {tag:'Parte 3 · Resolver ecuaciones · ejemplo 2',t:'La caja queda sola',x:'Al otro lado hay 14 cubos.',L:[BOX()],R:C(14),tilt:0,eq:`${bx('?')} = 14`},
+ {tag:'Parte 3 · Resolver ecuaciones · ejemplo 2',t:'Compruebo',x:'Pongo 14 en la caja: si le quito 4, ¿quedan 10?',L:[BOX(14),...H(4)],R:C(10),tilt:0,eq:`14 − 4 = 10 <span class="ok">✓</span>`},
+ {tag:'Parte 3 · ¡Recuerda!',fin:true,L:[BOX()],R:C(0),tilt:0}
 ];
 const ex=[
  {n:'a',q:'x + 7 = 15',L0:[X(),...C(7)],R0:C(15),L1:[X(),...C(7,'x')],R1:[...C(8),...C(7,'x')],e1:'x + 7 <span class="r">− 7</span> = 15 <span class="r">− 7</span>',R2:C(8),a:8,ck:'8 + 7 = 15'},
@@ -119,7 +128,7 @@ const ex=[
  {n:'h',q:'40 = x − 10',L0:[T(40)],R0:[X(),T('−10','h')],L1:[T(40),T(10,'n')],R1:[X(),T(10,'f')],e1:'40 <span class="g">+ 10</span> = x − 10 <span class="g">+ 10</span>',L2:[T(50)],R2:[X()],a:50,ck:'40 = 50 − 10',swap:true}
 ];
 ex.forEach(e=>{
- const tg='Ahora tú · ejercicio '+e.n;
+ const tg='Parte 3 · Ahora tú · ejercicio '+e.n;
  steps.push({tag:tg,t:'Resuelve en tu cuaderno',x:'¿Qué le hicieron a la <b>x</b>? ¿Qué hago en los dos lados?',L:e.L0,R:e.R0,tilt:0,eq:hl(e.q)});
  steps.push({tag:tg,t:'Corregimos',x:'<b>Lo que hago en un lado, lo hago en el otro.</b>',L:e.L1,R:e.R1,tilt:0,eq:hl(e.e1)});
  steps.push({tag:tg,t:'Resultado',x:`Compruebo: <b>${e.ck}</b> <span style="color:var(--green)">✓</span>`,L:e.L2||[X()],R:e.R2,tilt:0,eq:e.swap?`${e.a} = ${bx('x')}`:`${bx('x')} = ${e.a}`});
