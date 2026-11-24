@@ -81,15 +81,25 @@ const C=(n,st)=>Array.from({length:n},()=>({k:'c',st:st||''}));
 const BOX=(v)=>({k:'b',v:v??'?'});
 const H=(n,st)=>Array.from({length:n},()=>({k:'h',st:st||''}));
 const bx=s=>`<span class="bx">${s}</span>`;
+const T=(v,st)=>({k:'t',v,st:st||''});
+const X=v=>({k:'b',v:v??'x'});
+const hl=s=>s.replace(/(^|[ >])x(?=[ <]|$)/g,(m,p)=>p+bx('x'));
 const cb=(n,c)=>`<span class="cb ${c||''}"></span>`.repeat(n);
 const steps=[
  {tag:'Objetivo',html:`<p class="txt">Copia el objetivo en tu cuaderno:</p><p class="obj">Resolver ecuaciones de un paso usando el <span style="color:var(--box)">inverso aditivo</span> y la <span style="color:var(--cube)">propiedad de la igualdad</span>.</p>`},
- {tag:'Parte 1 · Inverso aditivo',html:`<h1>Tengo 7 cubos y agrego 5</h1><div class="cubes">${cb(7)}<span>+</span>${cb(5,'n')}</div><p class="eq">7 <span class="g">+ 5</span> = 12</p>`},
- {tag:'Parte 1 · Inverso aditivo',html:`<h1>Ahora quito esos 5</h1><div class="cubes">${cb(7)}<span>+</span>${cb(5,'n x')}</div><p class="eq">7 <span class="g">+ 5</span> <span class="r">− 5</span> = 7</p><p class="txt">¡Volví a tener 7! Agregar 5 y quitar 5 <b>se anulan</b>: <b>+5 − 5 = 0</b>.</p>`},
- {tag:'Parte 1 · Inverso aditivo',html:`<h1>También al revés</h1><div class="cubes">${cb(6)}${cb(3,'h')}</div><p class="txt">A 9 cubos le quitaron 3: quedan 6. Si le devuelvo 3, vuelvo a tener 9.</p><p class="eq">9 <span class="r">− 3</span> <span class="g">+ 3</span> = 9</p><p class="txt"><b>−3 + 3 = 0</b></p>`},
  {tag:'Parte 1 · Inverso aditivo',html:`<p class="def">El <span class="k">inverso aditivo</span> de un número es el que, sumado con él, da <b>0</b>.</p><ul class="items" style="counter-reset:none"><li style="counter-increment:none">El inverso aditivo de <span class="g" style="color:var(--green)">+5</span> es <span style="color:var(--red)">−5</span> → +5 − 5 = 0</li><li style="counter-increment:none">El inverso aditivo de <span style="color:var(--red)">−3</span> es <span style="color:var(--green)">+3</span> → −3 + 3 = 0</li><li style="counter-increment:none">El inverso aditivo de <span style="color:var(--green)">+12</span> es <span style="color:var(--red)">−12</span> → +12 − 12 = 0</li></ul>`},
- ...[false,true].map(sol=>{const q=[['El inverso aditivo de +8 es','−8'],['El inverso aditivo de −6 es','+6'],['+9 ___ = 0','−9'],['15 + 4 − 4 =','15'],['20 − 7 + 7 =','20'],['x + 3 − 3 =','x']];
-   return {tag:'Parte 1 · Ahora tú',html:`<h1>${sol?'Corregimos':'Resuelve en tu cuaderno'}</h1><ol class="items">${q.map(([a,b])=>a.includes('___')?`<li>${sol?a.replace('___',`<span class="ans">${b}</span>`):a}</li>`:`<li>${a} ${sol?`<span class="ans">${b}</span>`:'___'}</li>`).join('')}</ol>`}}),
+ {tag:'Parte 1 · Ahora tú · ejercicio 1',t:'Resuelve en tu cuaderno',x:'Le agregaron 8. ¿Qué hago para volver a equilibrar?',L:[...C(6),...C(8,'n')],R:C(6),tilt:-1,eq:hl(`6 <span class="g">+ 8</span> ___ = 6`)},
+ {tag:'Parte 1 · Ahora tú · ejercicio 1',t:'Corregimos',x:'El inverso aditivo de +8 es <b>−8</b>.',L:[...C(6),...C(8,'x')],R:C(6),tilt:0,eq:hl(`6 <span class="g">+ 8</span> <span class="r">− 8</span> = 6`)},
+ {tag:'Parte 1 · Ahora tú · ejercicio 2',t:'Resuelve en tu cuaderno',x:'Le quitaron 6. ¿Qué hago para volver a equilibrar?',L:[...C(4),...H(6)],R:C(10),tilt:1,eq:hl(`10 <span class="r">− 6</span> ___ = 10`)},
+ {tag:'Parte 1 · Ahora tú · ejercicio 2',t:'Corregimos',x:'El inverso aditivo de −6 es <b>+6</b>.',L:[...C(4),...H(6,'f')],R:C(10),tilt:0,eq:hl(`10 <span class="r">− 6</span> <span class="g">+ 6</span> = 10`)},
+ {tag:'Parte 1 · Ahora tú · ejercicio 3',t:'Resuelve en tu cuaderno',x:'Le agregaron 9. ¿Qué hago para volver a equilibrar?',L:[T(20),T('+9','n')],R:[T(20)],tilt:-1,eq:hl(`20 <span class="g">+ 9</span> ___ = 20`)},
+ {tag:'Parte 1 · Ahora tú · ejercicio 3',t:'Corregimos',x:'+9 − 9 = 0: el inverso aditivo de +9 es <b>−9</b>.',L:[T(20),T('+9','x')],R:[T(20)],tilt:0,eq:hl(`20 <span class="g">+ 9</span> <span class="r">− 9</span> = 20`)},
+ {tag:'Parte 1 · Ahora tú · ejercicio 4',t:'Resuelve en tu cuaderno',x:'¿Cuánto hay en la caja para que esté equilibrada?',L:[T(15),T('+4','n'),T('−4','h')],R:[BOX()],tilt:0,eq:hl(`15 <span class="g">+ 4</span> <span class="r">− 4</span> = ___`)},
+ {tag:'Parte 1 · Ahora tú · ejercicio 4',t:'Corregimos',x:'+4 y −4 se anulan: queda 15.',L:[T(15),T('+4','x'),T('−4','x')],R:[BOX(15)],tilt:0,eq:hl(`15 <span class="g">+ 4</span> <span class="r">− 4</span> = 15`)},
+ {tag:'Parte 1 · Ahora tú · ejercicio 5',t:'Resuelve en tu cuaderno',x:'¿Cuánto hay en la caja para que esté equilibrada?',L:[T(20),T('−7','h'),T('+7','n')],R:[BOX()],tilt:0,eq:hl(`20 <span class="r">− 7</span> <span class="g">+ 7</span> = ___`)},
+ {tag:'Parte 1 · Ahora tú · ejercicio 5',t:'Corregimos',x:'−7 y +7 se anulan: queda 20.',L:[T(20),T('−7','x'),T('+7','x')],R:[BOX(20)],tilt:0,eq:hl(`20 <span class="r">− 7</span> <span class="g">+ 7</span> = 20`)},
+ {tag:'Parte 1 · Ahora tú · ejercicio 6',t:'Resuelve en tu cuaderno',x:'¿Qué hay en la caja para que esté equilibrada?',L:[X(),T('+3','n'),T('−3','h')],R:[BOX()],tilt:0,eq:hl(`x <span class="g">+ 3</span> <span class="r">− 3</span> = ___`)},
+ {tag:'Parte 1 · Ahora tú · ejercicio 6',t:'Corregimos',x:'+3 y −3 se anulan: <b>la x queda sola</b>.',L:[X(),T('+3','x'),T('−3','x')],R:[X()],tilt:0,eq:hl(`x <span class="g">+ 3</span> <span class="r">− 3</span> = x`)},
  {tag:'Parte 1 · Inverso aditivo',html:`<h1>¿Para qué me sirve?</h1><p class="txt">Para <b>dejar sola la x</b>: uso el inverso aditivo de lo que acompaña a la x.</p><p class="eq">x <span class="g">+ 5</span> <span class="r">− 5</span> = x</p><p class="eq">x <span class="r">− 4</span> <span class="g">+ 4</span> = x</p><p class="txt">Pero en una ecuación hay <b>dos lados</b>… ¡veamos qué pasa con la balanza!</p>`},
  {tag:'Parte 2 · Propiedad de la igualdad · ejemplo 1',t:'Una balanza equilibrada',x:'Los dos platillos pesan lo mismo. Eso es una <b>igualdad</b>. Si cambio algo en un lado, tengo que hacer lo mismo en el otro.',L:[BOX(),...C(5)],R:C(12),tilt:0,eq:''},
  {tag:'Parte 2 · Propiedad de la igualdad · ejemplo 1',t:'La escribimos con números',x:'Para dejar sola la caja, uso el inverso aditivo de +5, que es <b>−5</b>.',L:[BOX(),...C(5)],R:C(12),tilt:0,eq:`${bx('?')} + 5 = 12`},
@@ -104,8 +114,6 @@ const steps=[
  {tag:'Parte 2 · Propiedad de la igualdad · ejemplo 2',t:'Compruebo',x:'Pongo 14 en la caja: si le quito 4, ¿quedan 10?',L:[BOX(14),...H(4)],R:C(10),tilt:0,eq:`14 − 4 = 10 <span class="ok">✓</span>`},
  {tag:'¡Recuerda!',fin:true,L:[BOX()],R:C(0),tilt:0}
 ];
-const T=(v,st)=>({k:'t',v,st:st||''});
-const X=v=>({k:'b',v:v??'x'});
 const ex=[
  {n:'a',q:'x + 7 = 15',L0:[X(),...C(7)],R0:C(15),L1:[X(),...C(7,'x')],R1:[...C(8),...C(7,'x')],e1:'x + 7 <span class="r">− 7</span> = 15 <span class="r">− 7</span>',R2:C(8),a:8,ck:'8 + 7 = 15'},
  {n:'b',q:'x + 20 = 50',L0:[X(),T(20)],R0:[T(50)],L1:[X(),T(20,'x')],R1:[T(30),T(20,'x')],e1:'x + 20 <span class="r">− 20</span> = 50 <span class="r">− 20</span>',R2:[T(30)],a:30,ck:'30 + 20 = 50'},
@@ -116,7 +124,6 @@ const ex=[
  {n:'g',q:'x + 9 = 16',L0:[X(),...C(9)],R0:C(16),L1:[X(),...C(9,'x')],R1:[...C(7),...C(9,'x')],e1:'x + 9 <span class="r">− 9</span> = 16 <span class="r">− 9</span>',R2:C(7),a:7,ck:'7 + 9 = 16'},
  {n:'h',q:'40 = x − 10',L0:[T(40)],R0:[X(),T('−10','h')],L1:[T(40),T(10,'n')],R1:[X(),T(10,'f')],e1:'40 <span class="g">+ 10</span> = x − 10 <span class="g">+ 10</span>',L2:[T(50)],R2:[X()],a:50,ck:'40 = 50 − 10',swap:true}
 ];
-const hl=s=>s.replace(/x/g,bx('x'));
 ex.forEach(e=>{
  const tg='Ahora tú · ejercicio '+e.n;
  steps.push({tag:tg,t:'Resuelve en tu cuaderno',x:'¿Qué le hicieron a la <b>x</b>? ¿Qué hago en los dos lados?',L:e.L0,R:e.R0,tilt:0,eq:hl(e.q)});
