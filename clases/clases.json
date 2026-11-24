@@ -17,6 +17,20 @@
     {
       "curso": "4basico",
       "asignatura": "Matemática",
+      "fecha": "2026-11-23",
+      "titulo": "La balanza equilibrada: lo que hago en un lado, lo hago en el otro",
+      "descripcion": "Explicación para proyectar, paso a paso, de la propiedad uniforme de la igualdad (OA 14): la balanza se inclina si se quita solo de un lado y se equilibra al hacer lo mismo en ambos. Dos ejemplos (▢ + 5 = 12 y ▢ − 4 = 10) con comprobación, lámina «¡Recuerda!» y sección «Ahora tú» con 8 ejercicios (resuelven en el cuaderno, luego se corrige paso a paso). Se avanza con botones o flechas; incluye pantalla completa.",
+      "carpeta": "4basico/2026-11-23-propiedad-balanza/",
+      "materiales": [
+        {
+          "nombre": "Explicación y ejercicios",
+          "archivo": "index.html"
+        }
+      ]
+    },
+    {
+      "curso": "4basico",
+      "asignatura": "Matemática",
       "fecha": "2026-11-20",
       "titulo": "Clase guiada: ¿Qué es una ecuación? (curso que parte de cero)",
       "descripcion": "Clase de 30-40 minutos para proyectar, paso a paso: conocemos la balanza, balanza libre para explicar, el signo =, completa para equilibrar (2 + __ = 6, 2 + __ + __ = 10), la definición y sus partes, práctica con 6 ecuaciones, desafío y cierre con ticket de salida. Incluye temporizador.",

@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>La balanza equilibrada</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Nunito:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+/* VOICE: claro, alegre y muy legible para proyectar en una sala de 4.º básico.
+   IDEA: la balanza de platillos de la sala con cubos multibase y una caja misteriosa.
+   PICTURE: balanza grande que se inclina y se equilibra paso a paso.
+   COLOUR and TYPE: papel cálido, cubos azules, caja naranja, rojo = quito, verde = agrego; Baloo 2 + Nunito.
+   LAYOUT: balanza arriba, pizarra con la ecuación abajo, botones grandes al pie. */
+:root{color-scheme:light dark;--bg:light-dark(#fbf7ef,#14171f);--ink:light-dark(#1d2433,#eef1f7);--soft:light-dark(#6b7385,#a7afc0);
+--card:light-dark(#ffffff,#1d2230);--line:light-dark(#e6dfd0,#2c3344);--cube:#2f6fe4;--cubeD:#1f4fb0;--box:#f59e0b;--boxD:#c97a05;
+--wood:light-dark(#8a5a35,#b07a4f);--woodD:light-dark(#6b4226,#8a5a35);--red:#e0352b;--green:#14a05a}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.5 Nunito,system-ui,sans-serif;overflow-x:clip;display:flex;flex-direction:column}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px max(4vw,16px) 0;flex-wrap:wrap}
+.tag{font:800 15px Nunito,sans-serif;color:var(--soft)}
+.tag b{color:var(--ink)}
+.dots{display:flex;gap:6px;flex-wrap:wrap}
+.dots i{width:12px;height:12px;border-radius:50%;background:var(--line);display:block;transition:background .3s}
+.dots i.on{background:var(--box)}.dots i.done{background:var(--cube)}
+main{flex:1;display:grid;grid-template-rows:minmax(260px,1fr) auto;gap:8px;padding:0 max(4vw,16px);max-width:1240px;width:100%;margin:0 auto}
+.fig{position:relative;min-height:260px}
+.fig>svg{position:absolute;inset:0;width:100%;height:100%}
+.board{background:var(--card);border:2px solid var(--line);border-radius:22px;padding:18px clamp(16px,3vw,32px);display:grid;gap:6px;min-height:190px;align-content:center}
+h1{font:800 clamp(28px,4.2vw,46px)/1.05 "Baloo 2",sans-serif;margin:0;text-wrap:balance}
+.txt{font-size:clamp(17px,2vw,22px);margin:0;max-width:60ch}
+.eq{font:800 clamp(30px,5.4vw,60px)/1.15 "Baloo 2",sans-serif;letter-spacing:.01em;min-height:1.15em}
+.eq .r{color:var(--red)}.eq .g{color:var(--green)}.eq .ok{color:var(--green)}
+.eq .bx{display:inline-block;min-width:1em;padding:0 .12em;border-radius:.14em;background:var(--box);color:#fff;text-align:center;line-height:1.1}
+.final{display:grid;gap:10px}
+.final p{margin:0;font:800 clamp(22px,3.4vw,38px)/1.2 "Baloo 2",sans-serif}
+.final .big{font-size:clamp(30px,5vw,56px)}
+nav{display:flex;justify-content:center;gap:14px;padding:14px 16px 18px}
+button{font:800 18px Nunito,sans-serif;min-height:52px;padding:0 26px;border-radius:999px;border:2px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer}
+button.main{background:var(--cube);border-color:var(--cube);color:#fff}
+button:disabled{opacity:.35;cursor:default}
+button:focus-visible{outline:3px solid var(--box);outline-offset:3px}
+#beam,.pan{transition:transform .8s cubic-bezier(.4,1.4,.5,1)}
+.pop{animation:pop .45s ease-out}
+@keyframes pop{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){#beam,.pan{transition:none}.pop{animation:none}}
+@media(max-width:600px){button{padding:0 18px;font-size:16px}.board{min-height:170px}}
+</style>
+</head>
+<body>
+<header>
+  <span class="tag" id="tag">Ejemplo 1</span>
+  <div class="dots" id="dots"></div>
+  <button id="fs" type="button" style="min-height:44px;padding:0 16px;font-size:15px">Pantalla completa</button>
+</header>
+<main>
+  <div class="fig" id="fig"><svg id="svg" viewBox="0 0 800 440" preserveAspectRatio="xMidYMid meet" aria-label="Balanza de platillos"></svg></div>
+  <section class="board" id="board" aria-live="polite"></section>
+</main>
+<nav>
+  <button id="prev" type="button">← Anterior</button>
+  <button id="next" type="button" class="main">Siguiente →</button>
+</nav>
+<script>
+{
+const C=(n,st)=>Array.from({length:n},()=>({k:'c',st:st||''}));
+const BOX=(v)=>({k:'b',v:v??'?'});
+const H=(n,st)=>Array.from({length:n},()=>({k:'h',st:st||''}));
+const bx=s=>`<span class="bx">${s}</span>`;
+const steps=[
+ {tag:'Ejemplo 1',t:'Una balanza equilibrada',x:'Los dos platillos pesan lo mismo. Eso es una <b>igualdad</b>.',L:[BOX(),...C(5)],R:C(12),tilt:0,eq:''},
+ {tag:'Ejemplo 1',t:'La escribimos con números',x:'La caja vale un número que no conocemos.',L:[BOX(),...C(5)],R:C(12),tilt:0,eq:`${bx('?')} + 5 = 12`},
+ {tag:'Ejemplo 1',t:'¿Y si saco 5 cubos solo de un lado?',x:'¡Se desequilibra! Ya no es una igualdad.',L:[BOX(),...C(5,'x')],R:C(12),tilt:1,eq:`${bx('?')} + 5 <span class="r">− 5</span> ≠ 12`},
+ {tag:'Ejemplo 1',t:'Saco 5 del otro lado también',x:'<b>Lo que hago en un lado, lo hago en el otro.</b> ¡Equilibrada otra vez!',L:[BOX(),...C(5,'x')],R:[...C(7),...C(5,'x')],tilt:0,eq:`${bx('?')} + 5 <span class="r">− 5</span> = 12 <span class="r">− 5</span>`},
+ {tag:'Ejemplo 1',t:'La caja queda sola',x:'Al otro lado quedaron 7 cubos.',L:[BOX()],R:C(7),tilt:0,eq:`${bx('?')} = 7`},
+ {tag:'Ejemplo 1',t:'Compruebo',x:'Pongo 7 en la caja y reviso si la igualdad se cumple.',L:[BOX(7),...C(5)],R:C(12),tilt:0,eq:`7 + 5 = 12 <span class="ok">✓</span>`},
+ {tag:'Ejemplo 2',t:'Ahora con resta',x:'A la caja le <b>quitaron 4</b>. Los cuadrados punteados son lo que le falta.',L:[BOX(),...H(4)],R:C(10),tilt:0,eq:`${bx('?')} − 4 = 10`},
+ {tag:'Ejemplo 2',t:'Le devuelvo los 4',x:'Si hay <b>−</b>, hago <b>+</b>. Pero ahora el lado izquierdo pesa más…',L:[BOX(),...H(4,'f')],R:C(10),tilt:-1,eq:`${bx('?')} − 4 <span class="g">+ 4</span> ≠ 10`},
+ {tag:'Ejemplo 2',t:'…y agrego 4 al otro lado',x:'<b>Lo que hago en un lado, lo hago en el otro.</b>',L:[BOX(),...H(4,'f')],R:[...C(10),...C(4,'n')],tilt:0,eq:`${bx('?')} − 4 <span class="g">+ 4</span> = 10 <span class="g">+ 4</span>`},
+ {tag:'Ejemplo 2',t:'La caja queda sola',x:'Al otro lado hay 14 cubos.',L:[BOX()],R:C(14),tilt:0,eq:`${bx('?')} = 14`},
+ {tag:'Ejemplo 2',t:'Compruebo',x:'Pongo 14 en la caja: si le quito 4, ¿quedan 10?',L:[BOX(14),...H(4)],R:C(10),tilt:0,eq:`14 − 4 = 10 <span class="ok">✓</span>`},
+ {tag:'¡Recuerda!',fin:true,L:[BOX()],R:C(0),tilt:0}
+];
+const T=(v,st)=>({k:'t',v,st:st||''});
+const X=v=>({k:'b',v:v??'x'});
+const ex=[
+ {n:'a',q:'x + 7 = 15',L0:[X(),...C(7)],R0:C(15),L1:[X(),...C(7,'x')],R1:[...C(8),...C(7,'x')],e1:'x + 7 <span class="r">− 7</span> = 15 <span class="r">− 7</span>',R2:C(8),a:8,ck:'8 + 7 = 15'},
+ {n:'b',q:'x + 20 = 50',L0:[X(),T(20)],R0:[T(50)],L1:[X(),T(20,'x')],R1:[T(30),T(20,'x')],e1:'x + 20 <span class="r">− 20</span> = 50 <span class="r">− 20</span>',R2:[T(30)],a:30,ck:'30 + 20 = 50'},
+ {n:'c',q:'x − 5 = 12',L0:[X(),...H(5)],R0:C(12),L1:[X(),...H(5,'f')],R1:[...C(12),...C(5,'n')],e1:'x − 5 <span class="g">+ 5</span> = 12 <span class="g">+ 5</span>',R2:C(17),a:17,ck:'17 − 5 = 12'},
+ {n:'d',q:'30 = x + 18',L0:[T(30)],R0:[X(),T(18)],L1:[T(12),T(18,'x')],R1:[X(),T(18,'x')],e1:'30 <span class="r">− 18</span> = x + 18 <span class="r">− 18</span>',L2:[T(12)],R2:[X()],a:12,ck:'30 = 12 + 18',swap:true},
+ {n:'e',q:'x − 15 = 25',L0:[X(),T('−15','h')],R0:[T(25)],L1:[X(),T(15,'f')],R1:[T(25),T(15,'n')],e1:'x − 15 <span class="g">+ 15</span> = 25 <span class="g">+ 15</span>',R2:[T(40)],a:40,ck:'40 − 15 = 25'},
+ {n:'f',q:'45 + x = 70',L0:[X(),T(45)],R0:[T(70)],L1:[X(),T(45,'x')],R1:[T(25),T(45,'x')],e1:'45 <span class="r">− 45</span> + x = 70 <span class="r">− 45</span>',R2:[T(25)],a:25,ck:'45 + 25 = 70'},
+ {n:'g',q:'x + 9 = 16',L0:[X(),...C(9)],R0:C(16),L1:[X(),...C(9,'x')],R1:[...C(7),...C(9,'x')],e1:'x + 9 <span class="r">− 9</span> = 16 <span class="r">− 9</span>',R2:C(7),a:7,ck:'7 + 9 = 16'},
+ {n:'h',q:'40 = x − 10',L0:[T(40)],R0:[X(),T('−10','h')],L1:[T(40),T(10,'n')],R1:[X(),T(10,'f')],e1:'40 <span class="g">+ 10</span> = x − 10 <span class="g">+ 10</span>',L2:[T(50)],R2:[X()],a:50,ck:'40 = 50 − 10',swap:true}
+];
+const hl=s=>s.replace(/x/g,bx('x'));
+ex.forEach(e=>{
+ const tg='Ahora tú · ejercicio '+e.n;
+ steps.push({tag:tg,t:'Resuelve en tu cuaderno',x:'¿Qué le hicieron a la <b>x</b>? ¿Qué hago en los dos lados?',L:e.L0,R:e.R0,tilt:0,eq:hl(e.q)});
+ steps.push({tag:tg,t:'Corregimos',x:'<b>Lo que hago en un lado, lo hago en el otro.</b>',L:e.L1,R:e.R1,tilt:0,eq:hl(e.e1)});
+ steps.push({tag:tg,t:'Resultado',x:`Compruebo: <b>${e.ck}</b> <span style="color:var(--green)">✓</span>`,L:e.L2||[X()],R:e.R2,tilt:0,eq:e.swap?`${e.a} = ${bx('x')}`:`${bx('x')} = ${e.a}`});
+});
+const svg=document.getElementById('svg'),board=document.getElementById('board'),dots=document.getElementById('dots'),tag=document.getElementById('tag');
+const prev=document.getElementById('prev'),next=document.getElementById('next');
+const PX=400,PY=110,ARM=270,ANG=9,S=34,G=5;
+svg.innerHTML=`
+ <defs><linearGradient id="wg" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="var(--wood)"/><stop offset="1" stop-color="var(--woodD)"/></linearGradient></defs>
+ <ellipse cx="400" cy="384" rx="150" ry="10" fill="#000" opacity=".08"/>
+ <path d="M330 382 L470 382 L450 360 L350 360 Z" fill="url(#wg)"/>
+ <rect x="390" y="${PY}" width="20" height="252" rx="6" fill="url(#wg)"/>
+ <g class="pan" id="panL"></g><g class="pan" id="panR"></g>
+ <g id="beam" style="transform-box:view-box;transform-origin:${PX}px ${PY}px">
+   <rect x="${PX-ARM-14}" y="${PY-8}" width="${2*ARM+28}" height="16" rx="8" fill="url(#wg)"/>
+   <circle cx="${PX-ARM}" cy="${PY}" r="7" fill="var(--woodD)"/><circle cx="${PX+ARM}" cy="${PY}" r="7" fill="var(--woodD)"/>
+ </g>
+ <circle cx="${PX}" cy="${PY}" r="15" fill="var(--box)" stroke="var(--boxD)" stroke-width="4"/>
+ <polygon points="${PX-9},${PY-22} ${PX+9},${PY-22} ${PX},${PY-8}" fill="var(--red)"/>`;
+const panL=document.getElementById('panL'),panR=document.getElementById('panR'),beam=document.getElementById('beam');
+function cube(x,y,st){
+  if(st==='h')return `<rect x="${x+1}" y="${y+1}" width="${S-2}" height="${S-2}" rx="5" fill="none" stroke="var(--soft)" stroke-width="2.5" stroke-dasharray="5 4"/>`;
+  const fill=st==='f'?'var(--green)':'var(--cube)',dark=st==='f'?'#0c7a43':'var(--cubeD)';
+  let s=`<g opacity="${st==='x'?.35:1}"><rect x="${x}" y="${y}" width="${S}" height="${S}" rx="5" fill="${fill}"/><rect x="${x}" y="${y+S-7}" width="${S}" height="7" rx="3" fill="${dark}"/><rect x="${x+5}" y="${y+5}" width="${S-16}" height="5" rx="2.5" fill="#fff" opacity=".45"/></g>`;
+  if(st==='x')s+=`<path d="M${x+3} ${y+3} L${x+S-3} ${y+S-3} M${x+S-3} ${y+3} L${x+3} ${y+S-3}" stroke="var(--red)" stroke-width="5" stroke-linecap="round"/>`;
+  if(st==='n')s+=`<rect x="${x-3}" y="${y-3}" width="${S+6}" height="${S+6}" rx="8" fill="none" stroke="var(--green)" stroke-width="4"/>`;
+  return s;
+}
+function pan(items){
+  const w=230,base=250;let s=`<line x1="-${w/2-10}" y1="${base-6}" x2="0" y2="0" stroke="var(--soft)" stroke-width="2.5"/><line x1="${w/2-10}" y1="${base-6}" x2="0" y2="0" stroke="var(--soft)" stroke-width="2.5"/>`;
+  s+=`<path d="M-${w/2} ${base} L${w/2} ${base} Q${w/2-20} ${base+26} 0 ${base+26} Q-${w/2-20} ${base+26} -${w/2} ${base} Z" fill="url(#wg)"/>`;
+  let cx=-w/2+14;const b=items.find(i=>i.k==='b');
+  if(b){const B=64,x=-w/2+12,y=base-B-2;
+    s+=`<rect x="${x}" y="${y}" width="${B}" height="${B}" rx="9" fill="var(--box)"/><rect x="${x}" y="${y+B-10}" width="${B}" height="10" rx="4" fill="var(--boxD)"/><text x="${x+B/2}" y="${y+B/2+13}" text-anchor="middle" font-family="Baloo 2,sans-serif" font-weight="800" font-size="${String(b.v).length>1?32:38}" fill="#fff">${b.v}</text>`;
+    cx=x+B+G+2;}
+  const tags=items.filter(i=>i.k==='t');
+  tags.forEach((t,k)=>{const tw=96,th=44,x=cx,y=base-th-2-k*(th+G);
+    if(t.st==='h'){s+=`<rect x="${x+1}" y="${y+1}" width="${tw-2}" height="${th-2}" rx="10" fill="none" stroke="var(--soft)" stroke-width="2.5" stroke-dasharray="6 4"/><text x="${x+tw/2}" y="${y+th/2+9}" text-anchor="middle" font-family="Baloo 2,sans-serif" font-weight="800" font-size="24" fill="var(--soft)">${t.v}</text>`;return}
+    const f=t.st==='f'?'var(--green)':'var(--cube)';
+    s+=`<g opacity="${t.st==='x'?.35:1}"><rect x="${x}" y="${y}" width="${tw}" height="${th}" rx="10" fill="${f}"/><text x="${x+tw/2}" y="${y+th/2+10}" text-anchor="middle" font-family="Baloo 2,sans-serif" font-weight="800" font-size="28" fill="#fff">${t.v}</text></g>`;
+    if(t.st==='x')s+=`<path d="M${x+8} ${y+6} L${x+tw-8} ${y+th-6} M${x+tw-8} ${y+6} L${x+8} ${y+th-6}" stroke="var(--red)" stroke-width="5" stroke-linecap="round"/>`;
+    if(t.st==='n')s+=`<rect x="${x-3}" y="${y-3}" width="${tw+6}" height="${th+6}" rx="13" fill="none" stroke="var(--green)" stroke-width="4"/>`;
+  });
+  const rest=items.filter(i=>i.k!=='b'&&i.k!=='t'),per=Math.max(1,Math.floor((w/2-8-cx)/(S+G))+0);
+  rest.forEach((it,i)=>{const col=i%per,row=Math.floor(i/per);s+=cube(cx+col*(S+G),base-S-2-row*(S+G),it.k==='h'?'h':it.st)});
+  return s;
+}
+let i=0;
+dots.innerHTML=steps.map(()=>'<i></i>').join('');
+function render(){
+  const st=steps[i],a=st.tilt*ANG,r=a*Math.PI/180;
+  beam.style.transform=`rotate(${a}deg)`;
+  const lx=PX-ARM*Math.cos(r),ly=PY-ARM*Math.sin(r),rx=PX+ARM*Math.cos(r),ry=PY+ARM*Math.sin(r);
+  panL.style.transform=`translate(${lx}px,${ly}px)`;panR.style.transform=`translate(${rx}px,${ry}px)`;
+  panL.innerHTML=pan(st.L);panR.innerHTML=pan(st.R);
+  tag.innerHTML=`<b>${st.tag}</b> · paso ${i+1} de ${steps.length}`;
+  [...dots.children].forEach((d,k)=>d.className=k===i?'on':k<i?'done':'');
+  board.innerHTML=st.fin?`<div class="final pop"><p class="big">Lo que hago en un lado, lo hago en el otro.</p><p>Si hay <span style="color:var(--green)">+</span>, hago <span style="color:var(--red)">−</span>. &nbsp; Si hay <span style="color:var(--red)">−</span>, hago <span style="color:var(--green)">+</span>.</p><p>Y siempre compruebo <span style="color:var(--green)">✓</span></p></div>`
+   :`<h1 class="pop">${st.t}</h1><p class="txt pop">${st.x}</p><div class="eq pop">${st.eq||'&nbsp;'}</div>`;
+  document.getElementById('fig').style.display=st.fin?'none':'';
+  prev.disabled=i===0;next.disabled=i===steps.length-1;
+}
+prev.addEventListener('click',()=>{if(i>0){i--;render()}});
+next.addEventListener('click',()=>{if(i<steps.length-1){i++;render()}});
+document.addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key===' '||e.key==='PageDown'){e.preventDefault();next.click()}if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();prev.click()}});
+document.getElementById('fs').addEventListener('click',()=>{try{document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen().catch(()=>{})}catch(e){}});
+render();
+}
+</script>
+</body>
+</html>
