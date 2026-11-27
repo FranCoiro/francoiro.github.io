@@ -15,6 +15,20 @@
   ],
   "clases": [
     {
+      "curso": "3basico",
+      "asignatura": "Geometría",
+      "fecha": "2026-11-27",
+      "titulo": "Clasificación de ángulos: agudo, recto y obtuso",
+      "descripcion": "Clase para proyectar, paso a paso. Objetivo para copiar en el cuaderno, «Mi escuadra de papel» (doblar una hoja dos veces para obtener un ángulo recto y comparar) y los tres tipos de ángulo. Ejercicios en el cuaderno: 1) clasificar 8 ángulos en distintas posiciones (A, R u O), 2) el ángulo de los punteros en 6 relojes, 3) contar los ángulos rectos de 4 figuras y 4) dibujar un ángulo de cada tipo. Las respuestas de los ejercicios 1, 2 y 3 aparecen al hacer clic en cada recuadro. Cierre con ticket de salida. Se avanza con botones o flechas; incluye pantalla completa.",
+      "carpeta": "3basico/2026-11-27-clasificacion-de-angulos/",
+      "materiales": [
+        {
+          "nombre": "Presentación",
+          "archivo": "index.html"
+        }
+      ]
+    },
+    {
       "curso": "4basico",
       "asignatura": "Matemática",
       "fecha": "2026-11-24",
